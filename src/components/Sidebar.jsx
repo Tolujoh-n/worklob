@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import stx from "../assets/img/stacks.png";
-import worklob from "../assets/img/worklob-logo-cp.png";
+import worklob from "../assets/img/worklob-coin.png";
 import useimage from "../assets/address.jpg";
 import Modal from "./Modal";
 

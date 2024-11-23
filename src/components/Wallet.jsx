@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import near from "../assets/img/nearlogo.jpg";
-import neargig from "../assets/img/neargig-logo.png";
+import STX from "../assets/img/stacks.png";
+import sbtc from "../assets/img/btc.png";
+import lobcoin from "../assets/img/worklob-coin.png";
 
 const Wallet = () => {
   // Initialize state for transaction data
@@ -8,29 +9,29 @@ const Wallet = () => {
     {
       type: "Deposit",
       date: "2024-08-30",
-      cryptocurrency: "NEAR",
-      transactionId: "0x123456789abcdef",
-      amount: "100 NEAR",
+      cryptocurrency: "STX",
+      transactionId: "sp123456789abcdef",
+      amount: "100 STX",
     },
     {
       type: "Withdrawal",
       date: "2024-08-28",
-      cryptocurrency: "NGIG",
-      transactionId: "0xa1b2c3d4e5f67890",
-      amount: "50 NGIG",
+      cryptocurrency: "LOB",
+      transactionId: "spa1b2c3d4e5f67890",
+      amount: "50 LOB",
     },
     {
       type: "Swap",
       date: "2024-08-27",
-      cryptocurrency: "NEAR to NGIG",
-      transactionId: "0xabcdef123456789",
-      amount: "25 NEAR",
+      cryptocurrency: "STX to LOB",
+      transactionId: "spabcdef123456789",
+      amount: "25 STX",
     },
     {
       type: "Deposit",
       date: "2024-08-26",
       cryptocurrency: "USDT",
-      transactionId: "0x0f9e8d7c6b5a4321",
+      transactionId: "sp0f9e8d7c6b5a4321",
       amount: "200 USDT",
     },
   ]);
@@ -55,7 +56,7 @@ const Wallet = () => {
           <div className="wallet-card">
             <div className="wallet-header">
               <h2>Wallet Address</h2>
-              <span>Available Balance: 0.00 NEAR</span>
+              <span>Available Balance: 0.00 STX</span>
             </div>
             <table className="wallet-table">
               <thead>
@@ -68,16 +69,23 @@ const Wallet = () => {
               <tbody>
                 <tr>
                   <td>
-                    <img src={near} alt="NEAR" className="token-logo" /> NEAR
+                    <img src={STX} alt="STX" className="token-logo" /> STX
                   </td>
-                  <td>0 NEAR</td>
+                  <td>0 STX</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>
                   <td>
-                    <img src={neargig} alt="NGIG" className="token-logo" /> NGIG
+                    <img src={sbtc} alt="LOB" className="token-logo" /> sBTC
                   </td>
-                  <td>0 NGIG</td>
+                  <td>0 sBTC</td>
+                  <td>0.00 USDT</td>
+                </tr>
+                <tr>
+                  <td>
+                    <img src={lobcoin} alt="LOB" className="token-logo" /> LOB
+                  </td>
+                  <td>0 LOB</td>
                   <td>0.00 USDT</td>
                 </tr>
               </tbody>
@@ -114,16 +122,16 @@ const Wallet = () => {
               <tbody>
                 <tr>
                   <td>
-                    <img src={near} alt="NEAR" className="token-logo" /> NEAR
+                    <img src={STX} alt="STX" className="token-logo" /> STX
                   </td>
-                  <td>0 NEAR</td>
+                  <td>0 STX</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>
                   <td>
-                    <img src={neargig} alt="NGIG" className="token-logo" /> NGIG
+                    <img src={lobcoin} alt="LOB" className="token-logo" /> LOB
                   </td>
-                  <td>0 NGIG</td>
+                  <td>0 LOB</td>
                   <td>0.00 USDT</td>
                 </tr>
               </tbody>
