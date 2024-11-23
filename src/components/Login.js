@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/img/ngig-logo.png";
+import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import { Toaster, toast } from "sonner";
 import near from "../assets/img/nearlogo.jpg";
 import axios from "axios";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -33,7 +33,7 @@ const Login = () => {
 
     if (!validateForm()) return;
 
-    setLoading(true); 
+    setLoading(true);
     try {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
@@ -43,13 +43,13 @@ const Login = () => {
       });
 
       if (response.status === 200) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         toast.success("Login successful!");
         setTimeout(() => {
           navigate("/dashboard");
         }, 2000);
-            }
+      }
     } catch (error) {
       console.error("Login error", error);
 
@@ -60,7 +60,7 @@ const Login = () => {
         toast.error("An error occurred. Please try again later.");
       }
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -111,7 +111,7 @@ const Login = () => {
               type="submit"
               id="optionbut"
               onClick={handleSubmit}
-              disabled={loading} 
+              disabled={loading}
             >
               {loading ? "Logging in..." : "Login"}
             </button>

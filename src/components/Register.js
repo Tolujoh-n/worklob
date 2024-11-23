@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/img/ngig-logo.png";
+import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import near from "../assets/img/nearlogo.jpg";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
@@ -50,27 +50,29 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/v1/user/signup', {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        role: formData.role,
-      });
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/user/signup",
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          role: formData.role,
+        }
+      );
 
       if (response.status === 200) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        toast.success('User registered successfully!');
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        toast.success("User registered successfully!");
         setTimeout(() => {
           navigate("/dashboard");
-
         }, 2000);
       }
     } catch (e) {
       if (e.response && e.response.data.errors) {
         e.response.data.errors.forEach((error) => {
-          toast.error(error.message); 
+          toast.error(error.message);
         });
       } else if (e.response && e.response.data.msg) {
         toast.error(e.response.data.msg || "Error during registration");

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import near from "../assets/img/nearlogo.jpg";
-import neargig from "../assets/img/neargig-logo.png";
+import stx from "../assets/img/stacks.png";
+import worklob from "../assets/img/worklob-logo-cp.png";
 import useimage from "../assets/address.jpg";
 import Modal from "./Modal";
 
@@ -15,8 +15,8 @@ const Hiring = [
 
 const Sidebar = () => {
   const [isGamemodalOpen, setIsGamemodalOpen] = useState(false);
-  const [nearBalance, setnearBalance] = useState("0");
-  const [neargigBalance, setneargigBalance] = useState("0");
+  const [stxBalance, setstxBalance] = useState("0");
+  const [worklobBalance, setworklobBalance] = useState("0");
 
   const handleGamemodalClick = () => {
     setIsGamemodalOpen(true);
@@ -41,19 +41,19 @@ const Sidebar = () => {
             <h5 className="card-title">Balance:</h5>
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={near} alt="" />
+                <img id="balance" src={stx} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{nearBalance} NEAR</h6>
+                <h6>{stxBalance} STX</h6>
               </div>
             </div>
             <hr />
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={neargig} alt="" />
+                <img id="balance" src={worklob} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{neargigBalance} NGIG</h6>
+                <h6>{worklobBalance} LOB</h6>
               </div>
             </div>
           </div>

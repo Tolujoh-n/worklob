@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/img/ngig-logo.png";
+import logo from "../assets/img/worklob-logo-cp.png";
 import Connectwallet from "./walletconnect/Connectwallet";
 
 // import logo from "../assets/img/logo.png";
@@ -31,7 +31,9 @@ const Navbar = () => {
             className="h-[90px] w-[70px] object-cover"
           />
 
-          <span className="d-none d-lg-block">NearGigs</span>
+          <span style={{ color: "#efbe2a" }} className="d-none d-lg-block">
+            WorkLob
+          </span>
         </Link>
       </div>
       {/* End Logo */}
