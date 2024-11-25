@@ -8,28 +8,35 @@ require("dotenv").config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "tushar";
 
-// Zod schemas
 const signupBody = z
   .object({
     username: z.string().min(1, { message: "Username is required" }),
     email: z.string().email({ message: "Invalid email format" }),
-    password: z.string().min(6).optional(),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters long" }),
     role: z.enum(["Customer", "Talent"]),
-    wallet: z.string().optional(), // Wallet address for wallet-based registration
-    confirmPassword: z.string().optional(),
+    confirmPassword: z.string().min(6, {
+      message: "Confirm password must be at least 6 characters long",
+    }),
   })
-  .refine((data) => !data.password || data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords do not match",
   });
 
 const signinBody = z.object({
   username: z.string().min(1, { message: "Username is required" }),
-  password: z.string().min(6).optional(),
-  wallet: z.string().optional(),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long" }),
 });
 
-// Signup endpoint
+const changePasswordBody = z.object({
+  oldPassword: z.string().min(6),
+  newPassword: z.string().min(6),
+});
+
 router.post("/signup", async (req, res) => {
   const parsed = signupBody.safeParse(req.body);
 
@@ -41,29 +48,27 @@ router.post("/signup", async (req, res) => {
   }
 
   try {
-    const { email, username, password, wallet, role } = req.body;
+    const { email, username, password, role } = req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ $or: [{ email }, { wallet }] });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ msg: "Email or Wallet already taken" });
+      return res.status(409).json({ msg: "Email already taken" });
     }
 
-    const hashedPassword = password ? await bcrypt.hash(password, 12) : null;
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create new user
     const user = await User.create({
       username,
       email,
       password: hashedPassword,
-      wallet,
       role,
     });
 
     const userId = user._id;
+
     const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
 
-    return res.status(201).json({
+    return res.status(200).json({
       msg: "User account created successfully",
       token,
       user: {
@@ -78,11 +83,51 @@ router.post("/signup", async (req, res) => {
     return res.status(500).json({ msg: "Server error during signup" });
   }
 });
+router.post("/wallet-signup", async (req, res) => {
+  const { email, username, walletAddress, role } = req.body;
 
-// Signin endpoint
+  if (!email || !username || !walletAddress || !role) {
+    return res.status(400).json({ msg: "All fields are required" });
+  }
+
+  try {
+    // Check if the wallet address is already registered
+    const existingUser = await User.findOne({ walletAddress });
+    if (existingUser) {
+      return res.status(409).json({ msg: "Wallet address already registered" });
+    }
+
+    // Create a new user
+    const user = await User.create({
+      username,
+      email,
+      walletAddress,
+      role,
+    });
+
+    const userId = user._id;
+
+    // Generate a token
+    const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
+
+    return res.status(200).json({
+      msg: "User registered successfully",
+      token,
+      user: {
+        id: userId,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Error during wallet signup:", error.message);
+    return res.status(500).json({ msg: "Server error during wallet signup" });
+  }
+});
+
 router.post("/signin", async (req, res) => {
   const parsed = signinBody.safeParse(req.body);
-
   if (!parsed.success) {
     return res.status(400).json({
       msg: "Invalid input",
@@ -91,20 +136,16 @@ router.post("/signin", async (req, res) => {
   }
 
   try {
-    const { username, password, wallet } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ $or: [{ username }, { wallet }] });
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    if (password) {
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ msg: "Invalid username or password" });
-      }
-    } else if (wallet && wallet !== user.wallet) {
-      return res.status(400).json({ msg: "Invalid wallet address" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid username or password" });
     }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
@@ -116,25 +157,50 @@ router.post("/signin", async (req, res) => {
       token,
       user: { username: user.username, email: user.email, role: user.role },
     });
-  } catch (error) {
-    console.error("Error during signin:", error);
+  } catch (err) {
+    console.error("Error during signin:", err.message);
     return res.status(500).json({ msg: "Server error during signin" });
   }
 });
+router.post("/wallet-login", async (req, res) => {
+  const { walletAddress } = req.body;
 
-// Additional endpoints (unchanged)
+  if (!walletAddress) {
+    return res.status(400).json({ msg: "Wallet address is required" });
+  }
+
+  try {
+    const user = await User.findOne({ walletAddress });
+
+    if (!user) {
+      return res.status(200).json({ registered: false });
+    }
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res.status(200).json({
+      registered: true,
+      token,
+      user: { username: user.username, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error("Error during wallet login:", error.message);
+    return res.status(500).json({ msg: "Server error during wallet login" });
+  }
+});
+
 router.post("/userid", async (req, res) => {
   try {
     const { userId } = req.body;
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     return res.status(200).json({ user });
   } catch (e) {
-    return res.status(500).json({ msg: "Error retrieving user" });
+    return res.status(500).json({ Eroro });
   }
 });
 
@@ -163,7 +229,6 @@ router.post("/change-role", async (req, res) => {
 });
 
 router.post("/change-password/:userId", async (req, res) => {
-  // eslint-disable-next-line no-undef
   const parsed = changePasswordBody.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({

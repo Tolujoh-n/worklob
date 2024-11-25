@@ -10,6 +10,8 @@ const WalletRegister = () => {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
+    walletAddress: "",
+    role: "",
   });
   const [roleSelected, setRoleSelected] = useState(false);
   const { connectWallet, account, connected } = useWeb3();
@@ -25,28 +27,36 @@ const WalletRegister = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleConnectAndRegister = async () => {
-    if (!formData.username || !formData.email) {
-      toast.error("Please fill all fields!");
+  const handleWalletConnect = async () => {
+    try {
+      await connectWallet();
+      setFormData((prevData) => ({ ...prevData, walletAddress: account }));
+      toast.success("Wallet connected successfully!");
+    } catch (error) {
+      toast.error("Failed to connect wallet.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.role) {
+      toast.error("Please select your role!");
       return;
     }
 
-    if (!connected) {
-      await connectWallet();
-    }
-
-    if (!connected || !account) {
-      toast.error("Wallet connection failed. Please try again.");
+    if (!formData.username || !formData.email || !formData.walletAddress) {
+      toast.error("Please fill all fields and connect your wallet!");
       return;
     }
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/user/signup",
+        "http://localhost:8080/api/v1/user/wallet-signup",
         {
           username: formData.username,
           email: formData.email,
-          walletAddress: account,
+          walletAddress: formData.walletAddress,
           role: formData.role,
         }
       );
@@ -81,7 +91,7 @@ const WalletRegister = () => {
 
         <div className="auth-box">
           <div>
-            <h2>Register with Wallet</h2>
+            <h2>Register</h2>
           </div>
 
           {!roleSelected ? (
@@ -93,6 +103,7 @@ const WalletRegister = () => {
                 margin: "20px 0",
               }}
             >
+              {/* Customer Card */}
               <div onClick={() => handleRoleSelect("Customer")} id="role-reg">
                 <span style={{ fontSize: "50px", marginBottom: "10px" }}>
                   👥
@@ -103,6 +114,7 @@ const WalletRegister = () => {
                 </div>
               </div>
 
+              {/* Talent Card */}
               <div onClick={() => handleRoleSelect("Talent")} id="role-reg">
                 <span style={{ fontSize: "50px", marginBottom: "10px" }}>
                   💼
@@ -114,7 +126,7 @@ const WalletRegister = () => {
               </div>
             </div>
           ) : (
-            <>
+            <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="username">Username</label>
                 <input
@@ -137,10 +149,22 @@ const WalletRegister = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="walletAddress">Wallet Address</label>
+                <input
+                  type="text"
+                  id="walletAddress"
+                  name="walletAddress"
+                  placeholder="Connect your wallet"
+                  value={formData.walletAddress}
+                  disabled
+                />
+              </div>
               <button
                 id="connbtn"
-                onClick={handleConnectAndRegister}
-                style={{ marginTop: "20px" }}
+                type="button"
+                style={{ marginBottom: "20px" }}
+                onClick={handleWalletConnect}
               >
                 <img
                   src={stx}
@@ -152,9 +176,12 @@ const WalletRegister = () => {
                     marginRight: "8px",
                   }}
                 />
-                {connected ? "Register with Wallet" : "Connect Wallet"}
+                {connected ? "Wallet Connected" : "Connect Wallet"}
               </button>
-            </>
+              <button id="optionbut" type="submit">
+                Sign Up
+              </button>
+            </form>
           )}
           <p>
             Already have an account? <Link to="/login">Login</Link>

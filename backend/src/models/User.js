@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -13,25 +14,16 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     password: {
-      type: String,
-      required: function () {
-        // Password is required only if the user is not using wallet-based registration
-        return !this.walletAddress;
-      },
+      type: String, // Password is optional for wallet-based users
     },
     walletAddress: {
-      type: String,
+      type: String, // Unique for wallet-based users
       unique: true,
-      sparse: true, // Allows this field to be optional for users without wallets
+      sparse: true, // Allows `walletAddress` to be optional for password-based users
     },
     role: {
       type: String,
       enum: ["Customer", "Talent"],
-      required: true,
-    },
-    accountType: {
-      type: String,
-      enum: ["Wallet", "Password"],
       required: true,
     },
     postedFullTimeJobs: [
@@ -48,18 +40,23 @@ const userSchema = new mongoose.Schema(
     ],
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );
 
-// Pre-save hook to ensure proper handling of password or wallet registration
+// Middleware to hash passwords before saving the user (for password-based signup)
 userSchema.pre("save", async function (next) {
-  if (this.password && this.isModified("password")) {
-    const bcrypt = require("bcryptjs");
+  if (this.isModified("password") && this.password) {
     this.password = await bcrypt.hash(this.password, 12);
   }
   next();
 });
+
+// Method to compare passwords during login
+userSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false; // No password set for wallet-based users
+  return bcrypt.compare(password, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

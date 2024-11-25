@@ -4,8 +4,10 @@ import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import stx from "../assets/img/stx-wallet.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
+import { useWeb3 } from "../Web3Provider";
 
 const Register = () => {
+  const { connectWallet, account, connected } = useWeb3();
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -24,6 +26,10 @@ const Register = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleConnectClick = () => {
+    navigate("/wallet-register");
   };
 
   const handleSubmit = async (e) => {
@@ -176,8 +182,11 @@ const Register = () => {
                   Sign Up
                 </button>
               </form>
-
-              <button id="connbtn" style={{ marginTop: "20px" }}>
+              <button
+                id="connbtn"
+                style={{ marginTop: "20px" }}
+                onClick={handleConnectClick}
+              >
                 <img
                   src={stx}
                   alt="Wallet"
