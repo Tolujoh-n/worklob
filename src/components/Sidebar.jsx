@@ -4,6 +4,7 @@ import stx from "../assets/img/stacks.png";
 import worklob from "../assets/img/worklob-coin.png";
 import useimage from "../assets/address.jpg";
 import Modal from "./Modal";
+import { useWeb3 } from "../Web3Provider";
 
 const Hiring = [
   { id: 1, title: "Tolujohn Bob", jobs: "1" },
@@ -15,7 +16,7 @@ const Hiring = [
 
 const Sidebar = () => {
   const [isGamemodalOpen, setIsGamemodalOpen] = useState(false);
-  const [stxBalance, setstxBalance] = useState("0");
+  const { account, btcBalance, stxBalance } = useWeb3();
   const [worklobBalance, setworklobBalance] = useState("0");
 
   const handleGamemodalClick = () => {
@@ -44,7 +45,7 @@ const Sidebar = () => {
                 <img id="balance" src={stx} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{stxBalance} STX</h6>
+                <h6>{parseFloat(stxBalance).toFixed(2)} STX</h6>
               </div>
             </div>
             <hr />
