@@ -4,16 +4,15 @@ import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import stx from "../assets/img/stx-wallet.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
+import { useWeb3 } from "../Web3Provider";
 
-const Register = () => {
+const WalletRegister = () => {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
-    password: "",
-    confirmPassword: "",
-    role: "",
   });
   const [roleSelected, setRoleSelected] = useState(false);
+  const { connectWallet, account, connected } = useWeb3();
   const navigate = useNavigate();
 
   const handleRoleSelect = (role) => {
@@ -26,26 +25,18 @@ const Register = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.role) {
-      toast.error("Please select your role!");
-      return;
-    }
-
-    if (
-      !formData.email ||
-      !formData.username ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
+  const handleConnectAndRegister = async () => {
+    if (!formData.username || !formData.email) {
       toast.error("Please fill all fields!");
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
+    if (!connected) {
+      await connectWallet();
+    }
+
+    if (!connected || !account) {
+      toast.error("Wallet connection failed. Please try again.");
       return;
     }
 
@@ -55,8 +46,7 @@ const Register = () => {
         {
           username: formData.username,
           email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
+          walletAddress: account,
           role: formData.role,
         }
       );
@@ -91,7 +81,7 @@ const Register = () => {
 
         <div className="auth-box">
           <div>
-            <h2>Register</h2>
+            <h2>Register with Wallet</h2>
           </div>
 
           {!roleSelected ? (
@@ -103,7 +93,6 @@ const Register = () => {
                 margin: "20px 0",
               }}
             >
-              {/* Customer Card */}
               <div onClick={() => handleRoleSelect("Customer")} id="role-reg">
                 <span style={{ fontSize: "50px", marginBottom: "10px" }}>
                   👥
@@ -114,7 +103,6 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Talent Card */}
               <div onClick={() => handleRoleSelect("Talent")} id="role-reg">
                 <span style={{ fontSize: "50px", marginBottom: "10px" }}>
                   💼
@@ -127,57 +115,33 @@ const Register = () => {
             </div>
           ) : (
             <>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="username">Username</label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Enter your username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="password">Password</label>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="confirmPassword">Confirm Password</label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <button id="optionbut" type="submit">
-                  Sign Up
-                </button>
-              </form>
-
-              <button id="connbtn" style={{ marginTop: "20px" }}>
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="Enter your username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <button
+                id="connbtn"
+                onClick={handleConnectAndRegister}
+                style={{ marginTop: "20px" }}
+              >
                 <img
                   src={stx}
                   alt="Wallet"
@@ -188,7 +152,7 @@ const Register = () => {
                     marginRight: "8px",
                   }}
                 />
-                Connect Wallet
+                {connected ? "Register with Wallet" : "Connect Wallet"}
               </button>
             </>
           )}
@@ -202,4 +166,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default WalletRegister;

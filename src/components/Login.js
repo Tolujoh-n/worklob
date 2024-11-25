@@ -1,14 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import { Toaster, toast } from "sonner";
-import near from "../assets/img/nearlogo.jpg";
+import stx from "../assets/img/stx-wallet.png";
 import axios from "axios";
+import { useWeb3 } from "../Web3Provider";
 
 const Login = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({
+    usernameOrEmail: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
+  const { connected, account, connectWallet } = useWeb3();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Automatically login when wallet is connected
+    if (connected && account) {
+      handleWalletLogin();
+    }
+  }, [connected, account]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -16,7 +28,7 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    if (!formData.username || !formData.password) {
+    if (!formData.usernameOrEmail || !formData.password) {
       toast.error("Please fill all fields!");
       return false;
     }
@@ -27,7 +39,32 @@ const Login = () => {
     return true;
   };
 
-  // Handle form submit
+  const handleWalletLogin = async () => {
+    setLoading(true);
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+      const response = await axios.post(`${API_URL}/api/v1/user/signin`, {
+        walletAddress: account,
+      });
+
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        toast.success("Login successful!");
+        setTimeout(() => navigate("/dashboard"), 2000);
+      } else if (response.status === 204) {
+        toast.info("Wallet not registered. Redirecting to registration...");
+        setTimeout(() => navigate("/wallet-register"), 2000);
+      }
+    } catch (error) {
+      console.error("Wallet login error", error);
+      toast.error("An error occurred during wallet login. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -38,7 +75,7 @@ const Login = () => {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
       const response = await axios.post(`${API_URL}/api/v1/user/signin`, {
-        username: formData.username,
+        usernameOrEmail: formData.usernameOrEmail,
         password: formData.password,
       });
 
@@ -46,9 +83,7 @@ const Login = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         toast.success("Login successful!");
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2000);
+        setTimeout(() => navigate("/dashboard"), 2000);
       }
     } catch (error) {
       console.error("Login error", error);
@@ -84,13 +119,13 @@ const Login = () => {
           </div>
           <div>
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="usernameOrEmail">Username or Email</label>
               <input
                 type="text"
-                id="username"
-                name="username"
-                placeholder="Enter your username"
-                value={formData.username}
+                id="usernameOrEmail"
+                name="usernameOrEmail"
+                placeholder="Enter your username or email"
+                value={formData.usernameOrEmail}
                 onChange={handleInputChange}
               />
             </div>
@@ -119,9 +154,13 @@ const Login = () => {
           <p>
             Don't have an account? <Link to="/register">Register</Link>
           </p>
-          <button id="connbtn">
+          <button
+            onClick={connected ? handleWalletLogin : connectWallet}
+            id="connbtn"
+            disabled={loading}
+          >
             <img
-              src={near}
+              src={stx}
               alt="Wallet"
               style={{
                 width: "24px",
@@ -130,7 +169,7 @@ const Login = () => {
                 marginRight: "8px",
               }}
             />
-            Connect Wallet
+            {connected ? "Login with Wallet" : "Connect Wallet"}
           </button>
         </div>
         <Toaster />
