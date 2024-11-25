@@ -61,33 +61,41 @@ const Login = () => {
     if (!connected) {
       await connectWallet();
     }
-    if (!account) {
-      toast.error("Wallet not connected!");
-      return;
-    }
+  };
 
-    try {
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
-      const response = await axios.post(`${API_URL}/api/v1/user/wallet-login`, {
-        walletAddress: account,
-      });
+  useEffect(() => {
+    const loginWithWallet = async () => {
+      if (connected && account) {
+        try {
+          const API_URL =
+            process.env.REACT_APP_API_URL || "http://localhost:8080";
+          const response = await axios.post(
+            `${API_URL}/api/v1/user/wallet-login`,
+            {
+              walletAddress: account,
+            }
+          );
 
-      if (response.status === 200) {
-        if (response.data.registered) {
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-          toast.success("Wallet login successful!");
-          setTimeout(() => navigate("/dashboard"), 2000);
-        } else {
-          toast.info("Wallet not registered! Redirecting...");
-          navigate("/wallet-register");
+          if (response.status === 200) {
+            if (response.data.registered) {
+              localStorage.setItem("token", response.data.token);
+              localStorage.setItem("user", JSON.stringify(response.data.user));
+              toast.success("Wallet login successful!");
+              navigate("/dashboard");
+            } else {
+              toast.info("Wallet not registered! Redirecting...");
+              navigate("/wallet-register");
+            }
+          }
+        } catch (error) {
+          console.error("Wallet login error", error);
+          toast.error("An error occurred during wallet login.");
         }
       }
-    } catch (error) {
-      console.error("Wallet login error", error);
-      toast.error("An error occurred during wallet login.");
-    }
-  };
+    };
+
+    loginWithWallet();
+  }, [connected, account, navigate]);
 
   return (
     <div>
