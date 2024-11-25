@@ -4,10 +4,8 @@ import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import stx from "../assets/img/stx-wallet.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
-import { useWeb3 } from "../Web3Provider";
 
 const Register = () => {
-  const { connectWallet, account, connected } = useWeb3();
   const [formData, setFormData] = useState({
     email: "",
     username: "",
