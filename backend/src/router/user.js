@@ -138,14 +138,18 @@ router.post("/signin", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({
+      $or: [{ username }, { email: username }],
+    });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid username or password" });
+    const isMatch = await user.comparePassword(password);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ msg: "User not found. Check username or email." });
     }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
