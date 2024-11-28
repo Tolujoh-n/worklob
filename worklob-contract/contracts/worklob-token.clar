@@ -16,7 +16,7 @@
 
 (define-data-var token-name (string-ascii 32) "Worklob")
 (define-data-var token-symbol (string-ascii 10) "LOB")
-(define-data-var token-uri (optional (string-utf8 256)) (some u"https://worklob.rocks/api/metadata/SP2ZNGJ85ENDY6QRHQ5P2D4FXKGZWCKTB2T0Z55KS.worklob-token.json"))
+(define-data-var token-uri (optional (string-utf8 256)) (some u"https://aqua-impressive-rook-631.mypinata.cloud/ipfs/Qmce7R1HSuhrRCRKUvdgE4byUMyC4LhZDukqU7mJrJVCtT"))
 (define-data-var token-decimals uint u6)
 
 (define-data-var block-counter uint u0)
