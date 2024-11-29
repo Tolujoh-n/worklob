@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/address.jpg";
-import near from "../../assets/img/nearlogo.jpg";
-import neargig from "../../assets/img/neargig-logo.png";
+import stx from "../../assets/img/stacks.png";
+import worklob from "../../assets/img/worklob-coin.png";
 import "./chat.css";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 const Chat = () => {
   const [activeCategory, setActiveCategory] = useState("Freelance");
-  const [nearBalance, setNearBalance] = useState("0");
-  const [neargigBalance, setNeargigBalance] = useState("0");
+  const [stxBalance, setStxBalance] = useState("0");
+  const [worklobBalance, setWorklobBalance] = useState("0");
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
@@ -25,7 +25,9 @@ const Chat = () => {
   useEffect(() => {
     const fetchCustomerJobs = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/chat/allchats/${userId}`);
+        const response = await axios.get(
+          `${API_URL}/api/v1/chat/allchats/${userId}`
+        );
         setJobs(response.data);
       } catch (error) {
         console.error("Error fetching customer jobs:", error);
@@ -37,7 +39,7 @@ const Chat = () => {
     fetchCustomerJobs();
   }, [API_URL, userId]);
 
-  const filteredChats = jobs.filter(chat => {
+  const filteredChats = jobs.filter((chat) => {
     if (activeCategory === "Freelance") return chat.jobType === "FreelanceJob";
     if (activeCategory === "Full-Time") return chat.jobType === "FullTimeJob";
     if (activeCategory === "GigJob") return chat.jobType === "GigJob";
@@ -93,13 +95,17 @@ const Chat = () => {
                 {loading ? (
                   <p>Loading chats...</p>
                 ) : (
-                  filteredChats.map(chat => (
+                  filteredChats.map((chat) => (
                     <Link
                       key={chat._id}
                       to={`/dashboard/chatdetails/${chat.jobId}/chat/${chat._id}`}
                       className="chat-item-link"
                     >
-                      <div className={`chat-item ${chat.isRead ? "read" : "unread"}`}>
+                      <div
+                        className={`chat-item ${
+                          chat.isRead ? "read" : "unread"
+                        }`}
+                      >
                         <img src={logo} alt="profile" className="chat-image" />
                         <div className="chat-details">
                           <div className="chat-header">
@@ -120,7 +126,8 @@ const Chat = () => {
                         </div>
                         {!chat.isRead && (
                           <div className="unread-count">
-                            {chat.unreadMessages || 1} {/* Placeholder for unread messages */}
+                            {chat.unreadMessages || 1}{" "}
+                            {/* Placeholder for unread messages */}
                           </div>
                         )}
                       </div>
@@ -139,19 +146,19 @@ const Chat = () => {
             <h5 className="card-title">Escrow Funds:</h5>
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={near} alt="" />
+                <img id="balance" src={stx} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{nearBalance} NEAR</h6>
+                <h6>{stxBalance} stx</h6>
               </div>
             </div>
             <hr />
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={neargig} alt="" />
+                <img id="balance" src={worklob} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{neargigBalance} NGIG</h6>
+                <h6>{worklobBalance} LOB</h6>
               </div>
             </div>
           </div>

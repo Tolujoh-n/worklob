@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useImage from "../../assets/img/ngig-logo.png";
+import useImage from "../../assets/img/worklob-coin.png";
 import { Link } from "react-router-dom";
 import person from "../../assets/address.jpg";
 

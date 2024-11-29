@@ -4,8 +4,10 @@ import logo from "../../assets/address.jpg";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
+import { useWeb3 } from "../../Web3Provider";
 
 const Connectwallet = () => {
+  const { connectWallet, account, connected, disconnectWallet } = useWeb3();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const dropdownRef = useRef(null);
@@ -14,6 +16,10 @@ const Connectwallet = () => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // Log localStorage and user for debugging
+  console.log("User from localStorage:", user);
+  console.log("localStorage content:", localStorage);
+
   let userId;
   let userRole;
 
@@ -21,6 +27,8 @@ const Connectwallet = () => {
     const decodedToken = jwtDecode(token);
     userId = decodedToken.userId;
   }
+
+  // Safe access to userRole and username
   if (user && user.role) {
     userRole = user.role;
   }
@@ -28,6 +36,9 @@ const Connectwallet = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  // Add a fallback for user
+  const username = user ? user.username : "Guest";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,24 +55,35 @@ const Connectwallet = () => {
 
   const changeUserRole = async (newRole) => {
     try {
-      toast(`Switching to ${newRole === "Customer" ? "Customer" : "Freelancer"}...`, {
-        icon: "🔄",
-        duration: 3000,
-      });
+      toast(
+        `Switching to ${newRole === "Customer" ? "Customer" : "Freelancer"}...`,
+        {
+          icon: "🔄",
+          duration: 3000,
+        }
+      );
 
-      const response = await axios.post("http://localhost:8080/api/v1/user/change-role", {
-        userId,
-        role: newRole,
-      });
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/user/change-role",
+        {
+          userId,
+          role: newRole,
+        }
+      );
 
       if (response.status === 200) {
         const updatedUser = { ...user, role: newRole };
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
-        toast.success(`Role switched to ${newRole === "Customer" ? "Customer" : "Freelancer"}!`, {
-          duration: 2000,
-          icon: "✅",
-        });
+        toast.success(
+          `Role switched to ${
+            newRole === "Customer" ? "Customer" : "Freelancer"
+          }!`,
+          {
+            duration: 2000,
+            icon: "✅",
+          }
+        );
 
         setTimeout(() => {
           window.location.reload();
@@ -78,34 +100,45 @@ const Connectwallet = () => {
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
   const handleLogout = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
-        await axios.post(`${API_URL}/api/v1/user/logout`, {}, { withCredentials: true });
+      // Log out from the server
+      await axios.post(
+        `${API_URL}/api/v1/user/logout`,
+        {},
+        { withCredentials: true }
+      );
 
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+      // Disconnect wallet if connected
+      if (connected) {
+        disconnectWallet();
+      }
 
-        toast.success("Logout successful!", {
-            duration: 2000,
-            icon: "✅",
-        });
+      // Remove user data from local storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-        setTimeout(() => {
-            setIsLoading(false); 
-            navigate("/login"); 
-        }, 2000);
+      toast.success("Logout successful!", {
+        duration: 2000,
+        icon: "✅",
+      });
+
+      // Navigate to login page after a delay
+      setTimeout(() => {
+        setIsLoading(false);
+        navigate("/login");
+      }, 2000);
     } catch (error) {
-        console.error("Error logging out:", error);
-        toast.error("Logout failed. Please try again.", {
-            duration: 3000,
-            icon: "❌",
-        });
+      console.error("Error logging out:", error);
+      toast.error("Logout failed. Please try again.", {
+        duration: 3000,
+        icon: "❌",
+      });
     } finally {
-        setIsLoading(false); 
+      setIsLoading(false);
     }
-};
+  };
 
-  
   return (
     <>
       <Toaster />
@@ -114,7 +147,11 @@ const Connectwallet = () => {
           <Link
             style={{ fontSize: "large" }}
             className="nav-link nav-icon d-none d-md-block"
-            to={userRole === "Customer" ? "/dashboard/postjob" : "/dashboard/postgig"}
+            to={
+              userRole === "Customer"
+                ? "/dashboard/postjob"
+                : "/dashboard/postgig"
+            }
           >
             {userRole === "Customer" ? "Post Job" : "Post Gig"}
           </Link>
@@ -141,7 +178,8 @@ const Connectwallet = () => {
             }}
           >
             <img src={logo} alt="Profile" className="rounded-circle" />
-            <span className="d-none d-md-block ps-2">{user.username}</span>
+            {/* Safely access username */}
+            <span className="d-none d-md-block ps-2">{username}</span>
             <i className="bi bi-caret-down-fill ps-1"></i>
           </button>
 
@@ -160,9 +198,15 @@ const Connectwallet = () => {
               <li>
                 <button
                   className="dropdown-item"
-                  onClick={() => changeUserRole(userRole === "Customer" ? "Talent" : "Customer")}
+                  onClick={() =>
+                    changeUserRole(
+                      userRole === "Customer" ? "Talent" : "Customer"
+                    )
+                  }
                 >
-                  {userRole === "Customer" ? "Switch to Talent" : "Switch to Customer"}
+                  {userRole === "Customer"
+                    ? "Switch to Talent"
+                    : "Switch to Customer"}
                 </button>
               </li>
               <li>
