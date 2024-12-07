@@ -79,7 +79,7 @@ export const Web3Provider = ({ children }) => {
       network: STACKS_TESTNET,
       appDetails: {
         name: "StarsLob",
-        icon: "https://example.com/icon.png",
+        icon: "https://i.ibb.co/XS780TX/worklob-coin.png",
       },
       onFinish: () => {
         const userData = userSession.loadUserData();

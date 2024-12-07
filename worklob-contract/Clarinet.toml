@@ -5,6 +5,11 @@ authors = []
 telemetry = true
 cache_dir = '.\.cache'
 requirements = []
+[contracts.dungeon-master]
+path = 'contracts/dungeon-master.clar'
+clarity_version = 2
+epoch = 2.4
+
 [contracts.worklob-token]
 path = 'contracts/worklob-token.clar'
 clarity_version = 2

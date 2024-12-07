@@ -1,7 +1,8 @@
 ;; The Worklob Token
 ;; https://worklob.netlify.app
 
-(impl-trait .dao-traits-v4.sip010-ft-trait)
+;; (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(impl-trait .worklob-traits-v1.sip010-ft-trait)
 
 (define-constant err-unauthorized (err u401))
 (define-constant err-liquidity-lock (err u402))
@@ -12,12 +13,13 @@
 (define-constant contract (as-contract tx-sender))
 (define-constant unlock-block block-height)
 
-(define-fungible-token worklob)
+(define-fungible-token charisma)
 
 (define-data-var token-name (string-ascii 32) "Worklob")
 (define-data-var token-symbol (string-ascii 10) "LOB")
 (define-data-var token-uri (optional (string-utf8 256)) (some u"https://aqua-impressive-rook-631.mypinata.cloud/ipfs/Qmce7R1HSuhrRCRKUvdgE4byUMyC4LhZDukqU7mJrJVCtT"))
 (define-data-var token-decimals uint u6)
+
 
 (define-data-var block-counter uint u0)
 
@@ -113,7 +115,7 @@
         (try! (is-unlocked))
         (var-set block-counter (+ (var-get block-counter) (var-get blocks-per-tx)))
         (try! (contract-call? .dme000-governance-token transfer amount-in sender contract none))
-        (try! (ft-mint? worklob amount-in sender))
+        (try! (ft-mint? charisma amount-in sender))
         (ok {
             block-counter: (var-get block-counter),
             max-liquidity-flow: max-amount,
@@ -132,7 +134,7 @@
         )
         (try! (is-unlocked))
         (var-set block-counter (+ (var-get block-counter) (var-get blocks-per-tx)))
-        (try! (ft-burn? worklob amount-out tx-sender))
+        (try! (ft-burn? charisma amount-out tx-sender))
         (try! (as-contract (contract-call? .dme000-governance-token transfer amount-out contract sender none)))
         (ok {
             block-counter: (var-get block-counter),
@@ -143,7 +145,7 @@
 )
 
 (define-public (burn (amount uint))
-  (ft-burn? worklob amount tx-sender)
+  (ft-burn? charisma amount tx-sender)
 )
 
 (define-read-only (get-blocks-per-tx)
@@ -177,7 +179,7 @@
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
 	(begin
 		(asserts! (or (is-eq tx-sender sender) (is-eq contract-caller sender)) err-not-token-owner)
-		(ft-transfer? worklob amount sender recipient)
+		(ft-transfer? charisma amount sender recipient)
 	)
 )
 
@@ -194,11 +196,11 @@
 )
 
 (define-read-only (get-balance (who principal))
-	(ok (ft-get-balance worklob who))
+	(ok (ft-get-balance charisma who))
 )
 
 (define-read-only (get-total-supply)
-	(ok (ft-get-supply worklob))
+	(ok (ft-get-supply charisma))
 )
 
 (define-read-only (get-token-uri)
@@ -225,4 +227,4 @@
   )
 )
 
-(ft-mint? worklob u100000000 tx-sender)
+(ft-mint? charisma u100000000 tx-sender)
