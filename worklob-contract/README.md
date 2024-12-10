@@ -24,6 +24,9 @@
 - Testnet Explorer: explorer.stacks.co
 - Mainnet Explorer: explorer.stacks.co
 
-- Contract publish: ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-contract
+- Contract publish:
+  ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token
+  ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.dungeon-master
+  ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-traits-v1
 
 - worklob on testnet

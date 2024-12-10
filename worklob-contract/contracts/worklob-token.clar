@@ -12,7 +12,7 @@
 (define-constant contract (as-contract tx-sender))
 (define-constant unlock-block block-height)
 
-(define-fungible-token charisma)
+(define-fungible-token worklob)
 
 (define-data-var token-name (string-ascii 32) "Worklob")
 (define-data-var token-symbol (string-ascii 10) "LOB")
@@ -62,7 +62,7 @@
 )
 
 (define-public (burn (amount uint))
-  (ft-burn? charisma amount tx-sender)
+  (ft-burn? worklob amount tx-sender)
 )
 
 (define-read-only (get-blocks-per-tx)
@@ -96,7 +96,7 @@
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
 	(begin
 		(asserts! (or (is-eq tx-sender sender) (is-eq contract-caller sender)) err-not-token-owner)
-		(ft-transfer? charisma amount sender recipient)
+		(ft-transfer? worklob amount sender recipient)
 	)
 )
 
@@ -113,11 +113,11 @@
 )
 
 (define-read-only (get-balance (who principal))
-	(ok (ft-get-balance charisma who))
+	(ok (ft-get-balance worklob who))
 )
 
 (define-read-only (get-total-supply)
-	(ok (ft-get-supply charisma))
+	(ok (ft-get-supply worklob))
 )
 
 (define-read-only (get-token-uri)
@@ -144,4 +144,4 @@
   )
 )
 
-(ft-mint? charisma u100000000 tx-sender)
+(ft-mint? worklob u100000000 tx-sender)
