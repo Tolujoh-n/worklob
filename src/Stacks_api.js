@@ -10,8 +10,6 @@ const {
 const BASE_URL = "https://api.testnet.hiro.so";
 const STACKS_API_KEY = process.env.STACKS_API_KEY;
 
-const CACHE_DURATION = 60 * 60 * 24 * 7; // 7 days in seconds
-
 // Fetch function with API Key handling
 async function fetchData(url, method = "GET", body = null) {
   const headers = {
@@ -125,6 +123,74 @@ async function getTotalSupply(
   return Number(cvToValue(hexToCV(response.result)));
 }
 
+async function getTokenMetadata(
+  contract = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token"
+) {
+  const [address, name] = contract.split(".");
+
+  const path = `/v2/contracts/call-read/${address}/${name}/get-token-uri`;
+  const response = await fetchData(path, "POST", {
+    body: { sender: address, arguments: [] },
+  });
+  const url =
+    cvToJSON(hexToCV(response.data.result))?.value?.value?.value ||
+    "https://aqua-impressive-rook-631.mypinata.cloud/ipfs/Qmce7R1HSuhrRCRKUvdgE4byUMyC4LhZDukqU7mJrJVCtT";
+  return await (await fetch(url)).json();
+}
+
+async function getTokenImage(
+  contract = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token"
+) {
+  const [address, name] = contract.split(".");
+
+  const path = `/v2/contracts/call-read/${address}/${name}/get-token-uri`;
+  const response = await fetchData(path, "POST", {
+    body: { sender: address, arguments: [] },
+  });
+  const url =
+    cvToJSON(hexToCV(response.data.result))?.value?.value?.value ||
+    "https://aqua-impressive-rook-631.mypinata.cloud/ipfs/Qmce7R1HSuhrRCRKUvdgE4byUMyC4LhZDukqU7mJrJVCtT";
+  return (
+    await (await fetch(url, { mode: "no-cors", redirect: "follow" })).json()
+  ).image;
+}
+
+async function getSymbol(
+  contract = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token"
+) {
+  const [address, name] = contract.split(".");
+
+  const path = `/v2/contracts/call-read/${address}/${name}/get-symbol`;
+  const response = await fetchData(path, "POST", {
+    body: { sender: address, arguments: [] },
+  });
+  return String(cvToValue(hexToCV(response.data.result)).value);
+}
+
+async function getTokenName(
+  contract = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token"
+) {
+  const [address, name] = contract.split(".");
+
+  const path = `/v2/contracts/call-read/${address}/${name}/get-name`;
+  const response = await fetchData(path, "POST", {
+    body: { sender: address, arguments: [] },
+  });
+  return String(cvToValue(hexToCV(response.data.result)).value);
+}
+
+async function getDecimals(
+  contract = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token"
+) {
+  const [address, name] = contract.split(".");
+
+  const path = `/v2/contracts/call-read/${address}/${name}/get-decimals`;
+  const response = await fetchData(path, "POST", {
+    body: { sender: address, arguments: [] },
+  });
+  return Number(cvToValue(hexToCV(response.data.result)).value);
+}
+
 // Exports
 module.exports = {
   getNamesFromAddress,
@@ -134,4 +200,9 @@ module.exports = {
   getTokenBalance,
   getTokenURI,
   getTotalSupply,
+  getTokenMetadata,
+  getTokenImage,
+  getSymbol,
+  getTokenName,
+  getDecimals,
 };
