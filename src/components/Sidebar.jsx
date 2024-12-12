@@ -5,6 +5,7 @@ import worklob from "../assets/img/worklob-coin.png";
 import useimage from "../assets/address.jpg";
 import Modal from "./Modal";
 import { useWeb3 } from "../Web3Provider";
+import { getTokenBalance } from "../Stacks_api";
 
 const Hiring = [
   { id: 1, title: "Tolujohn Bob", jobs: "1" },
@@ -16,7 +17,24 @@ const Hiring = [
 
 const Sidebar = () => {
   const [isGamemodalOpen, setIsGamemodalOpen] = useState(false);
-  const { account, btcBalance, stxBalance, lobBalance } = useWeb3();
+  const { account, btcBalance, stxBalance } = useWeb3();
+  const [tokenBalance, setTokenBalance] = useState(null); // Start with null for "loading" state
+  useEffect(() => {
+    async function fetchTokenBalance() {
+      if (account) {
+        try {
+          const balance = await getTokenBalance(
+            "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token",
+            account
+          );
+          setTokenBalance(balance);
+        } catch (error) {
+          console.error("Error fetching token balance:", error);
+        }
+      }
+    }
+    fetchTokenBalance();
+  }, [account]);
 
   const handleGamemodalClick = () => {
     setIsGamemodalOpen(true);
@@ -28,39 +46,43 @@ const Sidebar = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // claim
     handleCloseGamemodal();
   };
 
   return (
     <>
       <div className="col-lg-4">
-        {/* Recent Activity */}
         <div className="card info-card revenue-card">
           <div className="card-body">
             <h5 className="card-title">Balance:</h5>
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={stx} alt="" />
+                <img id="balance" src={stx} alt="STX" />
               </div>
               <div className="ps-3">
-                <h6>{parseFloat(stxBalance).toFixed(2)} STX</h6>
+                <h6>
+                  {stxBalance !== undefined
+                    ? `${parseFloat(stxBalance).toFixed(2)} STX`
+                    : "Loading..."}
+                </h6>
               </div>
             </div>
             <hr />
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={worklob} alt="" />
+                <img id="balance" src={worklob} alt="LOB" />
               </div>
               <div className="ps-3">
-                <h6>{parseFloat(lobBalance).toFixed(2)} LOB</h6>
+                <h6>
+                  {tokenBalance !== null
+                    ? `${parseFloat(tokenBalance).toFixed(2)} LOB`
+                    : "Loading..."}
+                </h6>
               </div>
             </div>
           </div>
         </div>
-        {/* End Recent Activity */}
 
-        {/* News & Updates Traffic */}
         <div className="card">
           <div className="card-body pb-0">
             <h5 className="card-title">Top Hiring manager</h5>
@@ -79,7 +101,7 @@ const Sidebar = () => {
                       <img
                         style={{ height: "60px", width: "60px" }}
                         src={useimage}
-                        alt=""
+                        alt="Manager"
                       />
                       <h4>
                         <a href="#">{card.title}</a>
@@ -100,17 +122,12 @@ const Sidebar = () => {
                 </div>
               ))}
             </div>
-            {/* End sidebar recent posts */}
           </div>
         </div>
-        {/* End News & Updates */}
       </div>
-      <>
-        {/* Render the Gamemodal if isGamemodalOpen is true */}
-        {isGamemodalOpen && (
-          <Modal onClose={handleCloseGamemodal} onSubmit={handleSubmit} />
-        )}
-      </>
+      {isGamemodalOpen && (
+        <Modal onClose={handleCloseGamemodal} onSubmit={handleSubmit} />
+      )}
     </>
   );
 };

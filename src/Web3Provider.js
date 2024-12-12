@@ -3,9 +3,17 @@ import { AppConfig, UserSession, showConnect } from "@stacks/connect";
 import { STACKS_TESTNET } from "@stacks/network";
 import { makeContractCall } from "@stacks/transactions";
 import { fetchCallReadOnlyFunction } from "@stacks/transactions";
-import { standardPrincipalCV, cvToValue } from "@stacks/transactions"; // Import cvToValue for extracting data from response
-
+import {
+  standardPrincipalCV,
+  cvToValue,
+  parseToCV,
+  hexToCV,
+  cvToHex,
+} from "@stacks/transactions";
 const Web3Context = createContext();
+
+const WORKLOB_TOKEN_CONTRACT =
+  "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53.worklob-token";
 
 const getBTCBalance = async (address) => {
   const url = `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`;
@@ -43,33 +51,35 @@ const getSTXBalance = async (address) => {
 };
 
 const getLOBTokenBalance = async (address) => {
-  if (!address) {
-    console.error("No address found");
-    return 0;
-  }
+  const [contractAddress, contractName] = WORKLOB_TOKEN_CONTRACT.split("."); // Split to get contract details
 
-  const contractAddress = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53";
-  const contractName = "worklob-token";
-  const functionName = "get-balance";
+  // Define the API endpoint for reading from the contract
+  const url = `https://api.testnet.hiro.so/v2/contracts/call-read/${contractAddress}/${contractName}/get-balance`;
 
-  try {
-    const response = await fetchCallReadOnlyFunction({
-      contractAddress,
-      contractName,
-      functionName,
-      functionArgs: [standardPrincipalCV(address)],
-      network: STACKS_TESTNET,
-      senderAddress: address, // Use the caller's address
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: contractAddress,
+      arguments: [cvToHex(parseToCV(String(address), "principal"))],
+    }),
+  })
+    .then(async (res) => {
+      if (res.ok) {
+        const data = await res.json();
+        // Assuming the response contains the result in the `data.result` property
+        const balance = Number(cvToValue(hexToCV(data.result)));
+        return balance; // Return the parsed balance
+      }
+      return 0; // Return 0 if the request fails
+    })
+    .catch((err) => {
+      console.error(err);
+      return 0; // Return 0 if there's an error in the fetch process
     });
-
-    const balance = cvToValue(response);
-    return balance || 0;
-  } catch (error) {
-    console.error("Error fetching LOB token balance", error);
-    return 0;
-  }
 };
-
 export const Web3Provider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [account, setAccount] = useState("");
