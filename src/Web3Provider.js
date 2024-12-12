@@ -1,6 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { AppConfig, UserSession, showConnect } from "@stacks/connect";
 import { STACKS_TESTNET } from "@stacks/network";
+import { makeContractCall } from "@stacks/transactions";
+import { fetchCallReadOnlyFunction } from "@stacks/transactions";
+import { standardPrincipalCV, cvToValue } from "@stacks/transactions"; // Import cvToValue for extracting data from response
 
 const Web3Context = createContext();
 
@@ -39,11 +42,40 @@ const getSTXBalance = async (address) => {
     });
 };
 
+const getLOBTokenBalance = async (address) => {
+  if (!address) {
+    console.error("No address found");
+    return 0;
+  }
+
+  const contractAddress = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53";
+  const contractName = "worklob-token";
+  const functionName = "get-balance";
+
+  try {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress,
+      contractName,
+      functionName,
+      functionArgs: [standardPrincipalCV(address)],
+      network: STACKS_TESTNET,
+      senderAddress: address, // Use the caller's address
+    });
+
+    const balance = cvToValue(response);
+    return balance || 0;
+  } catch (error) {
+    console.error("Error fetching LOB token balance", error);
+    return 0;
+  }
+};
+
 export const Web3Provider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [account, setAccount] = useState("");
   const [btcBalance, setBtcBalance] = useState("0");
   const [stxBalance, setStxBalance] = useState("0");
+  const [lobBalance, setLobBalance] = useState("0");
   const [userSession, setUserSession] = useState(null);
 
   useEffect(() => {
@@ -52,25 +84,28 @@ export const Web3Provider = ({ children }) => {
 
     if (session.isUserSignedIn()) {
       const userData = session.loadUserData();
-      setAccount(userData.profile.stxAddress.testnet); // Stacks Testnet Address
+      setAccount(userData.profile.stxAddress.testnet);
       setConnected(true);
-      fetchBalances(userData.profile.stxAddress.testnet); // Fetch balances on load
+      fetchBalances(userData.profile.stxAddress.testnet, session);
     } else if (session.isSignInPending()) {
       session.handlePendingSignIn().then((userData) => {
         setAccount(userData.profile.stxAddress.testnet);
         setConnected(true);
-        fetchBalances(userData.profile.stxAddress.testnet); // Fetch balances on sign-in
+        fetchBalances(userData.profile.stxAddress.testnet, session);
       });
     }
 
     setUserSession(session);
   }, []);
 
-  const fetchBalances = async (address) => {
-    const btcBal = await getBTCBalance(address); // Fetch BTC balance
-    const stxBal = await getSTXBalance(address); // Fetch STX balance
+  const fetchBalances = async (address, session) => {
+    const btcBal = await getBTCBalance(address);
+    const stxBal = await getSTXBalance(address);
+    const lobBal = await getLOBTokenBalance(address);
+
     setBtcBalance(btcBal);
     setStxBalance(stxBal);
+    setLobBalance(lobBal);
   };
 
   const connectWallet = () => {
@@ -85,7 +120,7 @@ export const Web3Provider = ({ children }) => {
         const userData = userSession.loadUserData();
         setAccount(userData.profile.stxAddress.testnet);
         setConnected(true);
-        fetchBalances(userData.profile.stxAddress.testnet); // Fetch balances on connect
+        fetchBalances(userData.profile.stxAddress.testnet, userSession);
       },
       onCancel: () => {
         console.error("Wallet connection canceled");
@@ -97,8 +132,9 @@ export const Web3Provider = ({ children }) => {
     userSession.signUserOut(window.location.origin);
     setConnected(false);
     setAccount("");
-    setBtcBalance("0"); // Reset balances on disconnect
+    setBtcBalance("0");
     setStxBalance("0");
+    setLobBalance("0");
   };
 
   const shortenAddress = (address) => {
@@ -113,6 +149,7 @@ export const Web3Provider = ({ children }) => {
         account,
         btcBalance,
         stxBalance,
+        lobBalance,
         connectWallet,
         disconnectWallet,
         shortenAddress,

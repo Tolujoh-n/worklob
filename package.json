@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@stacks/blockchain-api-client": "^8.2.2",
+    "@stacks/blockchain-api-client": "^8.3.0",
     "@stacks/common": "^7.0.2",
     "@stacks/connect": "^7.9.0",
     "@stacks/connect-react": "^22.6.0",
@@ -14,6 +14,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@vercel/kv": "^3.0.0",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "ethers": "^6.13.2",
