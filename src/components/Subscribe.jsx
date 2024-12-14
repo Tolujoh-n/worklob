@@ -25,7 +25,7 @@ const Profile = () => {
                 for="changesMade"
                 style={{ color: "#b1bad3" }}
               >
-                New Quiz updates on the platform
+                New Job updates on the platform
               </label>
             </div>
             <div className="form-check">
