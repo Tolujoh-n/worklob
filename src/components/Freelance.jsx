@@ -15,7 +15,9 @@ const Freelance = () => {
   useEffect(() => {
     const fetchFrJobs = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/frjobs/getAllFreelance`);
+        const response = await axios.get(
+          `${API_URL}/api/v1/frjobs/getAllFreelance`
+        );
         setJobs(response.data);
       } catch (error) {
         console.error("Error fetching job data:", error);
@@ -55,20 +57,30 @@ const Freelance = () => {
   };
 
   const filteredJobs = jobs
-    .filter((job) =>
-      job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (job) =>
+        job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.description.toLowerCase().includes(searchTerm.toLowerCase())
     )
-   
+
     .sort((a, b) => {
-      if (sortBy === "latest") return new Date(b.createdAt) - new Date(a.createdAt);
-      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === "latest")
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "oldest")
+        return new Date(a.createdAt) - new Date(b.createdAt);
       return 0;
     });
 
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
 
   return (
     <>
@@ -87,7 +99,7 @@ const Freelance = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-             
+
               <select
                 className="sort-by-filter"
                 value={sortBy}
@@ -110,12 +122,14 @@ const Freelance = () => {
                       />
                       <div className="freelance-job-details">
                         <h4 className="freelance-job-title">{job.jobTitle}</h4>
-                        <p className="freelance-task-assigner">{job.postedBy.username}</p>
+                        <p className="freelance-task-assigner">
+                          {job.postedBy.username}
+                        </p>
                         <span style={{ color: "#ddd", fontSize: "12px" }}>
                           {timeSince(job.createdAt)}
                         </span>
                         <p className="freelance-job-description">
-                          {job.description}
+                          {truncateText(job.description, 30)}
                         </p>
                         <div className="freelance-job-tags">
                           {job.selectedSkills.map((tag, index) => (
@@ -128,7 +142,9 @@ const Freelance = () => {
                     </div>
                   </Link>
                   <div className="freelance-job-card-footer">
-                    <p className="freelance-job-price">{formatPrice(job.budget)}</p>
+                    <p className="freelance-job-price">
+                      {formatPrice(job.budget)}
+                    </p>
                     <Link to={`/dashboard/gigdetails/${job._id}`}>
                       <button className="freelance-more-info-btn">
                         See details

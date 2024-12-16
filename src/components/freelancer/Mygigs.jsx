@@ -16,7 +16,9 @@ const Mygigs = () => {
   useEffect(() => {
     const fetchFrJobs = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/gigJob/getAllGigJob`);
+        const response = await axios.get(
+          `${API_URL}/api/v1/gigJob/getAllGigJob`
+        );
         setJobs(response.data);
       } catch (error) {
         console.error("Error fetching job data:", error);
@@ -28,18 +30,18 @@ const Mygigs = () => {
     fetchFrJobs();
   }, [API_URL]);
 
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const handleChat = async (jobId) => {
-    console.log("Job ID:", jobId); 
+    console.log("Job ID:", jobId);
     try {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
       console.log("Chat response:", response.data);
-      
+
       if (response.data.length > 0) {
-        const chatId = response.data[0]._id; 
+        const chatId = response.data[0]._id;
         navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
       } else {
         console.error("No chat found for this job");
@@ -88,14 +90,23 @@ const Mygigs = () => {
       return searchMatch && roleMatch;
     })
     .sort((a, b) => {
-      if (sortBy === "latest") return new Date(b.createdAt) - new Date(a.createdAt);
-      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === "latest")
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "oldest")
+        return new Date(a.createdAt) - new Date(b.createdAt);
       return 0;
     });
 
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
 
   const jobTabs = {
     all: filteredJobs,
@@ -182,11 +193,19 @@ const Mygigs = () => {
                         />
                       </div>
                     </div>
-                    <p className="job-description">{job.description}</p>
+                    <p className="job-description">
+                      {truncateText(job.description, 60)}
+                    </p>
                     <div className="d-flex justify-content-between align-items-center mt-3">
-                      <span className="job-amount">{formatPrice(job.budget)}</span>
-                      <button className="btn chat-button" onClick={()=>{
-                        handleChat(job._id)}}>
+                      <span className="job-amount">
+                        {formatPrice(job.budget)}
+                      </span>
+                      <button
+                        className="btn chat-button"
+                        onClick={() => {
+                          handleChat(job._id);
+                        }}
+                      >
                         <i className="bi bi-chat"></i> Chat
                       </button>
                     </div>

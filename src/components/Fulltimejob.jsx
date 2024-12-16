@@ -31,17 +31,17 @@ const Fulltimejob = () => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     let interval;
 
-    if (seconds < 60) return `${seconds} seconds ago`; 
+    if (seconds < 60) return `${seconds} seconds ago`;
     interval = Math.floor(seconds / 60);
-    if (interval < 60) return `${interval} minutes ago`; 
+    if (interval < 60) return `${interval} minutes ago`;
     interval = Math.floor(interval / 60);
-    if (interval < 24) return `${interval} hours ago`; 
+    if (interval < 24) return `${interval} hours ago`;
     interval = Math.floor(interval / 24);
-    if (interval < 30) return `${interval} days ago`; 
+    if (interval < 30) return `${interval} days ago`;
     interval = Math.floor(interval / 30);
-    if (interval < 12) return `${interval} months ago`; 
+    if (interval < 12) return `${interval} months ago`;
     interval = Math.floor(interval / 12);
-    return `${interval} years ago`; 
+    return `${interval} years ago`;
   };
 
   const filteredJobs = jobs
@@ -52,17 +52,37 @@ const Fulltimejob = () => {
     )
     .filter(
       (job) =>
-        selectedRole === "" || job.role.toLowerCase() === selectedRole.toLowerCase()
+        selectedRole === "" ||
+        job.role.toLowerCase() === selectedRole.toLowerCase()
     )
     .sort((a, b) => {
-      if (sortBy === "latest") return new Date(b.createdAt) - new Date(a.createdAt);
-      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === "latest")
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "oldest")
+        return new Date(a.createdAt) - new Date(b.createdAt);
       return 0;
     });
 
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
+  const formatPrice = (budget) => {
+    if (typeof budget === "number") {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 0,
+      }).format(budget);
+    }
+    return "N/A"; // Handle missing or incorrect budget data
+  };
 
   return (
     <>
@@ -124,7 +144,7 @@ const Fulltimejob = () => {
                       </div>
                       <div className="job-info">
                         <h4 className="job-title">{job.jobTitle}</h4>
-                        <p>{job.description}</p>
+                        <p>{truncateText(job.description, 30)}</p>
                         <div className="job-tags">
                           {job.selectedSkills.map((tag, index) => (
                             <span key={index}>{tag}</span>
@@ -132,6 +152,17 @@ const Fulltimejob = () => {
                         </div>
                       </div>
                     </Link>
+                    <br />
+                    <div className="freelance-job-card-footer">
+                      <p className="freelance-job-price">
+                        {formatPrice(job.budget)}
+                      </p>
+                      <Link to={`/dashboard/gigdetails/${job._id}`}>
+                        <button className="freelance-more-info-btn">
+                          See details
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 ))
               )}
@@ -143,5 +174,3 @@ const Fulltimejob = () => {
   );
 };
 export default Fulltimejob;
-
-
