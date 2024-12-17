@@ -144,7 +144,7 @@ const Sidenav = ({ activeLink, setActive }) => {
         <li className="nav-item">
           <a
             className="nav-link gap-1 collapsed"
-            href="https://dev.near.org/astraplusplus.ndctools.near/widget/home?tab=proposals&daoId=neargigs.sputnik-dao.near&page=dao"
+            href="https://www.stacks.co/"
             target="_blank"
           >
             <i className="bi bi-bank"></i>
