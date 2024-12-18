@@ -7,7 +7,7 @@ const gigRouter = require("./gigJob");
 const applyJobRouter = require("./applyjob");
 const buyGigRouter = require("./buyGig");
 const chatRouter = require("./chatRouter");
-const escrowRouter = require("./routers/escrowRouter");
+const escrowRouter = require("./escrowRouter");
 const z = require("zod");
 
 router.use("/user", userRouter);

@@ -25,47 +25,76 @@ const Escrow = ({ jobId, clientId, freelancerId, walletAddress }) => {
 
     try {
       let response;
+      let requestData;
 
-      // Call the appropriate API based on button index
+      // Prepare the data based on the button index
       switch (index) {
         case 0:
-          response = await axios.post(`${API_URL}/api/v1/escrow/offer`, {
+          requestData = {
             job_id: jobId,
             client_id: clientId,
             wallet_address: walletAddress,
-          });
+          };
+          console.log("Offer data:", requestData);
+          response = await axios.post(
+            `${API_URL}/api/v1/escrow/offer`,
+            requestData
+          );
           break;
         case 1:
-          response = await axios.post(`${API_URL}/api/v1/escrow/deposit`, {
+          requestData = {
             job_id: jobId,
             client_id: clientId,
             wallet_address: walletAddress,
-          });
+          };
+          console.log("Deposit data:", requestData);
+          response = await axios.post(
+            `${API_URL}/api/v1/escrow/deposit`,
+            requestData
+          );
           break;
         case 2:
-          response = await axios.post(`${API_URL}/api/v1/escrow/in-progress`, {
+          requestData = {
             job_id: jobId,
             freelancer_id: freelancerId,
             wallet_address: walletAddress,
-          });
+          };
+          console.log("In-Progress data:", requestData);
+          response = await axios.post(
+            `${API_URL}/api/v1/escrow/in-progress`,
+            requestData
+          );
           break;
         case 3:
-          response = await axios.post(`${API_URL}/api/v1/escrow/completed`, {
+          requestData = {
             job_id: jobId,
             freelancer_id: freelancerId,
             wallet_address: walletAddress,
-          });
+          };
+          console.log("Completed data:", requestData);
+          response = await axios.post(
+            `${API_URL}/api/v1/escrow/completed`,
+            requestData
+          );
           break;
         case 4:
-          response = await axios.post(`${API_URL}/api/v1/escrow/confirm`, {
+          requestData = {
             job_id: jobId,
             client_id: clientId,
             wallet_address: walletAddress,
-          });
+          };
+          console.log("Confirm data:", requestData);
+          response = await axios.post(
+            `${API_URL}/api/v1/escrow/confirm`,
+            requestData
+          );
           break;
         default:
           throw new Error("Invalid action");
       }
+
+      // Log the API response
+      console.log("API response:", response.data);
 
       // Update button state only if the API call succeeds
       if (response.status === 200) {
@@ -149,9 +178,6 @@ const Escrow = ({ jobId, clientId, freelancerId, walletAddress }) => {
       >
         {loading && !buttonStates[4] ? "Processing..." : "Confirm"}
       </button>
-
-      {/* Error message display */}
-      {error && <div className="error-message">{error}</div>}
     </div>
   );
 };
