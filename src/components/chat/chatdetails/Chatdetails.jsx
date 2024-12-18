@@ -181,7 +181,12 @@ const Chatdetails = () => {
                 </a>
               </div>
               <div className="progressexcrow">
-                <Escrow />
+                <Escrow
+                  jobDet={jobDet}
+                  receiverDet={receiverDet}
+                  senderDet={senderDet}
+                  applicantId={applicantId}
+                />
                 <br />
               </div>
 

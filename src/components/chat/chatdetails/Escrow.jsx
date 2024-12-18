@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useWeb3 } from "../../../Web3Provider"; // Assuming you have a Web3 context
+import { toast } from "sonner";
 import "../chat.css";
 
-const Escrow = ({ jobId, clientId, freelancerId, walletAddress }) => {
+const Escrow = () => {
   const [buttonStates, setButtonStates] = useState([
     false,
     false,
@@ -12,8 +14,15 @@ const Escrow = ({ jobId, clientId, freelancerId, walletAddress }) => {
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { account, connectWallet, connected } = useWeb3(); // Wallet connection
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  // Static data for Escrow operations
+  const jobId = "12345"; // Static Job ID
+  const clientId = "67890"; // Static Client ID
+  const freelancerId = "54321"; // Static Freelancer ID
+  const walletAddress = "0x123456789abcdef"; // Static wallet address
 
   const handleClick = async (index) => {
     if (loading || (index > 0 && !buttonStates[index - 1])) {
@@ -101,12 +110,14 @@ const Escrow = ({ jobId, clientId, freelancerId, walletAddress }) => {
         const updatedStates = [...buttonStates];
         updatedStates[index] = true;
         setButtonStates(updatedStates);
+        toast.success(`Step ${index + 1} completed successfully!`);
       } else {
         throw new Error("API request failed");
       }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "An error occurred");
+      toast.error(error);
     } finally {
       setLoading(false); // Reset loading state
     }
@@ -131,6 +142,7 @@ const Escrow = ({ jobId, clientId, freelancerId, walletAddress }) => {
           !buttonStates[0] ? "highlight" : ""
         }`}
         onClick={() => handleClick(0)}
+        disabled={loading}
       >
         {loading && !buttonStates[0] ? "Processing..." : "Offer"}
       </button>

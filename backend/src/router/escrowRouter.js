@@ -7,17 +7,27 @@ const Escrow = require("../models/Escrow");
 
 // 1. Create Offer
 router.post("/offer", async (req, res) => {
-  const { job_id, client_id, wallet_address } = req.body;
+  const { job_id, client_id, freelancer_id, wallet_address } = req.body;
+
+  // Validate required fields
+  if (!job_id || !client_id || !wallet_address) {
+    return res
+      .status(400)
+      .json({ message: "job_id, client_id, and wallet_address are required." });
+  }
+
   try {
     const escrow = new Escrow({
       job_id,
       client_id,
-      status: "offer_created",
+      freelancer_id, // Optional
       wallet_address,
+      status: "offer_created",
     });
     await escrow.save();
     res.status(200).json({ message: "Offer created successfully", escrow });
   } catch (err) {
+    console.error("Error creating offer:", err);
     res.status(500).json({ message: "Failed to create offer", error: err });
   }
 });
