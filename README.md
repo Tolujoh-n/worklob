@@ -8,7 +8,7 @@
 
 ### `npm clone https://github.com/Starslob/worklob`
 
-## Run the backend
+## Run the backend locally
 
 ### `cd worklob/backend`
 
