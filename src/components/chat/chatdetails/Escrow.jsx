@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useWeb3 } from "../../../Web3Provider"; // Assuming you have a Web3 context
+import { useWeb3 } from "../../../Web3Provider";
 import { toast } from "sonner";
 import "../chat.css";
 
-const Escrow = () => {
+const Escrow = ({ jobId, senderId, receiverId }) => {
+  const { account, connectWallet, connected } = useWeb3();
+  const [walletAddress, setWalletAddress] = useState("");
   const [buttonStates, setButtonStates] = useState([
     false,
     false,
@@ -13,117 +15,127 @@ const Escrow = () => {
     false,
   ]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const { account, connectWallet, connected } = useWeb3(); // Wallet connection
-
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
-  // Static data for Escrow operations
-  const jobId = "12345"; // Static Job ID
-  const clientId = "67890"; // Static Client ID
-  const freelancerId = "54321"; // Static Freelancer ID
-  const walletAddress = "0x123456789abcdef"; // Static wallet address
+  const isTalent = account === senderId; // Talent's wallet address matches senderId
+  const isCustomer = account === receiverId; // Customer's wallet address matches receiverId
+
+  // Fetch Wallet Address
+  useEffect(() => {
+    if (!connected) connectWallet();
+    if (account) setWalletAddress(account);
+  }, [connected, account, connectWallet]);
+
+  // Initialize state for each `jobId`
+  useEffect(() => {
+    const storedStates = JSON.parse(localStorage.getItem("escrowStates")) || {};
+    setButtonStates(storedStates[jobId] || [false, false, false, false, false]);
+
+    // Automatically log initial data
+    const initialData = {
+      job_id: jobId,
+      client_id: receiverId,
+      wallet_address: account || "Not Connected",
+      current_state: "Offer",
+    };
+    console.log("Initial Data:", initialData);
+  }, [jobId, receiverId, account]);
+
+  // Save button states to localStorage for the specific `jobId`
+  useEffect(() => {
+    const storedStates = JSON.parse(localStorage.getItem("escrowStates")) || {};
+    storedStates[jobId] = buttonStates;
+    localStorage.setItem("escrowStates", JSON.stringify(storedStates));
+  }, [jobId, buttonStates]);
 
   const handleClick = async (index) => {
     if (loading || (index > 0 && !buttonStates[index - 1])) {
       return; // Prevent invalid clicks or simultaneous API calls
     }
 
+    // Role-based validation
+    if (
+      ((index === 0 || index === 1) && !isCustomer) ||
+      ((index === 2 || index === 3) && !isTalent) ||
+      (index === 4 && !isCustomer)
+    ) {
+      toast.error("You do not have permission to perform this action.");
+      return;
+    }
+
     setLoading(true);
-    setError(""); // Clear previous errors
-
     try {
-      let response;
       let requestData;
-
-      // Prepare the data based on the button index
+      let currentState;
       switch (index) {
         case 0:
           requestData = {
             job_id: jobId,
-            client_id: clientId,
+            client_id: receiverId,
             wallet_address: walletAddress,
           };
+          currentState = "Offer";
           console.log("Offer data:", requestData);
-          response = await axios.post(
-            `${API_URL}/api/v1/escrow/offer`,
-            requestData
-          );
+          await axios.post(`${API_URL}/api/v1/escrow/offer`, requestData);
           break;
         case 1:
           requestData = {
             job_id: jobId,
-            client_id: clientId,
+            client_id: receiverId,
             wallet_address: walletAddress,
           };
+          currentState = "Deposit";
           console.log("Deposit data:", requestData);
-          response = await axios.post(
-            `${API_URL}/api/v1/escrow/deposit`,
-            requestData
-          );
+          await axios.post(`${API_URL}/api/v1/escrow/deposit`, requestData);
           break;
         case 2:
           requestData = {
             job_id: jobId,
-            freelancer_id: freelancerId,
+            freelancer_id: senderId,
             wallet_address: walletAddress,
           };
+          currentState = "In-Progress";
           console.log("In-Progress data:", requestData);
-          response = await axios.post(
-            `${API_URL}/api/v1/escrow/in-progress`,
-            requestData
-          );
+          await axios.post(`${API_URL}/api/v1/escrow/in-progress`, requestData);
           break;
         case 3:
           requestData = {
             job_id: jobId,
-            freelancer_id: freelancerId,
+            freelancer_id: senderId,
             wallet_address: walletAddress,
           };
+          currentState = "Completed";
           console.log("Completed data:", requestData);
-          response = await axios.post(
-            `${API_URL}/api/v1/escrow/completed`,
-            requestData
-          );
+          await axios.post(`${API_URL}/api/v1/escrow/completed`, requestData);
           break;
         case 4:
           requestData = {
             job_id: jobId,
-            client_id: clientId,
+            client_id: receiverId,
             wallet_address: walletAddress,
           };
+          currentState = "Confirm";
           console.log("Confirm data:", requestData);
-          response = await axios.post(
-            `${API_URL}/api/v1/escrow/confirm`,
-            requestData
-          );
+          await axios.post(`${API_URL}/api/v1/escrow/confirm`, requestData);
           break;
         default:
           throw new Error("Invalid action");
       }
 
-      // Log the API response
-      console.log("API response:", response.data);
-
-      // Update button state only if the API call succeeds
-      if (response.status === 200) {
-        const updatedStates = [...buttonStates];
-        updatedStates[index] = true;
-        setButtonStates(updatedStates);
-        toast.success(`Step ${index + 1} completed successfully!`);
-      } else {
-        throw new Error("API request failed");
-      }
+      const updatedStates = [...buttonStates];
+      updatedStates[index] = true;
+      setButtonStates(updatedStates);
+      toast.success(
+        `Step ${index + 1} (${currentState}) completed successfully!`
+      );
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "An error occurred");
-      toast.error(error);
+      toast.error(err.response?.data?.message || "An error occurred.");
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
-  // Calculate rope progress based on active buttons
   const ropeProgress = buttonStates.filter((state) => state).length;
 
   return (

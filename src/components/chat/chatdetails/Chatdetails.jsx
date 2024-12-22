@@ -182,10 +182,10 @@ const Chatdetails = () => {
               </div>
               <div className="progressexcrow">
                 <Escrow
-                  jobDet={jobDet}
-                  receiverDet={receiverDet}
-                  senderDet={senderDet}
-                  applicantId={applicantId}
+                  jobId={jobId}
+                  clientId={isTalent ? senderDet?.id : receiverDet?.id}
+                  freelancerId={isTalent ? receiverDet?.id : senderDet?.id}
+                  isTalent={isTalent}
                 />
                 <br />
               </div>
