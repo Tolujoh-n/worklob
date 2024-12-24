@@ -7,16 +7,9 @@ const EscrowSchema = new mongoose.Schema({
   wallet_address: { type: String, required: true },
   status: {
     type: String,
-    enum: [
-      "offer_created",
-      "funds_deposited",
-      "in_progress",
-      "completed",
-      "confirmed",
-    ],
-    default: "offer_created",
+    enum: ["Offer", "Deposit", "In-Progress", "Completed", "Confirm"],
+    required: true,
   },
-  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("Escrow", EscrowSchema);

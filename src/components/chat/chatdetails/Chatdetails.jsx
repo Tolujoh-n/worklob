@@ -201,7 +201,6 @@ const Chatdetails = () => {
                   jobId={jobId}
                   senderId={senderId}
                   receiverId={receiverId}
-                  isTalent={isTalent}
                 />
                 <br />
               </div>
