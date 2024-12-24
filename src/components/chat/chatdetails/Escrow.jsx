@@ -4,7 +4,7 @@ import { useWeb3 } from "../../../Web3Provider";
 import { toast } from "sonner";
 import "../chat.css";
 
-const Escrow = ({ jobId, senderId, receiverId }) => {
+const Escrow = ({ chatId, senderId, receiverId }) => {
   const { account, connectWallet, connected } = useWeb3();
   const [walletAddress, setWalletAddress] = useState("");
   const [buttonStates, setButtonStates] = useState([
@@ -26,27 +26,30 @@ const Escrow = ({ jobId, senderId, receiverId }) => {
     if (account) setWalletAddress(account);
   }, [connected, account, connectWallet]);
 
-  // Initialize state for each `jobId`
+  // Initialize state for each `chatId`
   useEffect(() => {
     const storedStates = JSON.parse(localStorage.getItem("escrowStates")) || {};
-    setButtonStates(storedStates[jobId] || [false, false, false, false, false]);
+    setButtonStates(
+      storedStates[chatId] || [false, false, false, false, false]
+    );
 
     // Automatically log initial data
     const initialData = {
-      job_id: jobId,
+      job_id: chatId,
       client_id: receiverId,
+      freelancer_id: senderId,
       wallet_address: account || "Not Connected",
       current_state: "Offer",
     };
     console.log("Initial Data:", initialData);
-  }, [jobId, receiverId, account]);
+  }, [chatId, receiverId, account]);
 
-  // Save button states to localStorage for the specific `jobId`
+  // Save button states to localStorage for the specific `chatId`
   useEffect(() => {
     const storedStates = JSON.parse(localStorage.getItem("escrowStates")) || {};
-    storedStates[jobId] = buttonStates;
+    storedStates[chatId] = buttonStates;
     localStorage.setItem("escrowStates", JSON.stringify(storedStates));
-  }, [jobId, buttonStates]);
+  }, [chatId, buttonStates]);
 
   const handleClick = async (index) => {
     if (loading || (index > 0 && !buttonStates[index - 1])) {
@@ -70,7 +73,7 @@ const Escrow = ({ jobId, senderId, receiverId }) => {
       switch (index) {
         case 0:
           requestData = {
-            job_id: jobId,
+            job_id: chatId,
             client_id: receiverId,
             wallet_address: walletAddress,
           };
@@ -80,7 +83,7 @@ const Escrow = ({ jobId, senderId, receiverId }) => {
           break;
         case 1:
           requestData = {
-            job_id: jobId,
+            job_id: chatId,
             client_id: receiverId,
             wallet_address: walletAddress,
           };
@@ -90,7 +93,7 @@ const Escrow = ({ jobId, senderId, receiverId }) => {
           break;
         case 2:
           requestData = {
-            job_id: jobId,
+            job_id: chatId,
             freelancer_id: senderId,
             wallet_address: walletAddress,
           };
@@ -100,7 +103,7 @@ const Escrow = ({ jobId, senderId, receiverId }) => {
           break;
         case 3:
           requestData = {
-            job_id: jobId,
+            job_id: chatId,
             freelancer_id: senderId,
             wallet_address: walletAddress,
           };
@@ -110,7 +113,7 @@ const Escrow = ({ jobId, senderId, receiverId }) => {
           break;
         case 4:
           requestData = {
-            job_id: jobId,
+            job_id: chatId,
             client_id: receiverId,
             wallet_address: walletAddress,
           };
