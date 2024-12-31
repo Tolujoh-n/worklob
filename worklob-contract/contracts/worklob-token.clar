@@ -1,11 +1,11 @@
 ;; The Worklob Token
 ;; https://worklob.netlify.app
 
-(impl-trait .dao-traits-v4.sip010-ft-trait)
+;; (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(impl-trait .worklob-traits-v1.sip010-ft-trait)
 
 (define-constant err-unauthorized (err u401))
 (define-constant err-liquidity-lock (err u402))
-(define-constant err-not-red-pilled (err u403))
 (define-constant err-not-token-owner (err u404))
 (define-constant err-invalid-input (err u405))
 
@@ -18,6 +18,7 @@
 (define-data-var token-symbol (string-ascii 10) "LOB")
 (define-data-var token-uri (optional (string-utf8 256)) (some u"https://aqua-impressive-rook-631.mypinata.cloud/ipfs/Qmce7R1HSuhrRCRKUvdgE4byUMyC4LhZDukqU7mJrJVCtT"))
 (define-data-var token-decimals uint u6)
+
 
 (define-data-var block-counter uint u0)
 
@@ -39,36 +40,10 @@
 	(ok (asserts! (is-dao-or-extension) err-unauthorized))
 )
 
-(define-read-only (is-red-pilled)
-    (ok (asserts! (contract-call? .red-pill-nft has-balance tx-sender) err-not-red-pilled))
-)
-
 (define-read-only (is-unlocked)
 	(ok (asserts! (>= block-height (+ unlock-block (var-get block-counter))) err-liquidity-lock))
 )
 
-;; --- Internal DAO functions
-
-(define-public (set-name (new-name (string-ascii 32)))
-	(begin
-		(try! (is-authorized))
-		(ok (var-set token-name new-name))
-	)
-)
-
-(define-public (set-symbol (new-symbol (string-ascii 10)))
-	(begin
-		(try! (is-authorized))
-		(ok (var-set token-symbol new-symbol))
-	)
-)
-
-(define-public (set-decimals (new-decimals uint))
-	(begin
-		(try! (is-authorized))
-		(ok (var-set token-decimals new-decimals))
-	)
-)
 
 (define-public (set-blocks-per-tx (new-blocks-per-tx uint))
     (begin
@@ -84,62 +59,6 @@
         (asserts! (and (>= new-max-liquidity-flow min-max-liquidity-flow) (<= new-max-liquidity-flow max-max-liquidity-flow)) err-invalid-input)
 		(ok (var-set max-liquidity-flow new-max-liquidity-flow))
 	)
-)
-
-(define-public (set-token-uri (new-uri (optional (string-utf8 256))))
-	(begin
-		(try! (is-authorized))
-		(var-set token-uri new-uri)
-		(ok 
-			(print {
-				notification: "token-metadata-update",
-				payload: {
-					token-class: "ft",
-					contract-id: contract
-				}
-			})
-		)
-	)
-)
-
-(define-public (wrap (amount uint))
-    (let
-        (
-            (sender tx-sender)
-            (red-pilled (try! (is-red-pilled)))
-            (max-amount (var-get max-liquidity-flow))
-            (amount-in (if (> amount max-amount) max-amount amount))
-        )
-        (try! (is-unlocked))
-        (var-set block-counter (+ (var-get block-counter) (var-get blocks-per-tx)))
-        (try! (contract-call? .dme000-governance-token transfer amount-in sender contract none))
-        (try! (ft-mint? worklob amount-in sender))
-        (ok {
-            block-counter: (var-get block-counter),
-            max-liquidity-flow: max-amount,
-            token-amount: amount-in
-        })
-    )
-)
-
-(define-public (unwrap (amount uint))
-    (let
-        (
-            (sender tx-sender)
-            (red-pilled (try! (is-red-pilled)))
-            (max-amount (var-get max-liquidity-flow))
-            (amount-out (if (and (not red-pilled) (> amount max-amount)) max-amount amount))
-        )
-        (try! (is-unlocked))
-        (var-set block-counter (+ (var-get block-counter) (var-get blocks-per-tx)))
-        (try! (ft-burn? worklob amount-out tx-sender))
-        (try! (as-contract (contract-call? .dme000-governance-token transfer amount-out contract sender none)))
-        (ok {
-            block-counter: (var-get block-counter),
-            max-liquidity-flow: max-amount,
-            token-amount: amount-out
-        })
-    )
 )
 
 (define-public (burn (amount uint))

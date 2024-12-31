@@ -81,8 +81,12 @@
 		(energize (uint principal) (response bool uint))
 		(exhaust (uint principal) (response bool uint))
 
+		;; Protocol Operations
+		(pay-to-play () (response bool uint))
+
 		;; Governance Token Operations
 		(transfer (uint principal principal) (response bool uint))
+		(mint (uint principal) (response bool uint))
 		(burn (uint principal) (response bool uint))
 		(lock (uint principal) (response bool uint))
 		(unlock (uint principal) (response bool uint))

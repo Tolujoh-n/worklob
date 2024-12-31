@@ -19,6 +19,8 @@ const Chatdetails = () => {
   const [senderDet, setSenderDet] = useState();
   const [receiverDet, setReceiverDet] = useState();
   const [jobDet, setJobDet] = useState();
+  const [senderId, setSenderId] = useState(null);
+  const [receiverId, setReceiverId] = useState(null);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -43,11 +45,22 @@ const Chatdetails = () => {
 
         console.log("Fetched chat details:", response.data);
 
-        const senderId = response.data.sender;
-        const receiverId = response.data.receiver;
+        const fetchedSenderId = response.data.sender;
+        const fetchedReceiverId = response.data.receiver;
+
+        // Log senderId and receiverId
+        console.log("Sender ID:", fetchedSenderId);
+        console.log("Receiver ID:", fetchedReceiverId);
+
+        // Set senderId and receiverId in state
+        setSenderId(fetchedSenderId);
+        setReceiverId(fetchedReceiverId);
 
         // Check permission to view chat
-        if (applicantId !== receiverId && applicantId !== senderId) {
+        if (
+          applicantId !== fetchedReceiverId &&
+          applicantId !== fetchedSenderId
+        ) {
           toast.error("You don't have permission to view this chat.");
           setTimeout(() => {
             navigate("/dashboard");
@@ -59,18 +72,20 @@ const Chatdetails = () => {
         const userDetailsResponse = await axios.get(
           `${API_URL}/api/v1/user/userDetails`,
           {
-            params: { senderId, receiverId },
+            params: {
+              senderId: fetchedSenderId,
+              receiverId: fetchedReceiverId,
+            },
           }
         );
 
-        // Assuming userDetailsResponse contains user details
         setReceiverDet(userDetailsResponse.data.receiver);
         setSenderDet(userDetailsResponse.data.sender);
 
         const jobDetailsResponse = await axios.get(
           `${API_URL}/api/v1/jobs/jobdetails/${jobId}`
         );
-        console.log("Job ka ", jobDetailsResponse);
+        console.log("Job Details:", jobDetailsResponse);
         setJobDet(jobDetailsResponse?.data);
 
         // Add new message
@@ -181,7 +196,12 @@ const Chatdetails = () => {
                 </a>
               </div>
               <div className="progressexcrow">
-                <Escrow />
+                <Escrow
+                  chatId={chatId}
+                  jobId={jobId}
+                  senderId={senderId}
+                  receiverId={receiverId}
+                />
                 <br />
               </div>
 

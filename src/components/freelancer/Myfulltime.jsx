@@ -13,7 +13,7 @@ const Myfulltime = () => {
     archive: [],
   });
   const [loading, setLoading] = useState(true);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
   let userId;
@@ -28,10 +28,10 @@ const Myfulltime = () => {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
-      console.log("yu h",response.data)
-      
+      console.log("yu h", response.data);
+
       if (response.data.length > 0) {
-        const chatId = response.data[0]._id; 
+        const chatId = response.data[0]._id;
         navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
       } else {
         console.error("No chat found for this job");
@@ -39,20 +39,28 @@ const Myfulltime = () => {
     } catch (error) {
       console.error("Error navigating applied job data:", error);
     }
-  }
+  };
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/jobs/applied-fulltimejobs/${userId}`);
+        const response = await axios.get(
+          `${API_URL}/api/v1/jobs/applied-fulltimejobs/${userId}`
+        );
         console.log(response.data.appliedJobs); // Fix console log to see correct structure
         const allAppliedJobs = response.data.appliedJobs;
 
         // Sort the jobs into different categories based on application status
         const categorizedJobs = {
           all: allAppliedJobs, // All jobs
-          apply: allAppliedJobs.filter(job => job.application.status === "apply"), // 'Apply' tab jobs
-          progress: allAppliedJobs.filter(job => job.application.status === "progress"), // 'In Progress' tab jobs
-          archive: allAppliedJobs.filter(job => job.application.status === "archive"), // 'Archive' tab jobs
+          apply: allAppliedJobs.filter(
+            (job) => job.application.status === "apply"
+          ), // 'Apply' tab jobs
+          progress: allAppliedJobs.filter(
+            (job) => job.application.status === "progress"
+          ), // 'In Progress' tab jobs
+          archive: allAppliedJobs.filter(
+            (job) => job.application.status === "archive"
+          ), // 'Archive' tab jobs
         };
 
         setJobs(categorizedJobs);
@@ -68,6 +76,13 @@ const Myfulltime = () => {
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
 
   return (
     <>
@@ -119,7 +134,9 @@ const Myfulltime = () => {
                           className="company-logo"
                         />
                         <div className="job-hr">
-                          <h4 className="job-head">{postedBy.username || "HR Name"}</h4>
+                          <h4 className="job-head">
+                            {postedBy.username || "HR Name"}
+                          </h4>
                           <div className="job-rating">
                             <span className="stars">★★★★☆</span>
                             <span className="rating-count">(25)</span>
@@ -127,20 +144,36 @@ const Myfulltime = () => {
                         </div>
 
                         <div className="job-meta">
-                          <span className="job-date">{new Date(jobDetails.createdAt).toLocaleDateString() || "No Date"}</span>
+                          <span className="job-date">
+                            {new Date(
+                              jobDetails.createdAt
+                            ).toLocaleDateString() || "No Date"}
+                          </span>
                           <i className="save-icon">&#9734;</i>
                         </div>
                       </div>
                       <div className="job-info">
-                        <h4 className="job-title">{jobDetails.jobTitle || "Job Title"}</h4>
-                        <p>{jobDetails.workplaceType || "Location not available"}</p>
-                        <p>{jobDetails.description || "Job description not available"}</p>
+                        <h4 className="job-title">
+                          {jobDetails.jobTitle || "Job Title"}
+                        </h4>
+                        <p>
+                          {jobDetails.workplaceType || "Location not available"}
+                        </p>
+                        <p>{truncateText(jobDetails.description, 30)}</p>
                       </div>
                     </Link>
                     <div className="d-flex justify-content-between align-items-center mt-3">
-                      <span className="job-amount">{jobDetails.fixedCompensation ? `$${jobDetails.fixedCompensation}` : "N/A"}</span>
-                    <button className="btn chat-button" onClick={()=>{
-                        handleChat(jobDetails._id)}}>
+                      <span className="job-amount">
+                        {jobDetails.fixedCompensation
+                          ? `$${jobDetails.fixedCompensation}`
+                          : "N/A"}
+                      </span>
+                      <button
+                        className="btn chat-button"
+                        onClick={() => {
+                          handleChat(jobDetails._id);
+                        }}
+                      >
                         <i className="bi bi-chat"></i> Chat
                       </button>
                     </div>

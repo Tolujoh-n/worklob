@@ -17,7 +17,7 @@ const Cusfreelance = () => {
     userId = decodedToken.userId;
   }
 
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const handleChat = async (jobId) => {
     console.log("Job ID:", jobId);
@@ -26,9 +26,9 @@ const Cusfreelance = () => {
         params: { jobId },
       });
       console.log("Chat response:", response.data);
-      
+
       if (response.data.length > 0) {
-        const chatId = response.data[0]._id; 
+        const chatId = response.data[0]._id;
         navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
       } else {
         console.error("No chat found for this job");
@@ -61,10 +61,6 @@ const Cusfreelance = () => {
     return <p>Loading jobs...</p>;
   }
 
-  if (!jobs.length) {
-    return <p>No jobs found.</p>;
-  }
-
   // Function to generate random reviews for each job
   const generateRandomReviews = () => {
     const ratings = Math.floor(Math.random() * 5) + 1; // Random rating between 1 and 5
@@ -78,6 +74,14 @@ const Cusfreelance = () => {
       style: "currency",
       currency: "USD",
     }).format(amount);
+  };
+
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
   };
 
   return (
@@ -113,6 +117,9 @@ const Cusfreelance = () => {
           </button>
         </div>
 
+        {/* Show "No jobs found" message if no jobs */}
+        {!jobs.length && <p className="no-jobs">No jobs found.</p>}
+
         <div className="row">
           {jobs.map((job) => {
             const { ratings, reviews } = generateRandomReviews();
@@ -120,12 +127,11 @@ const Cusfreelance = () => {
             return (
               <div key={job._id} className="col-lg-12">
                 <div className="card job-card">
-                <Link to={`/dashboard/gigdetails/${job._id}`}>
-                <div className="card-body">
-                    <span className="badge job-type">Freelance</span>
+                  <Link to={`/dashboard/gigdetails/${job._id}`}>
+                    <div className="card-body">
+                      <span className="badge job-type">Freelance</span>
 
                       <div className="d-flex flex-wrap justify-content-between align-items-start">
-
                         <div className="job-details">
                           <h4>{job.jobTitle}</h4>
                           <p className="job-date">
@@ -146,15 +152,21 @@ const Cusfreelance = () => {
                           <img src={useImage} className="hr-image" alt="HR" />
                         </div>
                       </div>
-                      <p className="job-description">{job.description}</p>
+                      <p className="job-description">
+                        {truncateText(job.description, 60)}
+                      </p>
                       <div className="d-flex justify-content-between align-items-center mt-3">
                         <span className="job-amount">
                           {formatBudget(job.budget)}
                         </span>
-                        <button className="btn chat-button" onClick={()=>{
-                        handleChat(job._id)}}>
-                        <i className="bi bi-chat"></i> Chat
-                      </button>
+                        <button
+                          className="btn chat-button"
+                          onClick={() => {
+                            handleChat(job._id);
+                          }}
+                        >
+                          <i className="bi bi-chat"></i> Chat
+                        </button>
                       </div>
                     </div>
                   </Link>

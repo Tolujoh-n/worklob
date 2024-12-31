@@ -19,7 +19,7 @@ const applicationSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['USDT', 'Near', 'BTC'],
+    enum: ['USDT', 'STX', 'sBTC'],
     required: true
   },
   cvFile: {

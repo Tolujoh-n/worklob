@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import person from "../../assets/address.jpg";
 
-
 const Browsegigs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +15,9 @@ const Browsegigs = () => {
   useEffect(() => {
     const fetchFrJobs = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/gigJob/getAllGigJob`);
+        const response = await axios.get(
+          `${API_URL}/api/v1/gigJob/getAllGigJob`
+        );
         setJobs(response.data);
       } catch (error) {
         console.error("Error fetching job data:", error);
@@ -67,14 +68,23 @@ const Browsegigs = () => {
       return searchMatch && roleMatch;
     })
     .sort((a, b) => {
-      if (sortBy === "latest") return new Date(b.createdAt) - new Date(a.createdAt);
-      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === "latest")
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "oldest")
+        return new Date(a.createdAt) - new Date(b.createdAt);
       return 0;
     });
 
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
 
   return (
     <div className="col-lg-12">
@@ -122,13 +132,15 @@ const Browsegigs = () => {
                   <Link to={`/dashboard/gigdetails/${job._id}`}>
                     <div className="freelance-job-card-body">
                       <img
-                        src={job.logo || person} 
+                        src={job.logo || person}
                         alt="Company Logo"
                         className="freelance-company-logo"
                       />
                       <div className="freelance-job-details">
                         <h4 className="freelance-job-title">{job.jobTitle}</h4>
-                        <p className="freelance-task-assigner">{job.postedBy.username}</p>
+                        <p className="freelance-task-assigner">
+                          {job.postedBy.username}
+                        </p>
                         <span style={{ color: "#ddd", fontSize: "12px" }}>
                           {timeSince(job.createdAt)}
                         </span>
@@ -139,7 +151,7 @@ const Browsegigs = () => {
                           ★★★★☆(4)
                         </div>
                         <p className="freelance-job-description">
-                          {job.description}
+                          {truncateText(job.description, 30)}
                         </p>
                         <div className="freelance-job-tags">
                           {job.selectedSkills.map((tag, index) => (

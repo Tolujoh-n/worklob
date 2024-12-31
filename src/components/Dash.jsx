@@ -15,7 +15,7 @@ const jobData = {
       jobType: "Full-time",
       datePosted: "17 Aug 2024, 1:11 AM",
       description:
-        "Develop and maintain web applications using React Design user interfaces and improve user experience Design user interfaces and improve user experience.",
+        "Develop and maintain web applications using React Design user interfaces and improve user experience Design user interfaces and improve user experience. Lead product development and strategy, Lead product development and strategy",
       amount: "$120,000/year",
     },
     {
@@ -56,6 +56,14 @@ const jobData = {
       amount: "$80,000/year",
     },
   ],
+};
+
+const truncateText = (text, wordLimit) => {
+  if (!text || text.trim() === "") return "No description available";
+  const words = text.split(" ");
+  return words.length > wordLimit
+    ? words.slice(0, wordLimit).join(" ") + "..."
+    : text;
 };
 
 const Dash = () => {
@@ -112,7 +120,9 @@ const Dash = () => {
                         <img src={useImage} className="hr-image" alt="HR" />
                       </div>
                     </div>
-                    <p className="job-description">{job.description}</p>
+                    <p className="job-description">
+                      {truncateText(job.description, 30)}
+                    </p>
                     <div className="d-flex justify-content-between align-items-center mt-3">
                       <span className="job-amount">{job.amount}</span>
                       <button className="btn chat-button">

@@ -16,20 +16,20 @@ const Cusfulltime = () => {
   if (token) {
     const decodedToken = jwtDecode(token);
     userId = decodedToken.userId;
-    // console.log(userId)
   }
-  const navigate=useNavigate()
+
+  const navigate = useNavigate();
 
   const handleChat = async (jobId) => {
-    console.log("Job ID:", jobId); // Add this line for debugging
+    console.log("Job ID:", jobId);
     try {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
       console.log("Chat response:", response.data);
-      
+
       if (response.data.length > 0) {
-        const chatId = response.data[0]._id; 
+        const chatId = response.data[0]._id;
         navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
       } else {
         console.error("No chat found for this job");
@@ -38,7 +38,6 @@ const Cusfulltime = () => {
       console.error("Error navigating applied job data:", error);
     }
   };
-  
 
   useEffect(() => {
     const fetchCustomerJobs = async () => {
@@ -47,9 +46,6 @@ const Cusfulltime = () => {
           `${API_URL}/api/v1/jobs/getAlljobs/${userId}`
         );
         setJobs(response.data);
-        console.log("Data type of jobs:", typeof response.data);
-
-        console.log(response.data)
       } catch (error) {
         console.error("Error fetching customer jobs:", error);
         setJobs([]);
@@ -64,33 +60,30 @@ const Cusfulltime = () => {
     return <p>Loading jobs...</p>;
   }
 
-  if (!jobs.length) {
-    return <p>No jobs found.</p>;
-  }
-
   const timeSince = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     let interval;
 
-    if (seconds < 60) return `${seconds} seconds ago`; 
+    if (seconds < 60) return `${seconds} seconds ago`;
     interval = Math.floor(seconds / 60);
-    if (interval < 60) return `${interval} minutes ago`; 
+    if (interval < 60) return `${interval} minutes ago`;
     interval = Math.floor(interval / 60);
-    if (interval < 24) return `${interval} hours ago`; 
+    if (interval < 24) return `${interval} hours ago`;
     interval = Math.floor(interval / 24);
-    if (interval < 30) return `${interval} days ago`; 
+    if (interval < 30) return `${interval} days ago`;
     interval = Math.floor(interval / 30);
-    if (interval < 12) return `${interval} months ago`; 
+    if (interval < 12) return `${interval} months ago`;
     interval = Math.floor(interval / 12);
-    return `${interval} years ago`; 
+    return `${interval} years ago`;
   };
 
-
-  // const jobData = {
-  //   Published: jobs.filter((job) => job.status === "published"),
-  //   Drafts: jobs.filter((job) => job.status === "draft"),
-  //   Archive: jobs.filter((job) => job.status === "archived"),
-  // };
+  const truncateText = (text, wordLimit) => {
+    if (!text || text.trim() === "") return "No description available";
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
 
   return (
     <>
@@ -119,12 +112,14 @@ const Cusfulltime = () => {
           </button>
         </div>
 
+        {!jobs.length && <p className="no-jobs-message">No jobs found.</p>}
+
         <div className="row">
           <div className="fulltime-job-list">
             {jobs.map((job) => (
               <div className="job-card" key={job._id}>
                 <Link to={`/dashboard/gigdetails/${job._id}`}>
-                <div className="job-card-header">
+                  <div className="job-card-header">
                     <img
                       src={job.logo || person}
                       alt="Company Logo"
@@ -134,7 +129,6 @@ const Cusfulltime = () => {
                       <h4 className="job-head">
                         {job.postedBy?.username || "Unknown"}
                       </h4>
-                      {/* rating */}
                       <div className="job-rating">
                         <span className="stars">★★★★☆</span>
                         <span className="rating-count">(25)</span>
@@ -142,14 +136,16 @@ const Cusfulltime = () => {
                     </div>
 
                     <div className="job-meta">
-                      <span className="job-date">{timeSince(job.createdAt)}</span>
+                      <span className="job-date">
+                        {timeSince(job.createdAt)}
+                      </span>
                       <i className="save-icon">&#9734;</i>
                     </div>
                   </div>
                   <div className="job-info">
                     <h4 className="job-title">{job.jobTitle}</h4>
 
-                    <p>{job.description}</p>
+                    <p>{truncateText(job.description, 30)}</p>
                     <div className="job-tags">
                       {job.selectedSkills.map((tag, index) => (
                         <span key={index}>{tag}</span>
@@ -160,10 +156,14 @@ const Cusfulltime = () => {
                 </Link>
                 <div className="d-flex justify-content-between align-items-center mt-3">
                   <span className="job-amount">{job.budget}</span>
-                  <button className="btn chat-button" onClick={()=>{
-                        handleChat(job._id)}}>
-                        <i className="bi bi-chat"></i> Chat
-                      </button>
+                  <button
+                    className="btn chat-button"
+                    onClick={() => {
+                      handleChat(job._id);
+                    }}
+                  >
+                    <i className="bi bi-chat"></i> Chat
+                  </button>
                 </div>
               </div>
             ))}
