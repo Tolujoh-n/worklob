@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
     "@stacks/blockchain-api-client": "^8.3.0",
     "@stacks/common": "^7.0.2",
     "@stacks/connect": "^7.9.0",

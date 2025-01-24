@@ -8495,12 +8495,24 @@
   "ast": {
     "absolutePath": "project:/contracts/LOBToken.sol",
     "exportedSymbols": {
-      "Context": [785],
-      "ERC20": [651],
-      "IERC20": [729],
-      "IERC20Errors": [41],
-      "IERC20Metadata": [755],
-      "LOBToken": [847]
+      "Context": [
+        785
+      ],
+      "ERC20": [
+        651
+      ],
+      "IERC20": [
+        729
+      ],
+      "IERC20Errors": [
+        41
+      ],
+      "IERC20Metadata": [
+        755
+      ],
+      "LOBToken": [
+        847
+      ]
     },
     "id": 848,
     "license": "MIT",
@@ -8508,7 +8520,12 @@
     "nodes": [
       {
         "id": 787,
-        "literals": ["solidity", "^", "0.8", ".0"],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
         "nodeType": "PragmaDirective",
         "src": "33:23:5"
       },
@@ -8531,7 +8548,9 @@
             "baseName": {
               "id": 789,
               "name": "ERC20",
-              "nameLocations": ["140:5:5"],
+              "nameLocations": [
+                "140:5:5"
+              ],
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 651,
               "src": "140:5:5"
@@ -8546,7 +8565,14 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 847,
-        "linearizedBaseContracts": [847, 651, 41, 755, 729, 785],
+        "linearizedBaseContracts": [
+          847,
+          651,
+          41,
+          755,
+          729,
+          785
+        ],
         "name": "LOBToken",
         "nameLocation": "128:8:5",
         "nodeType": "ContractDefinition",
@@ -8771,7 +8797,9 @@
                 "modifierName": {
                   "id": 794,
                   "name": "ERC20",
-                  "nameLocations": ["188:5:5"],
+                  "nameLocations": [
+                    "188:5:5"
+                  ],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 651,
                   "src": "188:5:5"
@@ -9305,8 +9333,18 @@
         ],
         "scope": 848,
         "src": "119:386:5",
-        "usedErrors": [11, 16, 21, 30, 35, 40],
-        "usedEvents": [663, 672]
+        "usedErrors": [
+          11,
+          16,
+          21,
+          30,
+          35,
+          40
+        ],
+        "usedEvents": [
+          663,
+          672
+        ]
       }
     ],
     "src": "33:474:5"

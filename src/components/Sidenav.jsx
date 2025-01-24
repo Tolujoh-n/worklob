@@ -144,7 +144,7 @@ const Sidenav = ({ activeLink, setActive }) => {
         <li className="nav-item">
           <a
             className="nav-link gap-1 collapsed"
-            href="https://www.stacks.co/"
+            href="https://www.base.org/ecosystem"
             target="_blank"
           >
             <i className="bi bi-bank"></i>

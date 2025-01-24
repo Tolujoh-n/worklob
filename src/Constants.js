@@ -7,11 +7,11 @@ export const CONTRACT_ADDRESS = "0xAcc0993377b716f4C9814751fb64022247427eF9"; //
 
 // LOB Token contract details
 export const LOB_TOKEN_ABI = LOBToken.abi;
-export const LOB_TOKEN_ADDRESS = "0xAcc0993377b716f4C9814751fb64022247427eF9"; // Replace with your LOB token contract address
+export const LOB_TOKEN_ADDRESS = "0x77950BA34F2EB2C3ce6cb0A0b73E894ba57B82b8"; // Replace with your LOB token contract address
 
 // Base Sepolia Testnet configuration
 export const BASE_TESTNET_PARAMS = {
-  chainId: 84532, // Hexadecimal Chain ID for Base Sepolia (84532 in decimal)
+  chainId: 84532,
   chainName: "Base Sepolia Testnet",
   nativeCurrency: {
     name: "ETH",
