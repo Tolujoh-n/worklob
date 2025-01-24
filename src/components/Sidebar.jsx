@@ -16,7 +16,7 @@ const Hiring = [
 
 const Sidebar = () => {
   const [isGamemodalOpen, setIsGamemodalOpen] = useState(false);
-  const { account, btcBalance, stxBalance, lobBalance } = useWeb3();
+  const { baseETHBalance, lobBalance } = useWeb3();
 
   const handleGamemodalClick = () => {
     setIsGamemodalOpen(true);
@@ -44,7 +44,7 @@ const Sidebar = () => {
                 <img id="balance" src={stx} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{parseFloat(stxBalance).toFixed(2)} STX</h6>
+                <h6>{parseFloat(baseETHBalance).toFixed(2)} STX</h6>
               </div>
             </div>
             <hr />

@@ -14,7 +14,7 @@ const WalletRegister = () => {
     role: "",
   });
   const [roleSelected, setRoleSelected] = useState(false);
-  const { connectWallet, account, connected } = useWeb3();
+  const { connectWallet, walletAddress, connected } = useWeb3();
   const navigate = useNavigate();
 
   const handleRoleSelect = (role) => {
@@ -30,7 +30,7 @@ const WalletRegister = () => {
   const handleWalletConnect = async () => {
     try {
       await connectWallet();
-      setFormData((prevData) => ({ ...prevData, walletAddress: account }));
+      setFormData((prevData) => ({ ...prevData, walletAddress: walletAddress }));
       toast.success("Wallet connected successfully!");
     } catch (error) {
       toast.error("Failed to connect wallet.");

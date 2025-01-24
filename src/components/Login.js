@@ -9,7 +9,7 @@ import { useWeb3 } from "../Web3Provider";
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const { connected, account, connectWallet } = useWeb3();
+  const { connected, walletAddress, connectWallet } = useWeb3();
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -65,14 +65,14 @@ const Login = () => {
 
   useEffect(() => {
     const loginWithWallet = async () => {
-      if (connected && account) {
+      if (connected && walletAddress) {
         try {
           const API_URL =
             process.env.REACT_APP_API_URL || "http://localhost:8080";
           const response = await axios.post(
             `${API_URL}/api/v1/user/wallet-login`,
             {
-              walletAddress: account,
+              walletAddress: walletAddress,
             }
           );
 
@@ -95,7 +95,7 @@ const Login = () => {
     };
 
     loginWithWallet();
-  }, [connected, account, navigate]);
+  }, [connected, walletAddress, navigate]);
 
   return (
     <div>

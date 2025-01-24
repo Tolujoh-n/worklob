@@ -1,149 +1,129 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { AppConfig, UserSession, showConnect } from "@stacks/connect";
-import { STACKS_TESTNET } from "@stacks/network";
-import { makeContractCall } from "@stacks/transactions";
-import { fetchCallReadOnlyFunction } from "@stacks/transactions";
-import { standardPrincipalCV, cvToValue } from "@stacks/transactions"; // Import cvToValue for extracting data from response
+import Web3 from "web3";
+import {
+  BASE_TESTNET_PARAMS,
+  LOB_TOKEN_ABI,
+  LOB_TOKEN_ADDRESS,
+} from "./Constants";
 
 const Web3Context = createContext();
 
-const getBTCBalance = async (address) => {
-  const url = `https://api.blockcypher.com/v1/btc/test3/addrs/${address}`;
-  return fetch(url)
-    .then(async (res) => {
-      if (res.ok) {
-        const data = await res.json();
-        let balance = Math.trunc(data.balance / 1000) / 100000;
-        return balance;
-      }
-      return 0;
-    })
-    .catch((err) => {
-      console.error(err);
-      return 0;
-    });
-};
-
-const getSTXBalance = async (address) => {
-  const url = `https://stacks-node-api.testnet.stacks.co/v2/accounts/${address}`;
-  return fetch(url)
-    .then(async (res) => {
-      if (res.ok) {
-        const data = await res.json();
-        let balance = parseInt(data.balance, 16);
-        balance = Math.trunc(balance / 10000) / 100;
-        return balance;
-      }
-      return 0;
-    })
-    .catch((err) => {
-      console.error(err);
-      return 0;
-    });
-};
-const getLOBTokenBalance = async (address) => {
-  if (!address) {
-    console.error("No address found");
-    return 0;
-  }
-
-  const contractAddress = "ST5HMBACVCBHDE0H96M11NCG6TKF7WVWSVSG2P53";
-  const contractName = "worklob-token";
-  const functionName = "get-balance";
-
-  try {
-    const response = await fetchCallReadOnlyFunction({
-      contractAddress,
-      contractName,
-      functionName,
-      functionArgs: [standardPrincipalCV(address)],
-      network: STACKS_TESTNET,
-      senderAddress: address,
-    });
-
-    console.log("LOB Token Balance Response:", response);
-
-    // Extracting the balance value
-    const balance = cvToValue(response);
-
-    // Handle the BigInt properly
-    if (balance && balance.value) {
-      const balanceInLOB = Number(balance.value) / 1000000;
-      console.log("Processed Balance:", balanceInLOB);
-      return balanceInLOB || 0;
-    }
-
-    return 0;
-  } catch (error) {
-    console.error("Error fetching LOB token balance", error);
-    return 0;
-  }
-};
-
 export const Web3Provider = ({ children }) => {
   const [connected, setConnected] = useState(false);
-  const [account, setAccount] = useState("");
-  const [btcBalance, setBtcBalance] = useState("0");
-  const [stxBalance, setStxBalance] = useState("0");
+  const [walletAddress, setWalletAddress] = useState("");
+  const [baseETHBalance, setBaseETHBalance] = useState("0");
   const [lobBalance, setLobBalance] = useState("0");
-  const [userSession, setUserSession] = useState(null);
+  const [web3, setWeb3] = useState(null);
 
-  useEffect(() => {
-    const appConfig = new AppConfig();
-    const session = new UserSession({ appConfig });
-
-    if (session.isUserSignedIn()) {
-      const userData = session.loadUserData();
-      setAccount(userData.profile.stxAddress.testnet);
-      setConnected(true);
-      fetchBalances(userData.profile.stxAddress.testnet, session);
-    } else if (session.isSignInPending()) {
-      session.handlePendingSignIn().then((userData) => {
-        setAccount(userData.profile.stxAddress.testnet);
-        setConnected(true);
-        fetchBalances(userData.profile.stxAddress.testnet, session);
+  // Switch to Base Testnet
+  const switchToBaseTestnet = async () => {
+    try {
+      const currentChainId = await window.ethereum.request({
+        method: "eth_chainId",
       });
+
+      // Convert the chainId to match the constant format
+      const baseTestnetChainId = `0x${BASE_TESTNET_PARAMS.chainId.toString(
+        16
+      )}`;
+
+      // If not on the Base Testnet, prompt the user to switch
+      if (currentChainId !== baseTestnetChainId) {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: baseTestnetChainId }],
+        });
+      }
+    } catch (switchError) {
+      // If the network is not added, add it
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: `0x${BASE_TESTNET_PARAMS.chainId.toString(16)}`,
+                chainName: BASE_TESTNET_PARAMS.chainName,
+                nativeCurrency: BASE_TESTNET_PARAMS.nativeCurrency,
+                rpcUrls: BASE_TESTNET_PARAMS.rpcUrls,
+                blockExplorerUrls: BASE_TESTNET_PARAMS.blockExplorerUrls,
+              },
+            ],
+          });
+        } catch (addError) {
+          console.error("Failed to add Base Testnet", addError);
+        }
+      } else {
+        console.error("Failed to switch network", switchError);
+      }
     }
-
-    setUserSession(session);
-  }, []);
-
-  const fetchBalances = async (address, session) => {
-    const btcBal = await getBTCBalance(address);
-    const stxBal = await getSTXBalance(address);
-    const lobBal = await getLOBTokenBalance(address);
-
-    setBtcBalance(btcBal);
-    setStxBalance(stxBal);
-    setLobBalance(lobBal);
   };
 
-  const connectWallet = () => {
-    showConnect({
-      userSession,
-      network: STACKS_TESTNET,
-      appDetails: {
-        name: "StarsLob",
-        icon: "https://i.ibb.co/XS780TX/worklob-coin.png",
-      },
-      onFinish: () => {
-        const userData = userSession.loadUserData();
-        setAccount(userData.profile.stxAddress.testnet);
-        setConnected(true);
-        fetchBalances(userData.profile.stxAddress.testnet, userSession);
-      },
-      onCancel: () => {
-        console.error("Wallet connection canceled");
-      },
-    });
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      console.error("MetaMask not detected. Please install MetaMask.");
+      window.open("https://metamask.io/download/", "_blank");
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setWalletAddress(accounts[0]);
+      setConnected(true);
+
+      // Log the connected address
+      console.log("Connected address:", accounts[0]);
+
+      // Switch to Base Testnet
+      await switchToBaseTestnet();
+
+      // Initialize Web3 with the current provider (MetaMask)
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
+
+      // Fetch balances
+      fetchBalances(accounts[0]);
+    } catch (error) {
+      console.error("Wallet connection failed", error);
+    }
+  };
+
+  const fetchBalances = async (address) => {
+    if (!web3) return;
+
+    try {
+      // Fetch Base ETH balance
+      const balance = await web3.eth.getBalance(address);
+      const ethBalance = web3.utils.fromWei(balance, "ether");
+      setBaseETHBalance(ethBalance);
+
+      // Log the ETH balance to console
+      console.log("Base ETH balance:", ethBalance);
+
+      // Fetch LOB token balance
+      const lobTokenContract = new web3.eth.Contract(
+        LOB_TOKEN_ABI,
+        LOB_TOKEN_ADDRESS
+      );
+      const lobBalance = await lobTokenContract.methods
+        .balanceOf(address)
+        .call();
+      const lobTokenBalance = web3.utils.fromWei(lobBalance, "ether");
+      setLobBalance(lobTokenBalance);
+
+      // Log the LOB token balance to console
+      console.log("LOB token balance:", lobTokenBalance);
+    } catch (error) {
+      console.error("Failed to fetch balances", error);
+    }
   };
 
   const disconnectWallet = () => {
-    userSession.signUserOut(window.location.origin);
     setConnected(false);
-    setAccount("");
-    setBtcBalance("0");
-    setStxBalance("0");
+    setWalletAddress("");
+    setBaseETHBalance("0");
     setLobBalance("0");
   };
 
@@ -152,13 +132,18 @@ export const Web3Provider = ({ children }) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  useEffect(() => {
+    if (connected) {
+      fetchBalances(walletAddress); // Fetch balances after connection
+    }
+  }, [connected, walletAddress]);
+
   return (
     <Web3Context.Provider
       value={{
         connected,
-        account,
-        btcBalance,
-        stxBalance,
+        walletAddress,
+        baseETHBalance,
         lobBalance,
         connectWallet,
         disconnectWallet,

@@ -7,7 +7,8 @@ import { toast, Toaster } from "sonner";
 import { useWeb3 } from "../../Web3Provider";
 
 const Connectwallet = () => {
-  const { connectWallet, account, connected, disconnectWallet } = useWeb3();
+  const { connectWallet, walletAddress, connected, disconnectWallet } =
+    useWeb3();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const dropdownRef = useRef(null);
