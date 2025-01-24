@@ -39,21 +39,27 @@ const Gigdetailsmodal = ({
 
     try {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
-      const response = await axios.post(`${API_URL}/api/v1/application/applyjob`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }, // Sending as form data
-      });
+      const response = await axios.post(
+        `${API_URL}/api/v1/application/applyjob`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" }, // Sending as form data
+        }
+      );
 
-      console.log("chat id recieve",response.data.chatId)
+      console.log("chat id recieve", response.data.chatId);
 
-    const chatId=response.data.chatId;
+      const chatId = response.data.chatId;
       if (response.status === 200) {
         toast.success("Application Submitted Successfully");
-        console.log("Navigating to:", `/dashboard/chatdetails/${jobId}/chat/${chatId}`);
+        console.log(
+          "Navigating to:",
+          `/dashboard/chatdetails/${jobId}/chat/${chatId}`
+        );
         setTimeout(() => {
           navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
-        }, 1000); 
+        }, 1000);
       }
-      
     } catch (error) {
       console.error("Error submitting application:", error);
       toast.error("Failed to submit application");
@@ -70,7 +76,11 @@ const Gigdetailsmodal = ({
         </span>
         <h2>Apply For {jobTitle}</h2>
         <div className="recruiter-info">
-          <img src={recruiterImage} alt={recruiterName} className="recruiter-image" />
+          <img
+            src={recruiterImage}
+            alt={recruiterName}
+            className="recruiter-image"
+          />
           <div>
             <h4>{recruiterName}</h4>
             <p>{jobTitle}</p>
@@ -85,14 +95,19 @@ const Gigdetailsmodal = ({
             required
           ></textarea>
           <label>Preferred Payment Method</label>
-          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} required>
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            required
+          >
             <option value="USDT">USDT</option>
-            <option value="Near">Near</option>
-            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
           </select>
           <label>Attach CV</label>
           <input type="file" onChange={handleFileChange} required />
-          <button type="submit" className="usbutton">Submit Application</button>
+          <button type="submit" className="usbutton">
+            Submit Application
+          </button>
         </form>
       </div>
     </div>

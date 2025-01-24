@@ -6,9 +6,9 @@ const Referredusers = () => {
     {
       type: "Deposit",
       date: "2024-08-30",
-      cryptocurrency: "STX",
+      cryptocurrency: "ETH",
       transactionId: "st9123456789abcdef",
-      amount: "100 STX",
+      amount: "100 ETH",
     },
     {
       type: "Withdrawal",
@@ -20,9 +20,9 @@ const Referredusers = () => {
     {
       type: "Swap",
       date: "2024-08-27",
-      cryptocurrency: "STX to LOB",
+      cryptocurrency: "ETH to LOB",
       transactionId: "st9abcdef123456789",
-      amount: "25 STX",
+      amount: "25 ETH",
     },
     {
       type: "Deposit",

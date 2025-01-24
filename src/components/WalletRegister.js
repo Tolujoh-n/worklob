@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/worklob-logo-cp-no-bg.png";
-import stx from "../assets/img/stx-wallet.png";
+import metamask from "../assets/img/metamask.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { useWeb3 } from "../Web3Provider";
@@ -30,7 +30,10 @@ const WalletRegister = () => {
   const handleWalletConnect = async () => {
     try {
       await connectWallet();
-      setFormData((prevData) => ({ ...prevData, walletAddress: walletAddress }));
+      setFormData((prevData) => ({
+        ...prevData,
+        walletAddress: walletAddress,
+      }));
       toast.success("Wallet connected successfully!");
     } catch (error) {
       toast.error("Failed to connect wallet.");
@@ -167,7 +170,7 @@ const WalletRegister = () => {
                 onClick={handleWalletConnect}
               >
                 <img
-                  src={stx}
+                  src={metamask}
                   alt="Wallet"
                   style={{
                     width: "24px",

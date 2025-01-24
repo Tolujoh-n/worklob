@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/worklob-logo-cp-no-bg.png";
-import stx from "../assets/img/stx-wallet.png";
+import metamask from "../assets/img/metamask.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 
@@ -186,7 +186,7 @@ const Register = () => {
                 onClick={handleConnectClick}
               >
                 <img
-                  src={stx}
+                  src={metamask}
                   alt="Wallet"
                   style={{
                     width: "24px",

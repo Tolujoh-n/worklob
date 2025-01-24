@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/address.jpg";
-import stx from "../../assets/img/stacks.png";
+import eth from "../../assets/img/eth.png";
 import worklob from "../../assets/img/worklob-coin.png";
 import "./chat.css";
 import axios from "axios";
@@ -9,7 +9,7 @@ import { jwtDecode } from "jwt-decode";
 
 const Chat = () => {
   const [activeCategory, setActiveCategory] = useState("Freelance");
-  const [stxBalance, setStxBalance] = useState("0");
+  const [ethBalance, setEthBalance] = useState("0");
   const [worklobBalance, setWorklobBalance] = useState("0");
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -146,10 +146,10 @@ const Chat = () => {
             <h5 className="card-title">Escrow Funds:</h5>
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={stx} alt="" />
+                <img id="balance" src={eth} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{stxBalance} stx</h6>
+                <h6>{ethBalance} ETH</h6>
               </div>
             </div>
             <hr />

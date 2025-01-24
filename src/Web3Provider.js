@@ -15,28 +15,46 @@ export const Web3Provider = ({ children }) => {
   const [lobBalance, setLobBalance] = useState("0");
   const [web3, setWeb3] = useState(null);
 
-  // Switch to Base Testnet
+  const saveBalancesToLocalStorage = (ethBalance, lobTokenBalance) => {
+    localStorage.setItem(
+      "balances",
+      JSON.stringify({
+        baseETHBalance: ethBalance,
+        lobBalance: lobTokenBalance,
+      })
+    );
+  };
+
+  const restoreBalancesFromLocalStorage = () => {
+    const savedBalances = localStorage.getItem("balances");
+    if (savedBalances) {
+      const { baseETHBalance, lobBalance } = JSON.parse(savedBalances);
+      setBaseETHBalance(baseETHBalance);
+      setLobBalance(lobBalance);
+      console.log("Restored balances from localStorage:");
+      console.log("Base ETH balance:", baseETHBalance);
+      console.log("LOB token balance:", lobBalance);
+    }
+  };
+
   const switchToBaseTestnet = async () => {
     try {
       const currentChainId = await window.ethereum.request({
         method: "eth_chainId",
       });
 
-      // Convert the chainId to match the constant format
       const baseTestnetChainId = `0x${BASE_TESTNET_PARAMS.chainId.toString(
         16
       )}`;
 
-      // If not on the Base Testnet, prompt the user to switch
       if (currentChainId !== baseTestnetChainId) {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: baseTestnetChainId }],
         });
       }
-    } catch (switchError) {
-      // If the network is not added, add it
-      if (switchError.code === 4902) {
+    } catch (error) {
+      if (error.code === 4902) {
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
@@ -54,7 +72,7 @@ export const Web3Provider = ({ children }) => {
           console.error("Failed to add Base Testnet", addError);
         }
       } else {
-        console.error("Failed to switch network", switchError);
+        console.error("Failed to switch network", error);
       }
     }
   };
@@ -70,39 +88,30 @@ export const Web3Provider = ({ children }) => {
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
       setWalletAddress(accounts[0]);
       setConnected(true);
 
-      // Log the connected address
+      // Save wallet address to localStorage
+      localStorage.setItem("walletAddress", accounts[0]);
+
       console.log("Connected address:", accounts[0]);
 
-      // Switch to Base Testnet
       await switchToBaseTestnet();
-
-      // Initialize Web3 with the current provider (MetaMask)
-      const web3Instance = new Web3(window.ethereum);
-      setWeb3(web3Instance);
-
-      // Fetch balances
-      fetchBalances(accounts[0]);
     } catch (error) {
       console.error("Wallet connection failed", error);
     }
   };
 
   const fetchBalances = async (address) => {
-    if (!web3) return;
+    if (!web3 || !address) return;
 
     try {
-      // Fetch Base ETH balance
       const balance = await web3.eth.getBalance(address);
       const ethBalance = web3.utils.fromWei(balance, "ether");
       setBaseETHBalance(ethBalance);
 
-      // Log the ETH balance to console
-      console.log("Base ETH balance:", ethBalance);
-
-      // Fetch LOB token balance
       const lobTokenContract = new web3.eth.Contract(
         LOB_TOKEN_ABI,
         LOB_TOKEN_ADDRESS
@@ -113,7 +122,10 @@ export const Web3Provider = ({ children }) => {
       const lobTokenBalance = web3.utils.fromWei(lobBalance, "ether");
       setLobBalance(lobTokenBalance);
 
-      // Log the LOB token balance to console
+      // Save balances to localStorage
+      saveBalancesToLocalStorage(ethBalance, lobTokenBalance);
+
+      console.log("Base ETH balance:", ethBalance);
       console.log("LOB token balance:", lobTokenBalance);
     } catch (error) {
       console.error("Failed to fetch balances", error);
@@ -125,18 +137,33 @@ export const Web3Provider = ({ children }) => {
     setWalletAddress("");
     setBaseETHBalance("0");
     setLobBalance("0");
+    localStorage.removeItem("walletAddress");
+    localStorage.removeItem("balances");
   };
 
-  const shortenAddress = (address) => {
-    if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  const shortenAddress = (address) =>
+    address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
 
   useEffect(() => {
-    if (connected) {
-      fetchBalances(walletAddress); // Fetch balances after connection
+    const savedAddress = localStorage.getItem("walletAddress");
+
+    if (savedAddress) {
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
+      setWalletAddress(savedAddress);
+      setConnected(true);
+      console.log("Restoring wallet connection:", savedAddress);
+
+      // Restore balances from localStorage
+      restoreBalancesFromLocalStorage();
     }
-  }, [connected, walletAddress]);
+  }, []);
+
+  useEffect(() => {
+    if (connected && walletAddress) {
+      fetchBalances(walletAddress);
+    }
+  }, [connected, walletAddress, web3]);
 
   return (
     <Web3Context.Provider

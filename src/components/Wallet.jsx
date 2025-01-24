@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import STX from "../assets/img/stacks.png";
-import sbtc from "../assets/img/btc.png";
+import ETH from "../assets/img/eth.png";
+import btc from "../assets/img/btc.png";
 import lobcoin from "../assets/img/worklob-coin.png";
 
 const Wallet = () => {
@@ -9,9 +9,9 @@ const Wallet = () => {
     {
       type: "Deposit",
       date: "2024-08-30",
-      cryptocurrency: "STX",
+      cryptocurrency: "ETH",
       transactionId: "sp123456789abcdef",
-      amount: "100 STX",
+      amount: "100 ETH",
     },
     {
       type: "Withdrawal",
@@ -23,9 +23,9 @@ const Wallet = () => {
     {
       type: "Swap",
       date: "2024-08-27",
-      cryptocurrency: "STX to LOB",
+      cryptocurrency: "ETH to LOB",
       transactionId: "spabcdef123456789",
-      amount: "25 STX",
+      amount: "25 ETH",
     },
     {
       type: "Deposit",
@@ -56,7 +56,7 @@ const Wallet = () => {
           <div className="wallet-card">
             <div className="wallet-header">
               <h2>Wallet Address</h2>
-              <span>Available Balance: 0.00 STX</span>
+              <span>Available Balance: 0.00 ETH</span>
             </div>
             <table className="wallet-table">
               <thead>
@@ -69,16 +69,16 @@ const Wallet = () => {
               <tbody>
                 <tr>
                   <td>
-                    <img src={STX} alt="STX" className="token-logo" /> STX
+                    <img src={ETH} alt="ETH" className="token-logo" /> ETH
                   </td>
-                  <td>0 STX</td>
+                  <td>0 ETH</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>
                   <td>
-                    <img src={sbtc} alt="LOB" className="token-logo" /> sBTC
+                    <img src={btc} alt="LOB" className="token-logo" /> BTC
                   </td>
-                  <td>0 sBTC</td>
+                  <td>0 BTC</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>
@@ -122,9 +122,9 @@ const Wallet = () => {
               <tbody>
                 <tr>
                   <td>
-                    <img src={STX} alt="STX" className="token-logo" /> STX
+                    <img src={ETH} alt="ETH" className="token-logo" /> ETH
                   </td>
-                  <td>0 STX</td>
+                  <td>0 ETH</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>

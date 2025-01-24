@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import { Toaster, toast } from "sonner";
-import stx from "../assets/img/stx-wallet.png";
+import metamask from "../assets/img/metamask.png";
 import axios from "axios";
 import { useWeb3 } from "../Web3Provider";
 
@@ -143,7 +143,7 @@ const Login = () => {
           </p>
           <button onClick={handleWalletLogin} id="connbtn">
             <img
-              src={stx}
+              src={metamask}
               alt="Wallet"
               style={{
                 width: "24px",
