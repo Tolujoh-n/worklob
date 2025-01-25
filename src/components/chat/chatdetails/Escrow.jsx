@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import "../chat.css";
 import { useWeb3 } from "../../../Web3Provider";
 import { toast } from "sonner";
-import "../chat.css";
+import axios from "axios";
 
-const Escrow = ({ chatId, jobID, senderId, receiverId }) => {
-  const { account, connectWallet, connected } = useWeb3();
-  const [walletAddress, setWalletAddress] = useState("");
+const Escrow = ({ jobId, chatId, currentStatus }) => {
+  const { connectWallet, walletAddress, connected } = useWeb3();
   const [buttonStates, setButtonStates] = useState([
     false,
     false,
@@ -14,166 +13,111 @@ const Escrow = ({ chatId, jobID, senderId, receiverId }) => {
     false,
     false,
   ]);
-  const [loading, setLoading] = useState(false);
+
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
-  const isTalent = account === senderId; // Talent's wallet address matches senderId
-  const isCustomer = account === receiverId; // Customer's wallet address matches receiverId
-
   useEffect(() => {
-    if (!connected) connectWallet();
-    if (account) setWalletAddress(account);
-  }, [connected, account, connectWallet]);
+    // Log jobId and currentStatus to the console on load
+    console.log("Job ID:", jobId);
+    console.log("Current Status:", currentStatus);
+    console.log("Escrow wallet address:", walletAddress);
 
-  useEffect(() => {
-    const storedStates = JSON.parse(localStorage.getItem("escrowStates")) || {};
-    setButtonStates(
-      storedStates[chatId] || [false, false, false, false, false]
-    );
-  }, [chatId]);
+    // Update button states based on the currentStatus
+    const statusMapping = {
+      offered: [true, false, false, false, false],
+      deposited: [true, true, false, false, false],
+      inProgress: [true, true, true, false, false],
+      completed: [true, true, true, true, false],
+      confirmed: [true, true, true, true, true],
+    };
 
-  useEffect(() => {
-    const storedStates = JSON.parse(localStorage.getItem("escrowStates")) || {};
-    storedStates[chatId] = buttonStates;
-    localStorage.setItem("escrowStates", JSON.stringify(storedStates));
-  }, [chatId, buttonStates]);
-
-  const handleClick = async (index) => {
-    if (loading || (index > 0 && !buttonStates[index - 1])) return;
-
-    if (
-      ((index === 0 || index === 1) && !isCustomer) ||
-      ((index === 2 || index === 3) && !isTalent) ||
-      (index === 4 && !isCustomer)
-    ) {
-      toast.error("You do not have permission to perform this action.");
-      return;
+    if (currentStatus in statusMapping) {
+      setButtonStates(statusMapping[currentStatus]);
     }
+  }, [jobId, currentStatus]);
 
-    if (walletAddress !== account) {
-      toast.error("Not appropriate wallet address.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      let requestData;
-      let currentState;
-      switch (index) {
-        case 0:
-          requestData = {
-            job_id: chatId,
-            client_id: receiverId,
-            wallet_address: walletAddress,
-          };
-          currentState = "Offer";
-          await axios.post(`${API_URL}/api/v1/escrow/offer`, requestData);
-          break;
-        case 1:
-          requestData = {
-            job_id: chatId,
-            client_id: receiverId,
-            wallet_address: walletAddress,
-          };
-          currentState = "Deposit";
-          await axios.post(`${API_URL}/api/v1/escrow/deposit`, requestData);
-          break;
-        case 2:
-          requestData = {
-            job_id: chatId,
-            freelancer_id: senderId,
-            wallet_address: walletAddress,
-          };
-          currentState = "In-Progress";
-          await axios.post(`${API_URL}/api/v1/escrow/in-progress`, requestData);
-          break;
-        case 3:
-          requestData = {
-            job_id: chatId,
-            freelancer_id: senderId,
-            wallet_address: walletAddress,
-          };
-          currentState = "Completed";
-          await axios.post(`${API_URL}/api/v1/escrow/completed`, requestData);
-          break;
-        case 4:
-          requestData = {
-            job_id: chatId,
-            client_id: receiverId,
-            wallet_address: walletAddress,
-          };
-          currentState = "Confirm";
-          await axios.post(`${API_URL}/api/v1/escrow/confirm`, requestData);
-          break;
-        default:
-          throw new Error("Invalid action");
-      }
-
-      // Log data to console
-      console.log("Current Action:", currentState);
-      console.log("Request Data:", requestData);
-
-      const updatedStates = [...buttonStates];
+  const handleClick = (index, status) => {
+    const updatedStates = [...buttonStates];
+    if (!updatedStates[index] && (index === 0 || updatedStates[index - 1])) {
       updatedStates[index] = true;
       setButtonStates(updatedStates);
-      toast.success(
-        `Step ${index + 1} (${currentState}) completed successfully!`
+
+      // Update the status via the API call
+      handleStatusUpdate(status);
+    }
+  };
+  const handleStatusUpdate = async (newStatus) => {
+    // Check if wallet is connected
+    if (!connected) {
+      await connectWallet();
+    }
+
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/v1/chat/chatdetails/${jobId}/chat/${chatId}`,
+        {
+          walletAddress,
+          status: newStatus,
+        }
       );
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "An error occurred.");
-    } finally {
-      setLoading(false);
+      console.log("Updated chat:", response.data);
+      toast.success("Status updated successfully!");
+    } catch (error) {
+      console.error("Error updating status:", error.message);
+      toast.error("Failed to update status.");
     }
   };
 
+  // Calculate rope progress based on active buttons
   const ropeProgress = buttonStates.filter((state) => state).length;
 
   return (
     <div className="progress-container">
+      {/* Rope element */}
       <div
         className="progress-rope"
-        style={{ width: `calc((100% / 4) * ${ropeProgress})` }}
+        style={{
+          width: `calc((100% / 4) * ${ropeProgress})`, // Adjust width for five stages
+        }}
       ></div>
 
       <button
         className={`progress-btn ${buttonStates[0] ? "active" : ""} ${
           !buttonStates[0] ? "highlight" : ""
         }`}
-        onClick={() => handleClick(0)}
-        disabled={loading}
+        onClick={() => handleClick(0, "offered")}
       >
-        {loading && !buttonStates[0] ? "Processing..." : "Offer"}
+        Offer
       </button>
 
       <button
         className={`progress-btn ${buttonStates[1] ? "active" : ""} ${
           !buttonStates[1] && buttonStates[0] ? "highlight" : ""
         }`}
-        onClick={() => handleClick(1)}
-        disabled={!buttonStates[0] || loading}
+        onClick={() => handleClick(1, "deposited")}
+        disabled={!buttonStates[0]}
       >
-        {loading && !buttonStates[1] ? "Processing..." : "Deposit"}
+        Deposit
       </button>
 
       <button
         className={`progress-btn ${buttonStates[2] ? "active" : ""} ${
           !buttonStates[2] && buttonStates[1] ? "highlight" : ""
         }`}
-        onClick={() => handleClick(2)}
-        disabled={!buttonStates[1] || loading}
+        onClick={() => handleClick(2, "inProgress")}
+        disabled={!buttonStates[1]}
       >
-        {loading && !buttonStates[2] ? "Processing..." : "In-Progress"}
+        In-Progress
       </button>
 
       <button
         className={`progress-btn ${buttonStates[3] ? "active" : ""} ${
           !buttonStates[3] && buttonStates[2] ? "highlight" : ""
         }`}
-        onClick={() => handleClick(3)}
-        disabled={!buttonStates[2] || loading}
+        onClick={() => handleClick(3, "completed")}
+        disabled={!buttonStates[2]}
       >
-        {loading && !buttonStates[3] ? "Processing..." : "Completed"}
+        Completed
       </button>
 
       <button
@@ -184,10 +128,10 @@ const Escrow = ({ chatId, jobID, senderId, receiverId }) => {
         className={`progress-btn ${buttonStates[4] ? "active" : ""} ${
           !buttonStates[4] && buttonStates[3] ? "highlight" : ""
         }`}
-        onClick={() => handleClick(4)}
-        disabled={!buttonStates[3] || loading}
+        onClick={() => handleClick(4, "confirmed")}
+        disabled={!buttonStates[3]}
       >
-        {loading && !buttonStates[4] ? "Processing..." : "Confirm"}
+        Confirmed
       </button>
     </div>
   );

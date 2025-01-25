@@ -21,6 +21,8 @@ const Chatdetails = () => {
   const [jobDet, setJobDet] = useState();
   const [senderId, setSenderId] = useState(null);
   const [receiverId, setReceiverId] = useState(null);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [status, setStatus] = useState("");
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -44,6 +46,14 @@ const Chatdetails = () => {
         );
 
         console.log("Fetched chat details:", response.data);
+
+        // Extract wallet address and status
+        setWalletAddress(response.data.walletAddress || "N/A");
+        setStatus(response.data.status || "N/A");
+
+        // Log wallet address and status
+        console.log("Track Wallet Address:", response.data.walletAddress);
+        console.log("Status:", response.data.status);
 
         const fetchedSenderId = response.data.sender;
         const fetchedReceiverId = response.data.receiver;
@@ -196,12 +206,7 @@ const Chatdetails = () => {
                 </a>
               </div>
               <div className="progressexcrow">
-                <Escrow
-                  chatId={chatId}
-                  jobId={jobId}
-                  senderId={senderId}
-                  receiverId={receiverId}
-                />
+                <Escrow jobId={jobId} chatId={chatId} currentStatus={status} />
                 <br />
               </div>
 

@@ -99,6 +99,7 @@ export const Web3Provider = ({ children }) => {
       console.log("Connected address:", accounts[0]);
 
       await switchToBaseTestnet();
+      window.location.reload();
     } catch (error) {
       console.error("Wallet connection failed", error);
     }
