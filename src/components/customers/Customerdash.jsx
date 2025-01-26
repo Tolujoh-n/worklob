@@ -9,9 +9,9 @@ const Customerdash = () => {
   return (
     <>
       <div className="pagetitle">
-        <h1>Get work done with LaborX</h1>
+        <h1>Get work done with WorkLob</h1>
         <p>
-          On LaborX, you can publish Freelance & Full-time Jobs or choose from
+          On WorkLob, you can publish Freelance & Full-time Jobs or choose from
           over 30,000 Gigs!
         </p>
       </div>

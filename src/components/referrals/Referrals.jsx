@@ -16,7 +16,7 @@ const Referrals = () => {
             </div>
             <p style={{ fontFamily: "sans-serif", fontSize: "large" }}>
               Invite your friends and colleagues to buy a Gig and receive 50% of
-              the commission fee paid to LaborX! To invite a user to purchase a
+              the commission fee paid to WorkLob! To invite a user to purchase a
               Gig or accept a regular Job, simply copy the unique link and send
               it to them. <br />
               You can also share Gigs and Jobs using our social media buttons.

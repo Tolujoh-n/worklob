@@ -1,44 +1,58 @@
 import React, { useEffect, useState } from "react";
-import placeholderImage from "../../assets/address.jpg"; // Renamed the image import
+import placeholderImage from "../../assets/address.jpg"; // Placeholder image
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const Mygigs = () => {
   const [selectedTab, setSelectedTab] = useState("all");
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState([]); // Changed from object to array
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [roleFilter, setRoleFilter] = useState("");
 
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  let userId;
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      userId = decodedToken.userId;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }
+
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
-    const fetchFrJobs = async () => {
+    const fetchUserGigs = async () => {
+      if (!userId) return; // Ensure userId is available
+
       try {
         const response = await axios.get(
-          `${API_URL}/api/v1/gigJob/getAllGigJob`
+          `${API_URL}/api/v1/gigJob/userGigs/${userId}`
         );
-        setJobs(response.data);
+        // Ensure response data is an array
+        setJobs(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
-        console.error("Error fetching job data:", error);
-        setJobs([]);
+        console.error("Error fetching user gigs:", error);
+        setJobs([]); // Fallback to empty array on error
       } finally {
         setLoading(false);
       }
     };
-    fetchFrJobs();
-  }, [API_URL]);
-
-  const navigate = useNavigate();
+    fetchUserGigs();
+  }, [API_URL, userId]);
 
   const handleChat = async (jobId) => {
-    console.log("Job ID:", jobId);
     try {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
-      console.log("Chat response:", response.data);
+      console.log("yu h", response.data);
 
       if (response.data.length > 0) {
         const chatId = response.data[0]._id;
@@ -79,13 +93,14 @@ const Mygigs = () => {
     return `${interval} years ago`;
   };
 
+  // Apply filters and sorting
   const filteredJobs = jobs
     .filter((job) => {
       const searchMatch =
-        job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchTerm.toLowerCase());
+        job.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.description?.toLowerCase().includes(searchTerm.toLowerCase());
       const roleMatch = roleFilter
-        ? job.role.toLowerCase() === roleFilter.toLowerCase()
+        ? job.role?.toLowerCase() === roleFilter.toLowerCase()
         : true;
       return searchMatch && roleMatch;
     })
@@ -100,6 +115,7 @@ const Mygigs = () => {
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+
   const truncateText = (text, wordLimit) => {
     if (!text || text.trim() === "") return "No description available";
     const words = text.split(" ");
@@ -124,70 +140,43 @@ const Mygigs = () => {
       </div>
       <div className="job-list">
         <div className="nav-toggle">
-          <button
-            className={selectedTab === "all" ? "active" : ""}
-            onClick={() => setSelectedTab("all")}
-          >
-            Posted
-          </button>
-          <button
-            className={selectedTab === "Offers" ? "active" : ""}
-            onClick={() => setSelectedTab("Offers")}
-          >
-            Offers
-          </button>
-          <button
-            className={selectedTab === "progress" ? "active" : ""}
-            onClick={() => setSelectedTab("progress")}
-          >
-            In Progress
-          </button>
-
-          <button
-            className={selectedTab === "completed" ? "active" : ""}
-            onClick={() => setSelectedTab("completed")}
-          >
-            Completed
-          </button>
-          <button
-            className={selectedTab === "draft" ? "active" : ""}
-            onClick={() => setSelectedTab("draft")}
-          >
-            Draft
-          </button>
-          <button
-            className={selectedTab === "archive" ? "active" : ""}
-            onClick={() => setSelectedTab("archive")}
-          >
-            Archive
-          </button>
+          {Object.keys(jobTabs).map((tab) => (
+            <button
+              key={tab}
+              className={selectedTab === tab ? "active" : ""}
+              onClick={() => setSelectedTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         <div className="row">
           {jobTabs[selectedTab].map((job) => (
-            <div key={job.id} className="col-lg-12">
+            <div key={job._id} className="col-lg-12">
               <div className="card job-card">
                 <Link to={`/dashboard/gigdetails/${job._id}`}>
                   <div className="card-body">
                     <div className="d-flex flex-wrap justify-content-between align-items-start">
                       <div className="job-details">
                         <span className="badge job-type">Gig Worker</span>
-                        <h4>{job.jobTitle}</h4>
+                        <h4>{job.jobTitle || "Untitled Job"}</h4>
                         <span style={{ color: "#ddd", fontSize: "12px" }}>
                           {timeSince(job.createdAt)}
                         </span>
                       </div>
                       <div className="hr-info d-flex align-items-center">
                         <div className="pe-3 text-left">
-                          <p className="hr-name">{job.postedBy.username}</p>
-                          <span className="rating">★★★★☆ (4)</span>
+                          <p className="hr-name">
+                            {job.postedBy?.username || "Unknown User"}
+                          </p>
                           <div className="star-rating">
-                            {"★".repeat(Math.floor(job.rating))}
-                            {"☆".repeat(5 - Math.floor(job.rating))}
+                            {"★".repeat(Math.floor(job.rating || 0))}
+                            {"☆".repeat(5 - Math.floor(job.rating || 0))}
                           </div>
                         </div>
                         <img
-                          src={job.postedBy.image || placeholderImage}
+                          src={job.postedBy?.image || placeholderImage}
                           className="hr-image"
                           alt="HR"
                         />
@@ -202,9 +191,7 @@ const Mygigs = () => {
                       </span>
                       <button
                         className="btn chat-button"
-                        onClick={() => {
-                          handleChat(job._id);
-                        }}
+                        onClick={() => handleChat(job._id)}
                       >
                         <i className="bi bi-chat"></i> Chat
                       </button>
