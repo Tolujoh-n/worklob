@@ -206,7 +206,13 @@ const Chatdetails = () => {
                 </a>
               </div>
               <div className="progressexcrow">
-                <Escrow jobId={jobId} chatId={chatId} currentStatus={status} />
+                <Escrow
+                  jobId={jobId}
+                  chatId={chatId}
+                  currentStatus={status}
+                  userRole={user.role}
+                  trackWalletAddress={walletAddress}
+                />
                 <br />
               </div>
 
