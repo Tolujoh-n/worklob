@@ -2,36 +2,39 @@ import React, { useState } from "react";
 import ETH from "../assets/img/eth.png";
 import btc from "../assets/img/btc.png";
 import lobcoin from "../assets/img/worklob-coin.png";
+import { useWeb3 } from "../Web3Provider";
 
 const Wallet = () => {
   // Initialize state for transaction data
+  const { baseETHBalance, lobBalance } = useWeb3();
+
   const [transactions, setTransactions] = useState([
     {
       type: "Deposit",
       date: "2024-08-30",
       cryptocurrency: "ETH",
-      transactionId: "sp123456789abcdef",
+      transactionId: "oxs123456789abcdef",
       amount: "100 ETH",
     },
     {
       type: "Withdrawal",
       date: "2024-08-28",
       cryptocurrency: "LOB",
-      transactionId: "spa1b2c3d4e5f67890",
+      transactionId: "oxsa1b2c3d4e5f67890",
       amount: "50 LOB",
     },
     {
       type: "Swap",
       date: "2024-08-27",
       cryptocurrency: "ETH to LOB",
-      transactionId: "spabcdef123456789",
+      transactionId: "oxsabcdef123456789",
       amount: "25 ETH",
     },
     {
       type: "Deposit",
       date: "2024-08-26",
       cryptocurrency: "USDT",
-      transactionId: "sp0f9e8d7c6b5a4321",
+      transactionId: "oxs0f9e8d7c6b5a4321",
       amount: "200 USDT",
     },
   ]);
@@ -56,7 +59,9 @@ const Wallet = () => {
           <div className="wallet-card">
             <div className="wallet-header">
               <h2>Wallet Address</h2>
-              <span>Available Balance: 0.00 ETH</span>
+              <span>
+                Available Balance: {parseFloat(baseETHBalance).toFixed(2)} ETH
+              </span>
             </div>
             <table className="wallet-table">
               <thead>
@@ -71,7 +76,7 @@ const Wallet = () => {
                   <td>
                     <img src={ETH} alt="ETH" className="token-logo" /> ETH
                   </td>
-                  <td>0 ETH</td>
+                  <td>{parseFloat(baseETHBalance).toFixed(2)} ETH</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>
@@ -85,7 +90,7 @@ const Wallet = () => {
                   <td>
                     <img src={lobcoin} alt="LOB" className="token-logo" /> LOB
                   </td>
-                  <td>0 LOB</td>
+                  <td>{parseFloat(lobBalance).toFixed(2)} LOB</td>
                   <td>0.00 USDT</td>
                 </tr>
               </tbody>
