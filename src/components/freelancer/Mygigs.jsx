@@ -165,22 +165,6 @@ const Mygigs = () => {
                           {timeSince(job.createdAt)}
                         </span>
                       </div>
-                      <div className="hr-info d-flex align-items-center">
-                        <div className="pe-3 text-left">
-                          <p className="hr-name">
-                            {job.postedBy?.username || "Unknown User"}
-                          </p>
-                          <div className="star-rating">
-                            {"★".repeat(Math.floor(job.rating || 0))}
-                            {"☆".repeat(5 - Math.floor(job.rating || 0))}
-                          </div>
-                        </div>
-                        <img
-                          src={job.postedBy?.image || placeholderImage}
-                          className="hr-image"
-                          alt="HR"
-                        />
-                      </div>
                     </div>
                     <p className="job-description">
                       {truncateText(job.description, 60)}
@@ -189,11 +173,8 @@ const Mygigs = () => {
                       <span className="job-amount">
                         {formatPrice(job.budget)}
                       </span>
-                      <button
-                        className="btn chat-button"
-                        onClick={() => handleChat(job._id)}
-                      >
-                        <i className="bi bi-chat"></i> Chat
+                      <button className="btn chat-button">
+                        <i className="bi bi-people"></i> 1
                       </button>
                     </div>
                   </div>

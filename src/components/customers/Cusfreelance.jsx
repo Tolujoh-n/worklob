@@ -138,19 +138,6 @@ const Cusfreelance = () => {
                             {new Date(job.createdAt).toLocaleString()}
                           </p>
                         </div>
-                        <div className="hr-info d-flex align-items-center">
-                          <div className="pe-3 text-left">
-                            <p className="hr-name">{job.postedBy.username}</p>
-                            <span className="rating">
-                              {ratings} stars ({reviews} reviews)
-                            </span>
-                            <div className="star-rating">
-                              {"★".repeat(ratings)}
-                              {"☆".repeat(5 - ratings)}
-                            </div>
-                          </div>
-                          <img src={useImage} className="hr-image" alt="HR" />
-                        </div>
                       </div>
                       <p className="job-description">
                         {truncateText(job.description, 60)}
@@ -159,13 +146,8 @@ const Cusfreelance = () => {
                         <span className="job-amount">
                           {formatBudget(job.budget)}
                         </span>
-                        <button
-                          className="btn chat-button"
-                          onClick={() => {
-                            handleChat(job._id);
-                          }}
-                        >
-                          <i className="bi bi-chat"></i> Chat
+                        <button className="btn chat-button">
+                          <i className="bi bi-people"></i> 1
                         </button>
                       </div>
                     </div>

@@ -120,21 +120,6 @@ const Cusfulltime = () => {
               <div className="job-card" key={job._id}>
                 <Link to={`/dashboard/gigdetails/${job._id}`}>
                   <div className="job-card-header">
-                    <img
-                      src={job.logo || person}
-                      alt="Company Logo"
-                      className="company-logo"
-                    />
-                    <div className="job-hr">
-                      <h4 className="job-head">
-                        {job.postedBy?.username || "Unknown"}
-                      </h4>
-                      <div className="job-rating">
-                        <span className="stars">★★★★☆</span>
-                        <span className="rating-count">(25)</span>
-                      </div>
-                    </div>
-
                     <div className="job-meta">
                       <span className="job-date">
                         {timeSince(job.createdAt)}
@@ -156,13 +141,8 @@ const Cusfulltime = () => {
                 </Link>
                 <div className="d-flex justify-content-between align-items-center mt-3">
                   <span className="job-amount">{job.budget}</span>
-                  <button
-                    className="btn chat-button"
-                    onClick={() => {
-                      handleChat(job._id);
-                    }}
-                  >
-                    <i className="bi bi-chat"></i> Chat
+                  <button className="btn chat-button">
+                    <i className="bi bi-people"></i> 1
                   </button>
                 </div>
               </div>
