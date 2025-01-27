@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import person from "../../assets/address.jpg"; // Fallback image
 import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
 
 const Myfreelance = () => {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -29,16 +30,24 @@ const Myfreelance = () => {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
-      console.log("yu h", response.data);
 
       if (response.data.length > 0) {
-        const chatId = response.data[0]._id;
-        navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
+        const chat = response.data.find(
+          (chat) => chat.sender === userId || chat.receiver === userId // Check if the user is involved in the chat
+        );
+
+        if (chat) {
+          const chatId = chat._id;
+          navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
+        } else {
+          toast.error("You don't have permission to view this chat.");
+        }
       } else {
-        console.error("No chat found for this job");
+        toast.error("No chat found for this job.");
       }
     } catch (error) {
-      console.error("Error navigating applied job data:", error);
+      console.error("Error fetching chat details:", error);
+      toast.error("Failed to load chat details.");
     }
   };
 
