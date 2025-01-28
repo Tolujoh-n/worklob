@@ -7,15 +7,14 @@ import { toast } from "sonner";
 
 const Myfreelance = () => {
   const [selectedTab, setSelectedTab] = useState("all");
-  const [jobs, setJobs] = useState({
-    all: [],
-    apply: [],
-    progress: [],
-    archive: [],
-  });
+
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
   let userId;
   if (token) {
     try {
@@ -25,6 +24,86 @@ const Myfreelance = () => {
       console.error("Error decoding token:", error);
     }
   }
+
+  const statusMap = {
+    all: "all",
+    applied: "applied",
+    offered: "offered",
+    inProgress: "inProgress",
+    completed: "completed",
+    archived: "confirmed", // 'confirmed' maps to archived
+  };
+
+  const fetchJobStatuses = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/chat/allchats/${userId}`
+      );
+      const fetchedJobs = response.data;
+
+      // Log jobId and status to the console
+      const jobStatuses = fetchedJobs.map((job) => ({
+        jobId: job.jobId,
+        status: job.status,
+      }));
+      console.log("Job statuses:", jobStatuses);
+
+      return jobStatuses;
+    } catch (error) {
+      console.error("Error fetching job statuses:", error);
+      toast.error("Failed to fetch job statuses.");
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      if (!userId) return;
+
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/v1/frjobs/applied-freelancejob/${userId}`
+        );
+        const allAppliedJobs = response.data.appliedJobs || [];
+
+        const jobStatuses = await fetchJobStatuses();
+
+        const categorizedJobs = {
+          all: [],
+          applied: [],
+          offered: [],
+          inProgress: [],
+          completed: [],
+          archived: [],
+        };
+
+        allAppliedJobs.forEach((job) => {
+          const jobId = job.jobDetails._id;
+          const status =
+            jobStatuses.find((j) => j.jobId === jobId)?.status || "all";
+
+          const category = Object.keys(statusMap).find(
+            (key) => statusMap[key] === status
+          );
+
+          if (category) {
+            categorizedJobs[category].push(job);
+          }
+          categorizedJobs.all.push(job); // Add to 'all' regardless of status
+        });
+
+        setJobs(categorizedJobs);
+      } catch (error) {
+        console.error("Error fetching job data:", error);
+        toast.error("Failed to fetch jobs.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [API_URL, userId]);
+
   const handleChat = async (jobId) => {
     try {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
@@ -33,7 +112,7 @@ const Myfreelance = () => {
 
       if (response.data.length > 0) {
         const chat = response.data.find(
-          (chat) => chat.sender === userId || chat.receiver === userId // Check if the user is involved in the chat
+          (chat) => chat.sender === userId || chat.receiver === userId
         );
 
         if (chat) {
@@ -51,46 +130,10 @@ const Myfreelance = () => {
     }
   };
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      if (!userId) return; // Prevent fetching if userId is undefined
-
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/v1/frjobs/applied-freelancejob/${userId}`
-        );
-        const allAppliedJobs = response.data.appliedJobs || [];
-
-        // Sort the jobs into different categories based on application status
-        const categorizedJobs = {
-          all: allAppliedJobs,
-          apply: allAppliedJobs.filter(
-            (job) => job.application?.status === "apply"
-          ),
-          progress: allAppliedJobs.filter(
-            (job) => job.application?.status === "progress"
-          ),
-          archive: allAppliedJobs.filter(
-            (job) => job.application?.status === "archive"
-          ),
-        };
-
-        setJobs(categorizedJobs);
-      } catch (error) {
-        console.error("Error fetching job data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, [API_URL, userId]);
-
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+
   const truncateText = (text, wordLimit) => {
     if (!text || text.trim() === "") return "No description available";
     const words = text.split(" ");
@@ -102,40 +145,26 @@ const Myfreelance = () => {
   return (
     <>
       <div className="pagetitle">
-        <h1>My Jobs</h1>
+        <h1>My Freelance Jobs</h1>
       </div>
       <div className="job-list">
         <div className="nav-toggle">
-          <button
-            className={selectedTab === "all" ? "active" : ""}
-            onClick={() => setSelectedTab("all")}
-          >
-            All
-          </button>
-          <button
-            className={selectedTab === "Offers" ? "active" : ""}
-            onClick={() => setSelectedTab("Offers")}
-          >
-            Offers
-          </button>
-          <button
-            className={selectedTab === "progress" ? "active" : ""}
-            onClick={() => setSelectedTab("progress")}
-          >
-            In Progress
-          </button>
-          <button
-            className={selectedTab === "completed" ? "active" : ""}
-            onClick={() => setSelectedTab("completed")}
-          >
-            Completed
-          </button>
-          <button
-            className={selectedTab === "archive" ? "active" : ""}
-            onClick={() => setSelectedTab("archive")}
-          >
-            Archive
-          </button>
+          {[
+            { label: "All", value: "all" },
+            { label: "Applied", value: "applied" },
+            { label: "Offered", value: "offered" },
+            { label: "In Progress", value: "inProgress" },
+            { label: "Completed", value: "completed" },
+            { label: "Archived", value: "archived" },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              className={selectedTab === tab.value ? "active" : ""}
+              onClick={() => setSelectedTab(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className="row">

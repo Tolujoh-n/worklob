@@ -28,7 +28,15 @@ const Chat = () => {
         const response = await axios.get(
           `${API_URL}/api/v1/chat/allchats/${userId}`
         );
-        setJobs(response.data);
+        const fetchedJobs = response.data;
+        setJobs(fetchedJobs);
+
+        // Log jobId and status to the console
+        const jobStatuses = fetchedJobs.map((job) => ({
+          jobId: job.jobId,
+          status: job.status,
+        }));
+        console.log("Job statuses:", jobStatuses);
       } catch (error) {
         console.error("Error fetching customer jobs:", error);
         setJobs([]);
@@ -36,6 +44,7 @@ const Chat = () => {
         setLoading(false);
       }
     };
+
     fetchCustomerJobs();
   }, [API_URL, userId]);
 

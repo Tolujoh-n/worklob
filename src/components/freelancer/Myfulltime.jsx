@@ -7,12 +7,8 @@ import { toast } from "sonner";
 
 const Myfulltime = () => {
   const [selectedTab, setSelectedTab] = useState("all");
-  const [jobs, setJobs] = useState({
-    all: [],
-    apply: [],
-    progress: [],
-    archive: [],
-  });
+  const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -24,6 +20,82 @@ const Myfulltime = () => {
   }
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
+  const statusMap = {
+    all: "all",
+    applied: "applied",
+    offered: "offered",
+    inProgress: "inProgress",
+    completed: "completed",
+    archived: "confirmed", // 'confirmed' maps to archived
+  };
+
+  const fetchJobStatuses = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/chat/allchats/${userId}`
+      );
+      const fetchedJobs = response.data;
+
+      // Log jobId and status to the console
+      const jobStatuses = fetchedJobs.map((job) => ({
+        jobId: job.jobId,
+        status: job.status,
+      }));
+      console.log("Job statuses:", jobStatuses);
+
+      return jobStatuses;
+    } catch (error) {
+      console.error("Error fetching job statuses:", error);
+      toast.error("Failed to fetch job statuses.");
+      return [];
+    }
+  };
+
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/jobs/applied-fulltimejobs/${userId}`
+      );
+      const jobData = response.data.appliedJobs;
+      const jobStatuses = await fetchJobStatuses();
+
+      // Map statuses to jobs
+      const jobsWithStatuses = jobData.map((job) => {
+        const statusEntry = jobStatuses.find(
+          (status) => status.jobId === job.jobDetails._id
+        );
+        return {
+          ...job,
+          status: statusEntry ? statusEntry.status : "unknown",
+        };
+      });
+
+      console.log("Jobs with statuses:", jobsWithStatuses);
+      setJobs(jobsWithStatuses);
+      setLoading(false);
+      filterJobs(selectedTab, jobsWithStatuses);
+    } catch (error) {
+      console.error("Error fetching job data:", error);
+      toast.error("Failed to fetch jobs.");
+    }
+  };
+
+  const filterJobs = (tab, jobList) => {
+    const filtered =
+      tab === "all"
+        ? jobList
+        : jobList.filter((job) => job.status === statusMap[tab]);
+    setFilteredJobs(filtered);
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  useEffect(() => {
+    filterJobs(selectedTab, jobs);
+  }, [selectedTab, jobs]);
+
   const handleChat = async (jobId) => {
     try {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
@@ -32,7 +104,7 @@ const Myfulltime = () => {
 
       if (response.data.length > 0) {
         const chat = response.data.find(
-          (chat) => chat.sender === userId || chat.receiver === userId // Check if the user is involved in the chat
+          (chat) => chat.sender === userId || chat.receiver === userId
         );
 
         if (chat) {
@@ -45,47 +117,15 @@ const Myfulltime = () => {
         toast.error("No chat found for this job.");
       }
     } catch (error) {
-      console.error("Error navigating applied job data:", error);
+      console.error("Error navigating to chat details:", error);
       toast.error("Failed to load chat details.");
     }
   };
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/v1/jobs/applied-fulltimejobs/${userId}`
-        );
-        console.log(response.data.appliedJobs); // Fix console log to see correct structure
-        const allAppliedJobs = response.data.appliedJobs;
-
-        // Sort the jobs into different categories based on application status
-        const categorizedJobs = {
-          all: allAppliedJobs, // All jobs
-          apply: allAppliedJobs.filter(
-            (job) => job.application.status === "apply"
-          ), // 'Apply' tab jobs
-          progress: allAppliedJobs.filter(
-            (job) => job.application.status === "progress"
-          ), // 'In Progress' tab jobs
-          archive: allAppliedJobs.filter(
-            (job) => job.application.status === "archive"
-          ), // 'Archive' tab jobs
-        };
-
-        setJobs(categorizedJobs);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching job data:", error);
-      }
-    };
-
-    fetchJobs();
-  }, [API_URL, userId]);
-
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+
   const truncateText = (text, wordLimit) => {
     if (!text || text.trim() === "") return "No description available";
     const words = text.split(" ");
@@ -101,45 +141,30 @@ const Myfulltime = () => {
       </div>
       <div className="job-list">
         <div className="nav-toggle">
-          <button
-            className={selectedTab === "all" ? "active" : ""}
-            onClick={() => setSelectedTab("all")}
-          >
-            All
-          </button>
-          <button
-            className={selectedTab === "apply" ? "active" : ""}
-            onClick={() => setSelectedTab("apply")}
-          >
-            Apply
-          </button>
-          <button
-            className={selectedTab === "progress" ? "active" : ""}
-            onClick={() => setSelectedTab("progress")}
-          >
-            In Progress
-          </button>
-          <button
-            className={selectedTab === "archive" ? "active" : ""}
-            onClick={() => setSelectedTab("archive")}
-          >
-            Archive
-          </button>
+          {Object.keys(statusMap).map((tab) => (
+            <button
+              key={tab}
+              className={selectedTab === tab ? "active" : ""}
+              onClick={() => setSelectedTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         <div className="row">
           <div className="fulltime-job-list">
-            {jobs[selectedTab].length > 0 ? (
-              jobs[selectedTab].map((job) => {
-                const jobDetails = job.jobDetails || {}; // Ensure jobDetails exists
-                const postedBy = jobDetails.postedBy || {}; // Ensure postedBy exists
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => {
+                const jobDetails = job.jobDetails || {};
+                const postedBy = jobDetails.postedBy || {};
 
                 return (
                   <div className="job-card" key={jobDetails._id}>
                     <Link to={`/dashboard/gigdetails/${jobDetails._id}`}>
                       <div className="job-card-header">
                         <img
-                          src={person} // Fallback to default image
+                          src={person}
                           alt="Company Logo"
                           className="company-logo"
                         />
@@ -152,7 +177,6 @@ const Myfulltime = () => {
                             <span className="rating-count">(25)</span>
                           </div>
                         </div>
-
                         <div className="job-meta">
                           <span className="job-date">
                             {new Date(
@@ -180,9 +204,7 @@ const Myfulltime = () => {
                       </span>
                       <button
                         className="btn chat-button"
-                        onClick={() => {
-                          handleChat(jobDetails._id);
-                        }}
+                        onClick={() => handleChat(jobDetails._id)}
                       >
                         <i className="bi bi-chat"></i> Chat
                       </button>

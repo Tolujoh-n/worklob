@@ -3,6 +3,7 @@ import placeholderImage from "../../assets/address.jpg"; // Placeholder image
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
 
 const Mygigs = () => {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -11,6 +12,7 @@ const Mygigs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [roleFilter, setRoleFilter] = useState("");
+  const [jobStatuses, setJobStatuses] = useState([]); // Added state to hold fetched statuses
 
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
@@ -27,7 +29,29 @@ const Mygigs = () => {
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
+  // Fetch job statuses to filter jobs by status
+  const fetchJobStatuses = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/chat/allchats/${userId}`
+      );
+      const fetchedJobs = response.data;
+
+      // Map job statuses to jobId
+      const statuses = fetchedJobs.map((job) => ({
+        jobId: job.jobId,
+        status: job.status,
+      }));
+      setJobStatuses(statuses);
+    } catch (error) {
+      console.error("Error fetching job statuses:", error);
+      toast.error("Failed to fetch job statuses.");
+      setJobStatuses([]);
+    }
+  };
+
   useEffect(() => {
+    // Fetch user gigs
     const fetchUserGigs = async () => {
       if (!userId) return; // Ensure userId is available
 
@@ -44,7 +68,9 @@ const Mygigs = () => {
         setLoading(false);
       }
     };
+
     fetchUserGigs();
+    fetchJobStatuses(); // Fetch job statuses when component mounts
   }, [API_URL, userId]);
 
   const handleChat = async (jobId) => {
@@ -52,8 +78,6 @@ const Mygigs = () => {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
-      console.log("yu h", response.data);
-
       if (response.data.length > 0) {
         const chatId = response.data[0]._id;
         navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
@@ -112,6 +136,20 @@ const Mygigs = () => {
       return 0;
     });
 
+  // Create dynamic tabs based on status map and job statuses
+  const jobTabs = {
+    all: filteredJobs,
+    Offers: filteredJobs.filter((job) => job.status === "Offer"),
+    progress: filteredJobs.filter((job) => job.status === "In Progress"),
+    completed: filteredJobs.filter((job) => job.status === "Completed"),
+    draft: filteredJobs.filter((job) => job.status === "Draft"),
+    archive: filteredJobs.filter((job) =>
+      jobStatuses.some(
+        (status) => status.jobId === job._id && status.status === "confirmed"
+      )
+    ), // Filter confirmed jobs for archive
+  };
+
   if (loading) {
     return <p>Loading jobs...</p>;
   }
@@ -122,15 +160,6 @@ const Mygigs = () => {
     return words.length > wordLimit
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
-  };
-
-  const jobTabs = {
-    all: filteredJobs,
-    Offers: filteredJobs.filter((job) => job.status === "Offer"),
-    progress: filteredJobs.filter((job) => job.status === "In Progress"),
-    completed: filteredJobs.filter((job) => job.status === "Completed"),
-    draft: filteredJobs.filter((job) => job.status === "Draft"),
-    archive: filteredJobs.filter((job) => job.status === "Archived"),
   };
 
   return (
