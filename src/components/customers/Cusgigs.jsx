@@ -3,14 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import person from "../../assets/address.jpg"; // Fallback image
 import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
 
 const Cusgigs = () => {
-  const [selectedTab, setSelectedTab] = useState("Offers");
-  const [jobs, setJobs] = useState({
-    Offers: [],
-    progress: [],
-    completed: [],
-  });
+  const [selectedTab, setSelectedTab] = useState("all");
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -26,21 +24,60 @@ const Cusgigs = () => {
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
+  const statusMap = {
+    all: "all",
+    applied: "applied",
+    offered: "offered",
+    inProgress: "inProgress",
+    completed: "completed",
+    archived: "confirmed", // 'confirmed' maps to archived
+  };
+
+  const fetchJobStatuses = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/chat/allchats/${userId}`
+      );
+      const fetchedJobs = response.data;
+
+      // Log jobId and status to the console
+      const jobStatuses = fetchedJobs.map((job) => ({
+        jobId: job.jobId,
+        status: job.status,
+      }));
+      console.log("Job statuses:", jobStatuses);
+
+      return jobStatuses;
+    } catch (error) {
+      console.error("Error fetching job statuses:", error);
+      toast.error("Failed to fetch job statuses.");
+      return [];
+    }
+  };
+
   const handleChat = async (jobId) => {
     try {
       const response = await axios.get(`${API_URL}/api/v1/chat/chatdetails`, {
         params: { jobId },
       });
-      console.log("yu h", response.data);
 
       if (response.data.length > 0) {
-        const chatId = response.data[0]._id;
-        navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
+        const chat = response.data.find(
+          (chat) => chat.sender === userId || chat.receiver === userId
+        );
+
+        if (chat) {
+          const chatId = chat._id;
+          navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
+        } else {
+          toast.error("You don't have permission to view this chat.");
+        }
       } else {
-        console.error("No chat found for this job");
+        toast.error("No chat found for this job.");
       }
     } catch (error) {
-      console.error("Error navigating applied job data:", error);
+      console.error("Error navigating to chat details:", error);
+      toast.error("Failed to load chat details.");
     }
   };
 
@@ -52,18 +89,22 @@ const Cusgigs = () => {
           `${API_URL}/api/v1/application/buy-gigjobs/${userId}`
         );
         const allAppliedJobs = response.data.appliedJobs || [];
+        const jobStatuses = await fetchJobStatuses();
 
-        const categorizedJobs = {
-          Offers: allAppliedJobs,
-          progress: allAppliedJobs.filter(
-            (job) => job.application?.status === "progress"
-          ),
-          completed: allAppliedJobs.filter(
-            (job) => job.application?.status === "completed"
-          ),
-        };
+        // Map statuses to jobs
+        const jobsWithStatuses = allAppliedJobs.map((job) => {
+          const statusEntry = jobStatuses.find(
+            (status) => status.jobId === job.jobDetails._id
+          );
+          return {
+            ...job,
+            status: statusEntry ? statusEntry.status : "unknown",
+          };
+        });
 
-        setJobs(categorizedJobs);
+        console.log("Jobs with statuses:", jobsWithStatuses);
+        setJobs(jobsWithStatuses);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching job data:", error);
       } finally {
@@ -74,9 +115,23 @@ const Cusgigs = () => {
     fetchJobs();
   }, [API_URL, userId]);
 
+  // Filter jobs whenever the selectedTab changes
+  useEffect(() => {
+    const filterJobs = (tab, jobList) => {
+      const filtered =
+        tab === "all"
+          ? jobList
+          : jobList.filter((job) => job.status === statusMap[tab]);
+      setFilteredJobs(filtered);
+    };
+
+    filterJobs(selectedTab, jobs); // Reapply the filter whenever selectedTab or jobs change
+  }, [selectedTab, jobs]); // Dependencies include selectedTab and jobs
+
   if (loading) {
     return <p>Loading jobs...</p>;
   }
+
   const truncateText = (text, wordLimit) => {
     if (!text || text.trim() === "") return "No description available";
     const words = text.split(" ");
@@ -92,30 +147,21 @@ const Cusgigs = () => {
       </div>
       <div className="job-list">
         <div className="nav-toggle">
-          <button
-            className={selectedTab === "Offers" ? "active" : ""}
-            onClick={() => setSelectedTab("Offers")}
-          >
-            Offers
-          </button>
-          <button
-            className={selectedTab === "progress" ? "active" : ""}
-            onClick={() => setSelectedTab("progress")}
-          >
-            In Progress
-          </button>
-          <button
-            className={selectedTab === "completed" ? "active" : ""}
-            onClick={() => setSelectedTab("completed")}
-          >
-            Completed
-          </button>
+          {Object.keys(statusMap).map((tab) => (
+            <button
+              key={tab}
+              className={selectedTab === tab ? "active" : ""}
+              onClick={() => setSelectedTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         <div className="row">
           <div className="fulltime-job-list">
-            {jobs[selectedTab]?.length > 0 ? (
-              jobs[selectedTab].map((job) => {
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => {
                 const jobDetails = job.jobDetails || {};
                 const postedBy = jobDetails.postedBy || {};
 

@@ -16,6 +16,7 @@ const Fulltimejob = () => {
     const fetchJobs = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/v1/jobs/getAlljobs`);
+        console.log("Fulltime jobs data:", response.data); // Log to check the response
         setJobs(response.data);
       } catch (error) {
         console.error("Error fetching job data:", error);
@@ -73,15 +74,34 @@ const Fulltimejob = () => {
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
   };
-  const formatPrice = (budget) => {
-    if (typeof budget === "number") {
+  const formatPrice = (job) => {
+    if (!job) return "N/A";
+
+    if (typeof job.fixedCompensation === "number") {
       return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
         minimumFractionDigits: 0,
-      }).format(budget);
+      }).format(job.fixedCompensation);
     }
-    return "N/A"; // Handle missing or incorrect budget data
+
+    if (
+      job.rangeCompensation &&
+      job.rangeCompensation.min !== null &&
+      job.rangeCompensation.max !== null
+    ) {
+      return `${new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 0,
+      }).format(job.rangeCompensation.min)} - ${new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 0,
+      }).format(job.rangeCompensation.max)}`;
+    }
+
+    return "N/A"; // If no valid budget found
   };
 
   return (
@@ -154,9 +174,7 @@ const Fulltimejob = () => {
                     </Link>
                     <br />
                     <div className="freelance-job-card-footer">
-                      <p className="freelance-job-price">
-                        {formatPrice(job.budget)}
-                      </p>
+                      <p className="freelance-job-price">{formatPrice(job)}</p>
                       <Link to={`/dashboard/gigdetails/${job._id}`}>
                         <button className="freelance-more-info-btn">
                           See details

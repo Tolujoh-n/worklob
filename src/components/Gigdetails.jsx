@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import xp from "../assets/img/xp.jpg";
 import useimage from "../assets/address.jpg";
 import Moregigs from "./Moregigs";
 import Gigdetailsmodal from "./Gigdetailsmodal";
@@ -25,20 +24,17 @@ const Gigdetails = () => {
   const [loading, setLoading] = useState(true);
   const { jobId } = useParams();
 
-
-
   const openBuyModal = () => setIsBuyModalOpen(true);
   const closeBuyModal = () => setIsBuyModalOpen(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  const token = localStorage.getItem("token");
 
-  const token=localStorage.getItem('token',)
-
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   // console.log(user)
-  let applicantId
+  let applicantId;
   if (token) {
     const decodedToken = jwtDecode(token);
     applicantId = decodedToken.userId;
@@ -78,7 +74,7 @@ const Gigdetails = () => {
     <div className="giginfo gig-details-container row">
       <div className="col-lg-8 gig-info">
         <div className="gig-info-header d-flex align-items-center">
-          <img src={xp} alt="Gig" className="gig-image" />
+          <img src={useimage} alt="Gig" className="gig-image" />
           <div className="gig-info-text">
             <h2 className="gig-name">{jobs.postedBy.username}</h2>
             <div className="gig-rating">Rating: ★★★★☆</div>
@@ -95,110 +91,109 @@ const Gigdetails = () => {
         </div>
       </div>
       <div className="col-lg-4 gig-sidebar">
+        {user?.role === "Talent" ? (
+          <div
+            style={{ border: "1px solid whitesmoke" }}
+            className="card info-card"
+          >
+            <div className="card-body">
+              <h5 className="card-title">
+                {" "}
+                $ {jobs.budget} {jobs.fixedCompensation}
+              </h5>
+              <p className="gig-balance">ETH, USDT</p>
 
-      {user?.role==='Talent'?(
+              <div className="gig-actions">
+                <button
+                  style={{
+                    borderRadius: "20px",
+                    width: "100%",
+                    marginBottom: "15px",
+                  }}
+                  className="sidebutton"
+                  onClick={openModal}
+                >
+                  Apply for this job
+                </button>
+                <button
+                  style={{ borderRadius: "20px", width: "100%" }}
+                  className="sidebutton"
+                >
+                  Save for later
+                </button>
+              </div>
 
-        <div
-          style={{ border: "1px solid whitesmoke" }}
-          className="card info-card"
-        >
-          <div className="card-body">
-            <h5 className="card-title"> $ {jobs.budget} {jobs.fixedCompensation}</h5>
-            <p className="gig-balance">ETH, USDT</p>
-
-            <div className="gig-actions">
-              <button
-                style={{
-                  borderRadius: "20px",
-                  width: "100%",
-                  marginBottom: "15px",
-                }}
-                className="sidebutton"
-                onClick={openModal} 
-              >
-                Apply for this job
-              </button>
-              <button
-                style={{ borderRadius: "20px", width: "100%" }}
-                className="sidebutton"
-              >
-                Save for later
-              </button>
-            </div>
-
-            <div className="gig-share">
-              <p style={{ color: "whitesmoke" }}>Share this job:</p>
-              <div className="share-container">
-                <div className="social-icons">
-                  <a href="#" className="icon facebook" aria-label="Facebook">
-                    <i className="fab fa-facebook-f"></i>
-                  </a>
-                  <a href="#" className="icon twitter" aria-label="Twitter">
-                    <i className="fab fa-twitter"></i>
-                  </a>
-                  <a href="#" className="icon telegram" aria-label="Telegram">
-                    <i className="fab fa-telegram-plane"></i>
-                  </a>
-                  <a href="#" className="icon linkedin" aria-label="LinkedIn">
-                    <i className="fab fa-linkedin-in"></i>
-                  </a>
+              <div className="gig-share">
+                <p style={{ color: "whitesmoke" }}>Share this job:</p>
+                <div className="share-container">
+                  <div className="social-icons">
+                    <a href="#" className="icon facebook" aria-label="Facebook">
+                      <i className="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" className="icon twitter" aria-label="Twitter">
+                      <i className="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" className="icon telegram" aria-label="Telegram">
+                      <i className="fab fa-telegram-plane"></i>
+                    </a>
+                    <a href="#" className="icon linkedin" aria-label="LinkedIn">
+                      <i className="fab fa-linkedin-in"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div style={{ border: "1px solid whitesmoke" }} className="card">
+            <div className="card-body">
+              <h5 className="card-title">Terms of work:</h5>
+              <p className="gig-balance">
+                $ {jobs.budget} {jobs.fixedCompensation}
+              </p>
+              <p className="gig-balance">6 purchases</p>
 
-        ):(
-          
-        <div style={{ border: "1px solid whitesmoke" }} className="card">
-          <div className="card-body">
-            <h5 className="card-title">Terms of work:</h5>
-            <p className="gig-balance">
-              $ {jobs.budget} {jobs.fixedCompensation}
-            </p>
-            <p className="gig-balance">6 purchases</p>
+              <div className="gig-actions">
+                <button
+                  style={{
+                    borderRadius: "20px",
+                    width: "100%",
+                    marginBottom: "15px",
+                  }}
+                  className="sidebutton"
+                  onClick={openBuyModal} // Open Buy modal on button click
+                >
+                  Buy this gig
+                </button>
+                <button
+                  style={{ borderRadius: "20px", width: "100%" }}
+                  className="sidebutton"
+                >
+                  Save for later
+                </button>
+              </div>
 
-            <div className="gig-actions">
-              <button
-                style={{
-                  borderRadius: "20px",
-                  width: "100%",
-                  marginBottom: "15px",
-                }}
-                className="sidebutton"
-                onClick={openBuyModal} // Open Buy modal on button click
-              >
-                Buy this gig
-              </button>
-              <button
-                style={{ borderRadius: "20px", width: "100%" }}
-                className="sidebutton"
-              >
-                Save for later
-              </button>
-            </div>
-
-            <div className="gig-share">
-              <p style={{ color: "whitesmoke" }}>Share this job:</p>
-              <div className="share-container">
-                <div className="social-icons">
-                  <a href="#" className="icon facebook" aria-label="Facebook">
-                    <i className="fab fa-facebook-f"></i>
-                  </a>
-                  <a href="#" className="icon twitter" aria-label="Twitter">
-                    <i className="fab fa-twitter"></i>
-                  </a>
-                  <a href="#" className="icon telegram" aria-label="Telegram">
-                    <i className="fab fa-telegram-plane"></i>
-                  </a>
-                  <a href="#" className="icon linkedin" aria-label="LinkedIn">
-                    <i className="fab fa-linkedin-in"></i>
-                  </a>
+              <div className="gig-share">
+                <p style={{ color: "whitesmoke" }}>Share this job:</p>
+                <div className="share-container">
+                  <div className="social-icons">
+                    <a href="#" className="icon facebook" aria-label="Facebook">
+                      <i className="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" className="icon twitter" aria-label="Twitter">
+                      <i className="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" className="icon telegram" aria-label="Telegram">
+                      <i className="fab fa-telegram-plane"></i>
+                    </a>
+                    <a href="#" className="icon linkedin" aria-label="LinkedIn">
+                      <i className="fab fa-linkedin-in"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* Top Hiring Managers */}
@@ -247,9 +242,9 @@ const Gigdetails = () => {
       </div>
 
       <Gigdetailsmodal
-       applicantId={applicantId}
-       jobId={jobId}
-        recruiterImage={xp}
+        applicantId={applicantId}
+        jobId={jobId}
+        recruiterImage={useimage}
         recruiterName={jobs.postedBy.username}
         jobTitle={jobs.jobTitle}
         isOpen={isModalOpen}
@@ -258,9 +253,9 @@ const Gigdetails = () => {
 
       {/* Buy gig Modal */}
       <Buygigmodal
-       applicantId={applicantId}
-       jobId={jobId}
-        recruiterImage={xp}
+        applicantId={applicantId}
+        jobId={jobId}
+        recruiterImage={useimage}
         recruiterName={jobs.postedBy.username}
         jobTitle={jobs.jobTitle}
         isOpen={isBuyModalOpen}

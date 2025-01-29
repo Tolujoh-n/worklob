@@ -139,8 +139,8 @@ const Mygigs = () => {
   // Create dynamic tabs based on status map and job statuses
   const jobTabs = {
     all: filteredJobs,
-    Offers: filteredJobs.filter((job) => job.status === "Offer"),
-    progress: filteredJobs.filter((job) => job.status === "In Progress"),
+    Offered: filteredJobs.filter((job) => job.status === "Offered"),
+    inProgress: filteredJobs.filter((job) => job.status === "inProgress"),
     completed: filteredJobs.filter((job) => job.status === "Completed"),
     draft: filteredJobs.filter((job) => job.status === "Draft"),
     archive: filteredJobs.filter((job) =>
