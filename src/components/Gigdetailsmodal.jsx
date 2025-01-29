@@ -8,6 +8,7 @@ const Gigdetailsmodal = ({
   recruiterName,
   jobTitle,
   jobId,
+  userRole,
   applicantId,
   isOpen,
   onClose,

@@ -33,6 +33,8 @@ const Gigdetails = () => {
   const token = localStorage.getItem("token");
 
   const user = JSON.parse(localStorage.getItem("user"));
+  let userRole = user?.role;
+  console.log("User Role:", userRole);
   // console.log(user)
   let applicantId;
   if (token) {
@@ -247,6 +249,7 @@ const Gigdetails = () => {
         recruiterImage={useimage}
         recruiterName={jobs.postedBy.username}
         jobTitle={jobs.jobTitle}
+        userRole={userRole}
         isOpen={isModalOpen}
         onClose={closeModal}
       />
@@ -258,6 +261,7 @@ const Gigdetails = () => {
         recruiterImage={useimage}
         recruiterName={jobs.postedBy.username}
         jobTitle={jobs.jobTitle}
+        userRole={userRole}
         isOpen={isBuyModalOpen}
         onClose={closeBuyModal}
       />

@@ -8,6 +8,7 @@ const Buygigmodal = ({
   recruiterName,
   jobTitle,
   jobId,
+  userRole,
   applicantId,
   isOpen,
   onClose,
