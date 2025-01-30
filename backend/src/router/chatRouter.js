@@ -103,7 +103,6 @@ router.get("/chatdetails", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
 router.get("/allchats/:userId", async (req, res) => {
   const { userId } = req.params;
 
@@ -113,8 +112,8 @@ router.get("/allchats/:userId", async (req, res) => {
       $or: [{ receiver: userId }, { sender: userId }],
     })
       .sort({ createdAt: -1 })
-      .populate("sender", "username userRole") // Populate userRole for sender
-      .populate("receiver", "username userRole"); // Populate userRole for receiver
+      .populate("sender", "username")
+      .populate("receiver", "username");
 
     // Helper function to populate job title based on job type
     const populateJobTitle = async (chat) => {
@@ -135,36 +134,28 @@ router.get("/allchats/:userId", async (req, res) => {
 
     // Fetch userRole from Application or GigApply model
     const getUserRole = async (chat) => {
-      let applicationUserRole = null;
-      let gigApplyUserRole = null;
-
       if (chat.jobType === "FullTimeJob" || chat.jobType === "FreelanceJob") {
         const application = await Application.findOne({
           jobId: chat.jobId,
           applicant: chat.sender._id,
         });
-        if (application) {
-          applicationUserRole = application.userRole;
-        }
+        return application ? application.userRole : "Unknown";
       } else if (chat.jobType === "GigJob") {
         const gigApply = await GigApply.findOne({
           jobId: chat.jobId,
           applicant: chat.sender._id,
         });
-        if (gigApply) {
-          gigApplyUserRole = gigApply.userRole;
-        }
+        return gigApply ? gigApply.userRole : "Unknown";
       }
-
-      return applicationUserRole || gigApplyUserRole || "Unknown";
+      return "Unknown";
     };
 
     // Populate job titles and userRoles for each chat
     const chatsWithDetails = await Promise.all(
       findChats.map(async (chat) => {
         const jobTitle = await populateJobTitle(chat);
-        const userRole = await getUserRole(chat);
-        return { ...chat.toObject(), jobTitle, userRole };
+        const applicantRole = await getUserRole(chat);
+        return { ...chat.toObject(), jobTitle, applicantRole };
       })
     );
 

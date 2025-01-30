@@ -1,4 +1,4 @@
-// models/Application.js
+// models/ApplicationSchema.js
 const mongoose = require("mongoose");
 
 const applicationSchema = new mongoose.Schema(

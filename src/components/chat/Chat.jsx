@@ -35,22 +35,15 @@ const Chat = () => {
         );
         const fetchedJobs = response.data;
 
-        // Filter based on userRole - Just retain this part
-        const filteredJobs = fetchedJobs.filter((job) => {
-          if (userRole === "Customer" || userRole === "Talent") {
-            console.log(`User role in chat: ${userRole}`);
-          }
-          return job.sender._id === userId || job.receiver._id === userId;
-        });
-
-        setJobs(filteredJobs);
-
-        // Log jobId and status to the console
-        const jobStatuses = filteredJobs.map((job) => ({
+        // Log jobId, status, and applicantRole to the console
+        const jobStatuses = fetchedJobs.map((job) => ({
           jobId: job.jobId,
           status: job.status,
+          applicantRole: job.applicantRole,
         }));
-        console.log("Job statuses:", jobStatuses);
+        console.log("Job statuses with applicant roles:", jobStatuses);
+
+        setJobs(fetchedJobs);
       } catch (error) {
         console.error("Error fetching jobs:", error);
         setJobs([]);
@@ -63,6 +56,10 @@ const Chat = () => {
   }, [API_URL, userId, userRole]);
 
   const filteredChats = jobs.filter((chat) => {
+    if (userRole === "Customer" && chat.applicantRole !== "Talent")
+      return false;
+    if (userRole === "Talent" && chat.applicantRole !== "Customer")
+      return false;
     if (activeCategory === "Freelance") return chat.jobType === "FreelanceJob";
     if (activeCategory === "Full-Time") return chat.jobType === "FullTimeJob";
     if (activeCategory === "GigJob") return chat.jobType === "GigJob";
