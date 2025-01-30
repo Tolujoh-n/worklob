@@ -32,6 +32,10 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    userRole: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

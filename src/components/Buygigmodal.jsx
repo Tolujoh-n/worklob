@@ -15,8 +15,8 @@ const Buygigmodal = ({
 }) => {
   const [cvFile, setCvFile] = useState(null);
   const [description, setDescription] = useState("");
- 
-  const navigate=useNavigate();
+
+  const navigate = useNavigate();
   const handleFileChange = (e) => {
     setCvFile(e.target.files[0]);
   };
@@ -29,23 +29,24 @@ const Buygigmodal = ({
     formData.append("applicantId", applicantId);
     formData.append("description", description);
     formData.append("cvFile", cvFile);
-
-    console.log("Form Data:", formData);
+    formData.append("userRole", userRole); // Add this line
 
     try {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
-      const response = await axios.post(`${API_URL}/api/v1/application/buyGig`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }, // Sending as form data
-      });
+      const response = await axios.post(
+        `${API_URL}/api/v1/application/buyGig`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-   
-      const chatId=response.data.chatId;
+      const chatId = response.data.chatId;
       if (response.status === 200) {
         toast.success("Application Submitted Successfully");
-        console.log("Navigating to:", `/dashboard/chatdetails/${jobId}/chat/${chatId}`);
         setTimeout(() => {
           navigate(`/dashboard/chatdetails/${jobId}/chat/${chatId}`);
-        }, 1000); 
+        }, 1000);
       }
     } catch (error) {
       console.error("Error submitting application:", error);

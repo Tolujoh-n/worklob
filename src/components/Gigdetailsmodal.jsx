@@ -35,6 +35,7 @@ const Gigdetailsmodal = ({
     formData.append("paymentMethod", paymentMethod);
     formData.append("description", description);
     formData.append("cvFile", cvFile);
+    formData.append("userRole", userRole); // Add this line
 
     console.log("Form Data:", formData);
 
@@ -44,11 +45,11 @@ const Gigdetailsmodal = ({
         `${API_URL}/api/v1/application/applyjob`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" }, // Sending as form data
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
-      console.log("chat id recieve", response.data.chatId);
+      console.log("chat id receive", response.data.chatId);
 
       const chatId = response.data.chatId;
       if (response.status === 200) {

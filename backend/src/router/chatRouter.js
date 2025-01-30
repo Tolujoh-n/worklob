@@ -3,6 +3,9 @@ const Chat = require("../models/Chat");
 const FullTimeJob = require("../models/FullTimeJob");
 const FreelanceJob = require("../models/FreelancingJob");
 const PostGig = require("../models/postgig");
+const Application = require("../models/ApplicationSchema");
+const GigApply = require("../models/GigApplication");
+
 const router = express.Router();
 
 router.get("/getAllchats", async (req, res) => {
@@ -11,12 +14,10 @@ router.get("/getAllchats", async (req, res) => {
     return res.status(200).json(chat);
   } catch (error) {
     console.error("Error fetching jobs:", error.message);
-    return res
-      .status(500)
-      .json({
-        msg: "Error occurred while fetching gigs",
-        error: error.message,
-      });
+    return res.status(500).json({
+      msg: "Error occurred while fetching gigs",
+      error: error.message,
+    });
   }
 });
 
@@ -51,11 +52,9 @@ router.put("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
 
     // Check walletAddress before updating status
     if (!chat.walletAddress && !walletAddress) {
-      return res
-        .status(400)
-        .json({
-          message: "Wallet address is required before updating status.",
-        });
+      return res.status(400).json({
+        message: "Wallet address is required before updating status.",
+      });
     }
 
     if (walletAddress) {
@@ -114,8 +113,8 @@ router.get("/allchats/:userId", async (req, res) => {
       $or: [{ receiver: userId }, { sender: userId }],
     })
       .sort({ createdAt: -1 })
-      .populate("sender", "username")
-      .populate("receiver", "username");
+      .populate("sender", "username userRole") // Populate userRole for sender
+      .populate("receiver", "username userRole"); // Populate userRole for receiver
 
     // Helper function to populate job title based on job type
     const populateJobTitle = async (chat) => {
@@ -134,15 +133,42 @@ router.get("/allchats/:userId", async (req, res) => {
       }
     };
 
-    // Populate job titles for each chat
-    const chatsWithJobTitles = await Promise.all(
+    // Fetch userRole from Application or GigApply model
+    const getUserRole = async (chat) => {
+      let applicationUserRole = null;
+      let gigApplyUserRole = null;
+
+      if (chat.jobType === "FullTimeJob" || chat.jobType === "FreelanceJob") {
+        const application = await Application.findOne({
+          jobId: chat.jobId,
+          applicant: chat.sender._id,
+        });
+        if (application) {
+          applicationUserRole = application.userRole;
+        }
+      } else if (chat.jobType === "GigJob") {
+        const gigApply = await GigApply.findOne({
+          jobId: chat.jobId,
+          applicant: chat.sender._id,
+        });
+        if (gigApply) {
+          gigApplyUserRole = gigApply.userRole;
+        }
+      }
+
+      return applicationUserRole || gigApplyUserRole || "Unknown";
+    };
+
+    // Populate job titles and userRoles for each chat
+    const chatsWithDetails = await Promise.all(
       findChats.map(async (chat) => {
         const jobTitle = await populateJobTitle(chat);
-        return { ...chat.toObject(), jobTitle };
+        const userRole = await getUserRole(chat);
+        return { ...chat.toObject(), jobTitle, userRole };
       })
     );
 
-    res.status(200).json(chatsWithJobTitles);
+    res.status(200).json(chatsWithDetails);
   } catch (error) {
     console.error("Error fetching chats:", error);
     res.status(500).json({ message: "Error fetching chats" });

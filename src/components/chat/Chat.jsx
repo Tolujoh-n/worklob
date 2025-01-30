@@ -17,36 +17,50 @@ const Chat = () => {
   const token = localStorage.getItem("token");
 
   let userId;
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  let userRole = user?.role;
+  console.log("User Role:", userRole);
+
   if (token) {
     const decodedToken = jwtDecode(token);
     userId = decodedToken.userId;
   }
 
   useEffect(() => {
-    const fetchCustomerJobs = async () => {
+    const fetchJobs = async () => {
       try {
         const response = await axios.get(
           `${API_URL}/api/v1/chat/allchats/${userId}`
         );
         const fetchedJobs = response.data;
-        setJobs(fetchedJobs);
+
+        // Filter based on userRole - Just retain this part
+        const filteredJobs = fetchedJobs.filter((job) => {
+          if (userRole === "Customer" || userRole === "Talent") {
+            console.log(`User role in chat: ${userRole}`);
+          }
+          return job.sender._id === userId || job.receiver._id === userId;
+        });
+
+        setJobs(filteredJobs);
 
         // Log jobId and status to the console
-        const jobStatuses = fetchedJobs.map((job) => ({
+        const jobStatuses = filteredJobs.map((job) => ({
           jobId: job.jobId,
           status: job.status,
         }));
         console.log("Job statuses:", jobStatuses);
       } catch (error) {
-        console.error("Error fetching customer jobs:", error);
+        console.error("Error fetching jobs:", error);
         setJobs([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCustomerJobs();
-  }, [API_URL, userId]);
+    fetchJobs();
+  }, [API_URL, userId, userRole]);
 
   const filteredChats = jobs.filter((chat) => {
     if (activeCategory === "Freelance") return chat.jobType === "FreelanceJob";
