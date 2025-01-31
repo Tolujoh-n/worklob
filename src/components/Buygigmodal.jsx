@@ -24,6 +24,11 @@ const Buygigmodal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (userRole !== "Customer") {
+      toast.error("Switch to a Customer Role to Apply for jobs");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("jobId", jobId);
     formData.append("applicantId", applicantId);

@@ -56,10 +56,6 @@ const Chat = () => {
   }, [API_URL, userId, userRole]);
 
   const filteredChats = jobs.filter((chat) => {
-    if (userRole === "Customer" && chat.applicantRole !== "Talent")
-      return false;
-    if (userRole === "Talent" && chat.applicantRole !== "Customer")
-      return false;
     if (activeCategory === "Freelance") return chat.jobType === "FreelanceJob";
     if (activeCategory === "Full-Time") return chat.jobType === "FullTimeJob";
     if (activeCategory === "GigJob") return chat.jobType === "GigJob";

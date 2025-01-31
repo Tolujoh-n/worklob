@@ -134,12 +134,12 @@ router.get("/allchats/:userId", async (req, res) => {
 
     // Fetch userRole from Application or GigApply model
     const getUserRole = async (chat) => {
+      let application;
       if (chat.jobType === "FullTimeJob" || chat.jobType === "FreelanceJob") {
-        const application = await Application.findOne({
+        application = await Application.findOne({
           jobId: chat.jobId,
           applicant: chat.sender._id,
         });
-        return application ? application.userRole : "Unknown";
       } else if (chat.jobType === "GigJob") {
         const gigApply = await GigApply.findOne({
           jobId: chat.jobId,
@@ -147,7 +147,7 @@ router.get("/allchats/:userId", async (req, res) => {
         });
         return gigApply ? gigApply.userRole : "Unknown";
       }
-      return "Unknown";
+      return application ? application.userRole : "Unknown";
     };
 
     // Populate job titles and userRoles for each chat

@@ -22,13 +22,12 @@ const upload = multer({ storage: storage });
 router.post("/applyjob", upload.single("cvFile"), async (req, res) => {
   try {
     const { jobId, applicantId, description, paymentMethod, userRole } =
-      req.body; // Include userRole
+      req.body;
 
     console.log("Received request with body:", req.body);
     console.log("Uploaded file details:", req.file);
 
     if (!jobId || !applicantId || !description || !paymentMethod || !userRole) {
-      // Validate userRole
       return res.status(400).json({ error: "All fields are required." });
     }
 
@@ -45,13 +44,13 @@ router.post("/applyjob", upload.single("cvFile"), async (req, res) => {
       "postedBy"
     );
     const jobType = fulltimeJob ? "FullTimeJob" : "FreelanceJob";
-    console.log(jobType);
+    console.log("Job Type:", jobType);
 
     let receiverId;
     if (jobType === "FullTimeJob" && fulltimeJob.postedBy) {
-      receiverId = fulltimeJob.postedBy;
+      receiverId = fulltimeJob.postedBy._id;
     } else if (jobType === "FreelanceJob" && freelanceJob.postedBy) {
-      receiverId = freelanceJob.postedBy;
+      receiverId = freelanceJob.postedBy._id;
     }
 
     if (!receiverId) {
@@ -69,7 +68,7 @@ router.post("/applyjob", upload.single("cvFile"), async (req, res) => {
       description,
       paymentMethod,
       cvFile: req.file.path,
-      userRole, // Save userRole
+      userRole,
     });
 
     const savedApplication = await newApplication.save();
@@ -81,7 +80,7 @@ router.post("/applyjob", upload.single("cvFile"), async (req, res) => {
       receiver: receiverId,
       message: `Application: ${description}`,
       isRead: false,
-      userRole, // Add userRole to chat if desired again
+      userRole,
     });
 
     const savedChat = await newChat.save();

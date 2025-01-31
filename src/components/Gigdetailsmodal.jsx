@@ -29,13 +29,18 @@ const Gigdetailsmodal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (userRole !== "Talent") {
+      toast.error("Switch to a Talent Role to Apply for jobs");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("jobId", jobId);
     formData.append("applicantId", applicantId);
     formData.append("paymentMethod", paymentMethod);
     formData.append("description", description);
     formData.append("cvFile", cvFile);
-    formData.append("userRole", userRole); // Add this line
+    formData.append("userRole", userRole);
 
     console.log("Form Data:", formData);
 
@@ -49,7 +54,7 @@ const Gigdetailsmodal = ({
         }
       );
 
-      console.log("chat id receive", response.data.chatId);
+      console.log("chat id received", response.data.chatId);
 
       const chatId = response.data.chatId;
       if (response.status === 200) {
