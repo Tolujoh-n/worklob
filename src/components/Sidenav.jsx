@@ -41,6 +41,12 @@ const Sidenav = ({ activeLink, setActive }) => {
       name: "My Full-time Jobs",
       icon: "bi-briefcase-fill",
     },
+    {
+      id: 6,
+      path: "chatbot",
+      name: "Ask AI",
+      icon: "bi-robot",
+    },
   ];
 
   const customercategory = [
@@ -58,9 +64,20 @@ const Sidenav = ({ activeLink, setActive }) => {
       name: "My Full-time Jobs",
       icon: "bi-briefcase-fill",
     },
+    {
+      id: 5,
+      path: "chatbot",
+      name: "Ask AI",
+      icon: "bi-robot",
+    },
   ];
 
   const userlist = [
+    { id: 1, path: "wallet", name: "Wallet", icon: "bi-wallet" },
+    { id: 1, path: "governance", name: "Governance", icon: "bi-bank" },
+    { id: 1, path: "staking", name: "Staking", icon: "bi-coin" },
+    { id: 1, path: "trade", name: "Trade", icon: "bi-arrow-left-right" },
+    { id: 1, path: "blogs", name: "Blogs", icon: "bi-journal-text" },
     { id: 1, path: "referrals", name: "Referrals", icon: "bi-people" },
     { id: 2, path: "settings", name: "Settings", icon: "bi-gear" },
   ];
@@ -135,22 +152,6 @@ const Sidenav = ({ activeLink, setActive }) => {
       <br />
 
       <ul className="sidebar-nav" id="sidebar-nav">
-        <li className="nav-item">
-          <Link className="nav-link gap-1 collapsed" to="/dashboard/wallet">
-            <i className="bi bi-wallet"></i>
-            <span>Wallet</span>
-          </Link>
-        </li>
-        <li className="nav-item">
-          <a
-            className="nav-link gap-1 collapsed"
-            href="https://www.base.org/ecosystem"
-            target="_blank"
-          >
-            <i className="bi bi-bank"></i>
-            <span>Governance</span>
-          </a>
-        </li>
         {userlist.map((user) => (
           <li key={user.id} className="nav-item">
             <Link

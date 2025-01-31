@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import ETH from "../assets/img/eth.png";
-import btc from "../assets/img/btc.png";
-import lobcoin from "../assets/img/worklob-coin.png";
-import { useWeb3 } from "../Web3Provider";
+import ETH from "../../assets/img/eth.png";
+import btc from "../../assets/img/btc.png";
+import lobcoin from "../../assets/img/worklob-coin.png";
+import { useWeb3 } from "../../Web3Provider";
 
 const Wallet = () => {
   // Initialize state for transaction data

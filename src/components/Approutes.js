@@ -26,7 +26,14 @@ import Settings from "../views/Settings";
 import Footer from "../components/Footer";
 import Gigdetails from "./Gigdetails";
 import Referrals from "./referrals/Referrals.jsx";
-import Wallet from "./Wallet.jsx";
+import Wallet from "./wallet/Wallet.jsx";
+
+// Future rootes
+import Trade from "./trade/Trade.jsx";
+import Staking from "./staking/Staking.jsx";
+import Governance from "./governance/Governance.jsx";
+import Blogs from "./blogs/Blogs.jsx";
+import Chatbot from "./ai/Chatbot.jsx";
 
 // Css files
 import "../assets/vendor/simple-datatables/style.css";
@@ -60,7 +67,10 @@ const Approutes = () => {
               <Route path="/fulltimejob" element={<Fulltimejob />} />
 
               <Route path="/chat" element={<Chat />} />
-              <Route path="/chatdetails/:jobId/chat/:chatId" element={<Chatdetails />} />
+              <Route
+                path="/chatdetails/:jobId/chat/:chatId"
+                element={<Chatdetails />}
+              />
 
               <Route path="/customerdash" element={<Customerdash />} />
               <Route path="/cusfreelance" element={<Cusfreelance />} />
@@ -75,6 +85,11 @@ const Approutes = () => {
               <Route path="/settings" element={<Settings />} />
               <Route path="/gigdetails/:jobId" element={<Gigdetails />} />
               <Route path="/referrals" element={<Referrals />} />
+              <Route path="/trade" element={<Trade />} />
+              <Route path="/staking" element={<Staking />} />
+              <Route path="/governance" element={<Governance />} />
+              <Route path="/blogs" element={<Blogs />} />
+              <Route path="/chatbot" element={<Chatbot />} />
             </Routes>
           </div>
         </section>
