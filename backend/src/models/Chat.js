@@ -13,10 +13,12 @@ const chatSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  talentId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   message: { type: String, required: true },
   isRead: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
-  walletAddress: { type: String, required: false }, // New field
+  walletAddress: { type: String, required: false },
   status: {
     type: String,
     enum: [

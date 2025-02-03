@@ -41,7 +41,7 @@ router.get("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
 
 router.put("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
   const { chatId } = req.params;
-  const { walletAddress, status } = req.body;
+  const { walletAddress, status, userId, userRole } = req.body;
 
   try {
     const chat = await Chat.findById(chatId);
@@ -49,6 +49,12 @@ router.put("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
     if (!chat) {
       return res.status(404).json({ message: "Chat not found" });
     }
+
+    // Log user details for debugging
+    console.log("User Role:", userRole);
+    console.log("User ID:", userId);
+    console.log("Customer ID:", chat.customerId);
+    console.log("Talent ID:", chat.talentId);
 
     // Check walletAddress before updating status
     if (!chat.walletAddress && !walletAddress) {
@@ -61,6 +67,7 @@ router.put("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
       chat.walletAddress = walletAddress;
     }
 
+    // Validate status transition
     const validTransitions = {
       applied: "offered",
       offered: "deposited",
@@ -77,6 +84,32 @@ router.put("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
       });
     }
 
+    // Role and ID checks for each status
+    if (
+      status === "offered" ||
+      status === "deposited" ||
+      status === "confirmed"
+    ) {
+      if (userRole !== "Customer") {
+        return res
+          .status(403)
+          .json({ message: "Switch to Customer role to perform this action." });
+      }
+      if (userId !== chat.customerId.toString()) {
+        return res.status(403).json({ message: "You are not the Customer." });
+      }
+    } else if (status === "inProgress" || status === "completed") {
+      if (userRole !== "Talent") {
+        return res
+          .status(403)
+          .json({ message: "Switch to Talent role to perform this action." });
+      }
+      if (userId !== chat.talentId.toString()) {
+        return res.status(403).json({ message: "You are not the Talent." });
+      }
+    }
+
+    // Update the status
     if (status) {
       chat.status = status;
     }
@@ -113,7 +146,9 @@ router.get("/allchats/:userId", async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .populate("sender", "username")
-      .populate("receiver", "username");
+      .populate("receiver", "username")
+      .populate("customerId", "username")
+      .populate("talentId", "username");
 
     // Helper function to populate job title based on job type
     const populateJobTitle = async (chat) => {
