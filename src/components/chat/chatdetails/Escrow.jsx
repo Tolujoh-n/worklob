@@ -76,23 +76,23 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
   const handleClick = async (
     index,
     status,
-    requiredRole,
-    isWalletCheckRequired = false
+    requiredRole
+    // isWalletCheckRequired = false
   ) => {
     if (userRole !== requiredRole) {
-      toast.error(`Only the ${requiredRole} can perform this action.`);
+      toast.error(`Switch to ${requiredRole} role this action.`);
       return;
     }
 
-    if (isWalletCheckRequired && walletAddress !== trackWalletAddress) {
-      toast.error(
-        `Please use the wallet address: ${trackWalletAddress.substring(
-          0,
-          6
-        )}...${trackWalletAddress.slice(-4)}.`
-      );
-      return;
-    }
+    // if (isWalletCheckRequired && walletAddress !== trackWalletAddress) {
+    //   toast.error(
+    //     `Please use the wallet address: ${trackWalletAddress.substring(
+    //       0,
+    //       6
+    //     )}...${trackWalletAddress.slice(-4)}.`
+    //   );
+    //   return;
+    // }
 
     const updatedStates = [...buttonStates];
     if (!updatedStates[index] && (index === 0 || updatedStates[index - 1])) {
@@ -129,7 +129,7 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
       toast.success("Status updated successfully!");
     } catch (error) {
       console.error("Error updating status:", error.message);
-      toast.error("Failed to update status.");
+      toast.error("Failed to update status(Not the role Permited).");
     }
   };
 

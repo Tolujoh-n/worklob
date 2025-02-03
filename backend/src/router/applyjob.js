@@ -81,6 +81,8 @@ router.post("/applyjob", upload.single("cvFile"), async (req, res) => {
       message: `Application: ${description}`,
       isRead: false,
       userRole,
+      customerId: receiverId,
+      talentId: applicantId,
     });
 
     const savedChat = await newChat.save();
