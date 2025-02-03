@@ -73,26 +73,11 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
     }
   }, [jobId, currentStatus]);
 
-  const handleClick = async (
-    index,
-    status,
-    requiredRole
-    // isWalletCheckRequired = false
-  ) => {
+  const handleClick = async (index, status, requiredRole) => {
     if (userRole !== requiredRole) {
       toast.error(`Switch to ${requiredRole} role this action.`);
       return;
     }
-
-    // if (isWalletCheckRequired && walletAddress !== trackWalletAddress) {
-    //   toast.error(
-    //     `Please use the wallet address: ${trackWalletAddress.substring(
-    //       0,
-    //       6
-    //     )}...${trackWalletAddress.slice(-4)}.`
-    //   );
-    //   return;
-    // }
 
     const updatedStates = [...buttonStates];
     if (!updatedStates[index] && (index === 0 || updatedStates[index - 1])) {
