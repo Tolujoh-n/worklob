@@ -20,10 +20,9 @@ const upload = multer({ storage: storage });
 
 router.post("/buyGig", upload.single("cvFile"), async (req, res) => {
   try {
-    const { jobId, applicantId, description, userRole } = req.body; // Include userRole
+    const { jobId, applicantId, description, userRole } = req.body;
 
     if (!jobId || !applicantId || !description || !userRole) {
-      // Validate userRole
       return res.status(400).json({ error: "All fields are required." });
     }
 
@@ -43,7 +42,7 @@ router.post("/buyGig", upload.single("cvFile"), async (req, res) => {
       applicant: applicantId,
       description,
       cvFile: req.file.path,
-      userRole, // Save userRole
+      userRole,
     });
 
     const savedApplication = await newApplication.save();
@@ -55,7 +54,9 @@ router.post("/buyGig", upload.single("cvFile"), async (req, res) => {
       receiver: receiverId,
       message: `Application: ${description}`,
       isRead: false,
-      userRole, // Add userRole to chat if desired again
+      userRole,
+      customerId: receiverId,
+      talentId: applicantId,
     });
 
     const savedChat = await newChat.save();

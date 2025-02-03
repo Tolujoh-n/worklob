@@ -38,10 +38,9 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
         const response = await axios.get(
           `${API_URL}/api/v1/chat/chatdetails/${jobId}/chat/${chatId}`
         );
-        setChat(response.data); // Store chat details in state
+        setChat(response.data);
         console.log("Chat details fetched:", response.data);
 
-        // Log user details for debugging
         console.log("User Role:", userRole);
         console.log("User ID:", userId);
         console.log("Customer ID:", response.data.customerId);

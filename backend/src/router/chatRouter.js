@@ -22,17 +22,20 @@ router.get("/getAllchats", async (req, res) => {
 });
 
 router.get("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
-  const jobId = req.params.jobId;
-  const chatId = req.params.chatId;
+  const { jobId, chatId } = req.params;
 
   try {
-    const chat = await Chat.findById(chatId);
-    console.log(chat);
-    if (chat) {
-      return res.status(200).json(chat);
+    const chat = await Chat.findById(chatId)
+      .populate("customerId", "username")
+      .populate("talentId", "username");
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
     }
 
-    return res.status(404).json({ message: "Chat not found" });
+    console.log(chat); // Optional: for debugging
+
+    res.status(200).json(chat);
   } catch (error) {
     console.error("Error fetching job details:", error);
     return res.status(500).json({ message: "Server error" });

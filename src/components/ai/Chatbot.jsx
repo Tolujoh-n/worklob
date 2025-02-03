@@ -248,6 +248,78 @@ const Chatbot = () => {
               </div>
             </div>
           </div>
+          <style>{`
+        .chat-window {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          margin: 0;
+          padding-top: 10%;
+          border: none;
+          overflow: hidden;
+        }
+
+        .chat-messages {
+          flex-grow: 1;
+          overflow-y: auto;
+          color: whitesmoke;
+        }
+
+        .chat-message {
+          margin: 10px 0;
+          padding: 10px 20px;
+          border-radius: 20px;
+          word-wrap: break-word;
+        }
+
+        .user-message {
+          align-self: flex-end;
+          background-color: #e2e3e5;
+          color: #41464b;
+          margin-left: 40%;
+        }
+
+        .ai-message {
+          align-self: flex-start;
+          background: transparent;
+          color: whitesmoke;
+          width: 100%;
+        }
+
+        .chat-input {
+          align-items: center;
+          padding: 10px;
+          margin-bottom: 20px;
+          width: 100%;
+        }
+
+        .chat-input input {
+          flex-grow: 1;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 20px;
+          outline: none;
+          padding-right: 40px;
+        }
+
+        .chat-input button {
+          margin-left: -40px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          color: #007bff;
+          outline: none;
+        }
+
+        .chat-input button:hover {
+          color: #0056b3;
+        }
+
+        .chat-input button svg {
+          width: 20px;
+          height: 20px;
+        }
+      `}</style>
         </section>
       </div>
     </>
