@@ -74,12 +74,12 @@ const Sidenav = ({ activeLink, setActive }) => {
 
   const userlist = [
     { id: 1, path: "wallet", name: "Wallet", icon: "bi-wallet" },
-    { id: 1, path: "governance", name: "Governance", icon: "bi-bank" },
-    { id: 1, path: "staking", name: "Staking", icon: "bi-coin" },
-    { id: 1, path: "trade", name: "Trade", icon: "bi-arrow-left-right" },
-    { id: 1, path: "blogs", name: "Blogs", icon: "bi-journal-text" },
-    { id: 1, path: "referrals", name: "Referrals", icon: "bi-people" },
-    { id: 2, path: "settings", name: "Settings", icon: "bi-gear" },
+    { id: 2, path: "staking", name: "Staking", icon: "bi-coin" },
+    { id: 3, path: "governance", name: "Governance", icon: "bi-bank" },
+    { id: 4, path: "trade", name: "Trade", icon: "bi-arrow-left-right" },
+    { id: 5, path: "blogs", name: "Blogs", icon: "bi-journal-text" },
+    { id: 6, path: "referrals", name: "Referrals", icon: "bi-people" },
+    { id: 6, path: "settings", name: "Settings", icon: "bi-gear" },
   ];
 
   const location = useLocation();
