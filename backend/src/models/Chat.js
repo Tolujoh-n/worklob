@@ -16,6 +16,7 @@ const chatSchema = new mongoose.Schema({
   customerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   talentId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   message: { type: String, required: true },
+  type: { type: String, enum: ["text", "image", "file"], default: "text" }, // Add this field for media type
   isRead: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   walletAddress: { type: String, required: false },
@@ -30,7 +31,7 @@ const chatSchema = new mongoose.Schema({
       "confirmed",
     ],
     default: "applied",
-  }, // New field
+  },
 });
 
 const Chat = mongoose.model("Chat", chatSchema);
