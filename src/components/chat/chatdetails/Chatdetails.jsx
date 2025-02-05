@@ -36,6 +36,16 @@ const Chatdetails = () => {
     isTalent = user.role === "Talent"; // Assuming 'role' defines if user is 'talent'
   }
 
+  let userId;
+
+  let userRole = user?.role;
+  console.log("User Role:", userRole);
+
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    userId = decodedToken.userId;
+  }
+
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
@@ -98,19 +108,19 @@ const Chatdetails = () => {
         console.log("Job Details:", jobDetailsResponse);
         setJobDet(jobDetailsResponse?.data);
 
-        // Add new message
-        const newMessage = {
-          text: response.data.message,
-          sender: response.data.sender === applicantId ? "self" : "other",
-          createdAt: response.data.createdAt,
-          type: "text",
-        };
+        // Fetch all messages for the chat
+        const chatMessagesResponse = await axios.get(
+          `${API_URL}/api/v1/chat/getChatMessages/${jobId}`
+        );
+        console.log("Chat Messages:", chatMessagesResponse.data);
 
-        // Avoid duplicate messages
-        setMessages((prevMessages) =>
-          prevMessages.some((msg) => msg.text === newMessage.text)
-            ? prevMessages
-            : [...prevMessages, newMessage]
+        setMessages(
+          chatMessagesResponse.data.map((msg) => ({
+            text: msg.message,
+            sender: msg.sender === applicantId ? "self" : "other",
+            createdAt: msg.createdAt,
+            type: msg.type,
+          }))
         );
       } catch (error) {
         console.error(
@@ -142,17 +152,64 @@ const Chatdetails = () => {
     return `${interval} years ago`;
   };
 
-  const handleSendMessage = () => {
+  const fetchJobType = async (jobId) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/chat/allchats/${userId}`
+      );
+      console.log("API Response:", response.data); // Log the entire API response
+
+      const chat = response.data.find((chat) => chat.jobId === jobId);
+      console.log("Found Chat jobType:", chat ? chat.jobType : "Unknown"); // Log the found chat's jobType
+
+      return { jobType: chat ? chat.jobType : "Unknown" };
+    } catch (error) {
+      console.error("Error fetching jobType:", error);
+      return { jobType: "Unknown" };
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (inputMessage.trim() || mediaPreview) {
+      // Fetch jobType from your API
+      const { jobType } = await fetchJobType(jobId);
+
       const newMessage = {
-        text: inputMessage || mediaPreview,
-        sender: "self",
-        time: new Date().toLocaleTimeString(),
-        type: mediaType,
+        jobId: jobId,
+        jobType: jobType, // Include jobType in the message payload
+        sender: senderId,
+        receiver: receiverId,
+        message: inputMessage || mediaPreview, // Update this field name
+        type: mediaType || "text",
+        userRole, // Ensure userRole is included if needed
       };
-      setMessages([...messages, newMessage]);
-      setInputMessage("");
-      setMediaPreview(null);
+
+      console.log("Sending message data:", newMessage); // Log the message data
+
+      try {
+        const response = await axios.post(
+          `${API_URL}/api/v1/chat/sendMessage`,
+          newMessage,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setMessages([...messages, response.data.chatMessage]);
+          setInputMessage("");
+          setMediaPreview(null);
+        } else {
+          console.error("Failed to send message", response.data);
+        }
+      } catch (error) {
+        console.error(
+          "Error sending message",
+          error.response ? error.response.data : error.message
+        );
+      }
     }
   };
 
@@ -288,43 +345,42 @@ const Chatdetails = () => {
                   </div>
                 )}
               </div>
-              {activeCategory === "Thread" &&
-                applicantId === receiverDet?._id && (
-                  <div className="chat-input-container">
-                    {mediaPreview && (
-                      <div className="media-preview">
-                        {mediaType === "image" ? (
-                          <img
-                            src={mediaPreview}
-                            alt="preview"
-                            className="preview-img"
-                          />
-                        ) : (
-                          <p className="preview-file">{mediaPreview}</p>
-                        )}
-                      </div>
-                    )}
-                    <label htmlFor="attach-file" className="attach-icon">
-                      <FaPaperclip />
-                    </label>
-                    <input
-                      type="file"
-                      id="attach-file"
-                      style={{ display: "none" }}
-                      onChange={handleAttachMedia}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Type your message"
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      className="chat-input"
-                    />
-                    <button onClick={handleSendMessage} className="usbutton">
-                      <FaPaperPlane />
-                    </button>
-                  </div>
-                )}
+              {activeCategory === "Thread" && (
+                <div className="chat-input-container">
+                  {mediaPreview && (
+                    <div className="media-preview">
+                      {mediaType === "image" ? (
+                        <img
+                          src={mediaPreview}
+                          alt="preview"
+                          className="preview-img"
+                        />
+                      ) : (
+                        <p className="preview-file">{mediaPreview}</p>
+                      )}
+                    </div>
+                  )}
+                  <label htmlFor="attach-file" className="attach-icon">
+                    <FaPaperclip />
+                  </label>
+                  <input
+                    type="file"
+                    id="attach-file"
+                    style={{ display: "none" }}
+                    onChange={handleAttachMedia}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Type your message"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    className="chat-input"
+                  />
+                  <button onClick={handleSendMessage} className="usbutton">
+                    <FaPaperPlane />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

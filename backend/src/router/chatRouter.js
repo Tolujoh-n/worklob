@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Chat = require("../models/Chat");
 const FullTimeJob = require("../models/FullTimeJob");
 const FreelanceJob = require("../models/FreelancingJob");
@@ -21,11 +22,39 @@ router.get("/getAllchats", async (req, res) => {
   }
 });
 
+// Add this new endpoint to fetch all messages for a specific chat
+router.get("/getChatMessages/:jobId", async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return res.status(400).json({ error: "Invalid jobId format." });
+    }
+
+    const chatMessages = await Chat.find({ jobId })
+      .sort({ createdAt: 1 }) // Sort by creation date in ascending order
+      .populate("sender", "username")
+      .populate("receiver", "username");
+
+    if (!chatMessages) {
+      return res
+        .status(404)
+        .json({ message: "No messages found for this job." });
+    }
+
+    res.status(200).json(chatMessages);
+  } catch (error) {
+    console.error("Error fetching chat messages:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.get("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
   const { jobId, chatId } = req.params;
 
   try {
     const chat = await Chat.findById(chatId)
+      .sort({ createdAt: 1 })
       .populate("customerId", "username")
       .populate("talentId", "username");
 
@@ -39,6 +68,40 @@ router.get("/chatdetails/:jobId/chat/:chatId", async (req, res) => {
   } catch (error) {
     console.error("Error fetching job details:", error);
     return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/sendMessage", async (req, res) => {
+  try {
+    const { jobId, jobType, sender, receiver, message, type, userRole } =
+      req.body;
+
+    if (!jobId || !sender || !receiver || !message || !type || !userRole) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    const newChatMessage = new Chat({
+      jobId,
+      jobType,
+      sender,
+      receiver,
+      message,
+      type,
+      userRole,
+    });
+
+    const savedChatMessage = await newChatMessage.save();
+
+    res.status(200).json({
+      message: "Message sent successfully.",
+      chatMessage: savedChatMessage,
+    });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({
+      error: "Failed to send message. Please try again later.",
+      details: error.message,
+    });
   }
 });
 
