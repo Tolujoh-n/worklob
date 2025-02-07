@@ -676,9 +676,44 @@
 .wallet-button i {
   font-size: 16px;
 }
+.transaction-history-card {
+  background-color: #213743;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
 
 .transaction-history {
   margin-top: 40px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.controls button {
+  background-color: #0f212e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.controls button:hover {
+  background-color: #5c7e90;
+}
+
+.stake-search-bar {
+  margin-left: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 200px;
 }
 
 .transaction-table {
@@ -695,6 +730,17 @@
 
 .transaction-table th {
   font-weight: bold;
+}
+
+.table-header {
+  background-color: #182b34;
+  color: white;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.table-row:hover {
+  background-color: #1a2a33;
 }
 
 .bonus-details p {
@@ -725,15 +771,93 @@
   }
 }
 
-/* Share Icon */
-.share-container {
+/* stake css */
+.stake-container {
   display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stake-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 2rem;
+}
+
+.stake-card {
+  background: #213743;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stake-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.share-container p {
-  margin: 0;
+.stake-button {
+  background: #ff9900;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
 }
+
+.stake-staking-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  background: #213743;
+}
+
+.stake-staking-left,
+.stake-staking-right {
+  flex: 1;
+}
+
+.stake-input-container {
+  margin: 15px 0;
+}
+
+.stake-input-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: gray;
+}
+
+.stake-input-box {
+  display: flex;
+  align-items: center;
+  background: #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 5px;
+}
+
+.stake-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: black;
+  font-size: 18px;
+  outline: none;
+}
+
+.stake-btc-logo {
+  width: 24px;
+  height: 24px;
+  margin-left: 10px;
+  border-radius: 50%;
+}
+
+/* end stake */
 
 .social-icons {
   margin-left: 10px;

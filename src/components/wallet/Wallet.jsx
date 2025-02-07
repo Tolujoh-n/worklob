@@ -172,45 +172,47 @@ const Wallet = () => {
 
       {/* Transaction History */}
       <div className="col-lg-12">
-        <div className="transaction-history">
-          <h2>Transaction History</h2>
-          <div
-            style={{ borderRadius: "5px", overflowX: "auto" }}
-            className="col-12"
-          >
-            <table className="responsive-table">
-              <thead>
-                <tr className="table-header">
-                  <th>Type & Date</th>
-                  <th>Cryptocurrency</th>
-                  <th>Transaction ID</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((transaction, index) => (
-                  <tr key={index} className="table-row">
-                    <td className="col col-4" data-label="Amount">
-                      <h6>
-                        {" "}
-                        {transaction.type} - {transaction.date}
-                      </h6>
-                    </td>
-
-                    <td className="col col-2" data-label="Job Ids">
-                      <h6>{transaction.cryptocurrency}</h6>
-                    </td>
-                    <td className="col col-4" data-label="Amount">
-                      <h6>{transaction.transactionId}</h6>
-                    </td>
-
-                    <td className="col col-4" data-label="Job Ids">
-                      <h6>{transaction.amount}</h6>
-                    </td>
+        <div className="transaction-history-card">
+          <div className="transaction-history">
+            <h2>Transaction History</h2>
+            <div
+              style={{ borderRadius: "5px", overflowX: "auto" }}
+              className="col-12"
+            >
+              <table className="transaction-table">
+                <thead>
+                  <tr className="table-header">
+                    <th>Type & Date</th>
+                    <th>Cryptocurrency</th>
+                    <th>Transaction ID</th>
+                    <th>Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {transactions.map((transaction, index) => (
+                    <tr key={index} className="table-row">
+                      <td className="col col-4" data-label="Amount">
+                        <h6>
+                          {" "}
+                          {transaction.type} - {transaction.date}
+                        </h6>
+                      </td>
+
+                      <td className="col col-2" data-label="Job Ids">
+                        <h6>{transaction.cryptocurrency}</h6>
+                      </td>
+                      <td className="col col-4" data-label="Amount">
+                        <h6>{transaction.transactionId}</h6>
+                      </td>
+
+                      <td className="col col-4" data-label="Job Ids">
+                        <h6>{transaction.amount}</h6>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
