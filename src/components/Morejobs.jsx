@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import person from "../assets/address.jpg";
 
-const Moregigs = () => {
+const Morejobs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +13,7 @@ const Moregigs = () => {
     const fetchJobs = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/api/v1/gigJob/getAllGigJob`
+          `${API_URL}/api/v1/frjobs/getAllFreelance`
         );
         setJobs(response.data);
       } catch (error) {
@@ -37,10 +37,6 @@ const Moregigs = () => {
     return "N/A";
   };
 
-  if (loading) {
-    return <p>Loading jobs...</p>;
-  }
-
   const truncateText = (text, wordLimit) => {
     if (!text || text.trim() === "") return "No description available";
     const words = text.split(" ");
@@ -49,12 +45,16 @@ const Moregigs = () => {
       : text;
   };
 
+  if (loading) {
+    return <p>Loading jobs...</p>;
+  }
+
   return (
     <div className="giginfo">
       <div className="gig-job-header">
-        <h3 className="gig-job-sitename">New Gigs</h3>
-        <a href="/dashboard/browsegigs" className="gig-job-show-all">
-          Show all gig jobs
+        <h3 className="gig-job-sitename">New Jobs</h3>
+        <a href="/dashboard/freelance" className="gig-job-show-all">
+          Show more jobs
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -99,7 +99,7 @@ const Moregigs = () => {
                 <span className="gig-job-price">{formatPrice(gig.budget)}</span>
                 <button className="freelance-more-info-btn">More Info</button>
               </div>
-              <div className="gig-job-rating">★★★★☆(4)</div>
+              <div className="gig-job-rating">★★★★☆</div>
             </a>
           </div>
         ))}
@@ -108,4 +108,4 @@ const Moregigs = () => {
   );
 };
 
-export default Moregigs;
+export default Morejobs;

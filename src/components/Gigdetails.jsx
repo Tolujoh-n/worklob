@@ -7,6 +7,7 @@ import { FaFacebook, FaTwitter, FaTelegram, FaLinkedin } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import Morejobs from "./Morejobs";
 
 const Hiring = [
   { id: 1, title: "Tolujohn Bob", jobs: "1" },
@@ -240,7 +241,7 @@ const Gigdetails = () => {
 
       {/* More Gigs Section */}
       <div className="col-lg-12">
-        <Moregigs />
+        {userRole === "Talent" ? <Morejobs /> : <Moregigs />}
       </div>
 
       <Gigdetailsmodal

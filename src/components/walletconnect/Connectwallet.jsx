@@ -87,7 +87,12 @@ const Connectwallet = () => {
         );
 
         setTimeout(() => {
-          window.location.reload();
+          // Add redirection based on the new role
+          if (newRole === "Talent") {
+            window.location.href = "/dashboard";
+          } else if (newRole === "Customer") {
+            window.location.href = "/dashboard/customerdash";
+          }
         }, 2500);
       }
     } catch (error) {
