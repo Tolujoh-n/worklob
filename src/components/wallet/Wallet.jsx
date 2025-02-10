@@ -3,10 +3,25 @@ import ETH from "../../assets/img/eth.png";
 import btc from "../../assets/img/btc.png";
 import lobcoin from "../../assets/img/worklob-coin.png";
 import { useWeb3 } from "../../Web3Provider";
+import Depositmodal from "./Depositmodal";
+import Transfermodal from "./Transfermodal";
+import Swapmodal from "./Swapmodal";
 
 const Wallet = () => {
   // Initialize state for transaction data
   const { baseETHBalance, lobBalance } = useWeb3();
+  const [isDepositmodalOpen, setIsDepositmodalOpen] = useState(false);
+  const [isTransfermodalOpen, setIsTransfermodalOpen] = useState(false);
+  const [isSwapmodalOpen, setIsSwapmodalOpen] = useState(false);
+
+  const openDepositmodal = () => setIsDepositmodalOpen(true);
+  const closeDepositmodal = () => setIsDepositmodalOpen(false);
+
+  const openTransfermodal = () => setIsTransfermodalOpen(true);
+  const closeTransfermodal = () => setIsTransfermodalOpen(false);
+
+  const openSwapmodal = () => setIsSwapmodalOpen(true);
+  const closeSwapmodal = () => setIsSwapmodalOpen(false);
 
   const [transactions, setTransactions] = useState([
     {
@@ -96,13 +111,13 @@ const Wallet = () => {
               </tbody>
             </table>
             <div className="wallet-buttons">
-              <button className="chat-button">
+              <button className="chat-button" onClick={openDepositmodal}>
                 <i className="bi bi-arrow-down-circle"></i> Deposit
               </button>
-              <button className="chat-button">
-                <i className="bi bi-arrow-up-circle"></i> Withdraw
+              <button className="chat-button" onClick={openTransfermodal}>
+                <i className="bi bi-arrow-up-circle"></i> Transfer
               </button>
-              <button className="chat-button">
+              <button className="chat-button" onClick={openSwapmodal}>
                 <i className="bi bi-arrow-left-right"></i> Swap
               </button>
             </div>
@@ -216,6 +231,12 @@ const Wallet = () => {
           </div>
         </div>
       </div>
+      <Depositmodal isOpen={isDepositmodalOpen} onClose={closeDepositmodal} />
+      <Transfermodal
+        isOpen={isTransfermodalOpen}
+        onClose={closeTransfermodal}
+      />
+      <Swapmodal isOpen={isSwapmodalOpen} onClose={closeSwapmodal} />
     </>
   );
 };
