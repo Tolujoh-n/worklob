@@ -69,7 +69,6 @@ const Swapmodal = ({ isOpen, onClose }) => {
   return (
     <div className="modal" style={modalStyle}>
       <div className="modal-content" style={modalContentStyle}>
-        <Toaster position="top-right" />
         {connected ? (
           <>
             <h3 style={{ textAlign: "center" }}>Swap Tokens</h3>
@@ -113,28 +112,36 @@ const Swapmodal = ({ isOpen, onClose }) => {
               <label style={labelStyle}>Amount</label>
               <input
                 type="number"
+                placeholder="$0.00"
                 value={amount}
                 onChange={handleAmountChange}
                 style={formControlStyle}
               />
             </div>
-            <button onClick={handleSwap} style={swapButtonStyle}>
-              Swap Tokens
-            </button>
+
+            <div className="wallet-buttons">
+              <button className="closemodall-button" onClick={onClose}>
+                Close
+              </button>
+              <button className="modall-button" onClick={handleSwap}>
+                Swap Tokens
+              </button>
+            </div>
           </>
         ) : (
           <>
             <h3 style={{ textAlign: "center" }}>Connect wallet to swap</h3>
             <div style={{ textAlign: "center" }}>
-              <button onClick={connectWallet} style={connectButtonStyle}>
+              <button onClick={connectWallet} className="modall-button">
                 Connect Wallet
               </button>
             </div>
+            <br></br>
+            <button className="closemodall-button" onClick={onClose}>
+              Close
+            </button>
           </>
         )}
-        <button onClick={onClose} style={closeButtonStyle}>
-          Close
-        </button>
       </div>
     </div>
   );

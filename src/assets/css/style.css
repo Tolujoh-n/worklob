@@ -586,6 +586,34 @@ h6 {
   margin-right: 5px;
 }
 
+.modall-button {
+  background-color: #5c7e90;
+  border-radius: 10px;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.modall-button:hover {
+  background-color: #28516f;
+  color: white;
+}
+
+.closemodall-button {
+  background-color: #374855;
+  border-radius: 10px;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.closemodall-button:hover {
+  background-color: #5c7e90;
+  color: white;
+}
+
 .hr-info {
   display: flex;
   align-items: center;
@@ -626,6 +654,44 @@ h6 {
     margin-left: 0;
     margin-top: 10px;
   }
+}
+
+/* dash tab content */
+.tabb-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: transparent;
+  /* border-radius: 8px; */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+}
+
+.tabb-heading {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tabb-paragraph {
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tabb-button {
+  display: block;
+  margin: 0 auto;
+  background-color: #5c7e90;
+  color: #ffffff;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.tabb-button:hover {
+  background-color: #28516f;
 }
 
 /* Breadcrumbs */

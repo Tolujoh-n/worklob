@@ -3,60 +3,8 @@ import useImage from "../assets/address.jpg";
 import { Link } from "react-router-dom";
 import Modal from "./Modal"; // Assuming Modal is still required
 import Notification from "./Notification";
-
-const jobData = {
-  active: [
-    {
-      id: 1,
-      title: "Software Engineer",
-      hrName: "John Doe",
-      rating: 4.5,
-      reviews: 120,
-      jobType: "Full-time",
-      datePosted: "17 Aug 2024, 1:11 AM",
-      description:
-        "Develop and maintain web applications using React Design user interfaces and improve user experience Design user interfaces and improve user experience. Lead product development and strategy, Lead product development and strategy",
-      amount: "$120,000/year",
-    },
-    {
-      id: 2,
-      title: "Product Manager",
-      hrName: "Jane Smith",
-      rating: 4.0,
-      reviews: 85,
-      jobType: "Remote",
-      datePosted: "16 Aug 2024, 3:30 PM",
-      description: "Lead product development and strategy.",
-      amount: "$100,000/year",
-    },
-  ],
-  draft: [
-    {
-      id: 3,
-      title: "Data Scientist",
-      hrName: "Alice Johnson",
-      rating: 4.8,
-      reviews: 150,
-      jobType: "Part-time",
-      datePosted: "15 Aug 2024, 9:45 AM",
-      description: "Analyze data trends and build predictive models.",
-      amount: "$90,000/year",
-    },
-  ],
-  archive: [
-    {
-      id: 4,
-      title: "UI/UX Designer",
-      hrName: "Michael Brown",
-      rating: 4.2,
-      reviews: 60,
-      jobType: "Full-time",
-      datePosted: "14 Aug 2024, 11:00 AM",
-      description: "Design user interfaces and improve user experience.",
-      amount: "$80,000/year",
-    },
-  ],
-};
+import { useWeb3 } from "../Web3Provider";
+import { Toaster, toast } from "sonner";
 
 const truncateText = (text, wordLimit) => {
   if (!text || text.trim() === "") return "No description available";
@@ -68,6 +16,36 @@ const truncateText = (text, wordLimit) => {
 
 const Dash = () => {
   const [selectedTab, setSelectedTab] = useState("active");
+  const { connectWallet, connected, baseETHBalance, walletAddress } = useWeb3();
+
+  const tabContent = {
+    active: {
+      heading: "Explore Job Mining Opportunities",
+      paragraph:
+        "Stake our platform token and start mining jobs. Experience the benefits of decentralized job mining today.",
+      button: "Start Mining",
+      link: "/dashboard/staking",
+    },
+    draft: {
+      heading: "Trade Tokens Seamlessly",
+      paragraph:
+        "Trade tokens seamlessly on our platform. Enjoy competitive rates and a secure trading environment.",
+      button: "Start Trading",
+      link: "/dashboard/trade",
+    },
+    archive: {
+      heading: "Get Involved in Governance",
+      paragraph:
+        "Participate in the governance of our platform. Vote on proposals and be a part of important decisions.",
+      button: "Participate",
+      link: "/dashboard/governance",
+    },
+  };
+
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(walletAddress);
+    toast.success("Wallet address copied to clipboard!");
+  };
 
   return (
     <>
@@ -78,62 +56,30 @@ const Dash = () => {
             className={selectedTab === "active" ? "active" : ""}
             onClick={() => setSelectedTab("active")}
           >
-            Active
+            Job Mining
           </button>
           <button
             className={selectedTab === "draft" ? "active" : ""}
             onClick={() => setSelectedTab("draft")}
           >
-            Draft
+            Trade
           </button>
           <button
             className={selectedTab === "archive" ? "active" : ""}
             onClick={() => setSelectedTab("archive")}
           >
-            Archive
+            Governance
           </button>
         </div>
 
-        <div className="row">
-          {jobData[selectedTab].map((job) => (
-            <div key={job.id} className="col-lg-12">
-              <Link to="/dashboard/gigdetails">
-                <div className="card job-card">
-                  <div className="card-body">
-                    <div className="d-flex flex-wrap justify-content-between align-items-start">
-                      <div className="job-details">
-                        <span className="badge job-type">{job.jobType}</span>
-                        <h4>{job.title}</h4>
-                        <p className="job-date">{job.datePosted}</p>
-                      </div>
-                      <div className="hr-info d-flex align-items-center">
-                        <div className="pe-3 text-left">
-                          <p className="hr-name">{job.hrName}</p>
-                          <span className="rating">
-                            {job.rating} stars ({job.reviews})
-                          </span>
-                          <div className="star-rating">
-                            {"★".repeat(Math.floor(job.rating))}
-                            {"☆".repeat(5 - Math.floor(job.rating))}
-                          </div>
-                        </div>
-                        <img src={useImage} className="hr-image" alt="HR" />
-                      </div>
-                    </div>
-                    <p className="job-description">
-                      {truncateText(job.description, 30)}
-                    </p>
-                    <div className="d-flex justify-content-between align-items-center mt-3">
-                      <span className="job-amount">{job.amount}</span>
-                      <button className="btn chat-button">
-                        <i className="bi bi-chat"></i> Chat
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+        <div className="tabb-content">
+          <h2 className="tabb-heading">{tabContent[selectedTab].heading}</h2>
+          <p className="tabb-paragraph">{tabContent[selectedTab].paragraph}</p>
+          <div className="text-center">
+            <Link to={tabContent[selectedTab].link} className="modall-button">
+              {tabContent[selectedTab].button}
+            </Link>
+          </div>
         </div>
       </div>
       <div className="col-12">
@@ -148,18 +94,54 @@ const Dash = () => {
 
             {/* Wallet management section */}
             <div className="wallet-manage">
-              <p className="manage-wallet">
-                <i className="bi-wallet"></i> Manage Wallet
-              </p>
-              <h5 className="balance-amount">$00.0</h5>
-              <h5 className="balance-amount">$00.0</h5>
+              <Link to="/dashboard/wallet">
+                <p className="manage-wallet">
+                  <i className="bi-wallet"></i> Manage Wallet
+                </p>
+              </Link>
+              {connected ? (
+                <>
+                  <h5 className="balance-amount">
+                    {parseFloat(baseETHBalance).toFixed(2)} ETH
+                  </h5>
+                  <h5 className="balance-amount">$00.00</h5>
+                </>
+              ) : (
+                <>
+                  <h5 className="balance-amount">$00.0</h5>
+                  <h5 className="balance-amount">$00.0</h5>
+                </>
+              )}
             </div>
           </div>
+          {connected && (
+            <p className="walllet-address">
+              {walletAddress}{" "}
+              <span onClick={handleCopyAddress}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="30"
+                  height="30"
+                  fill="currentColor"
+                  class="bi bi-copy"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                  />
+                </svg>
+              </span>
+            </p>
+          )}
+
           <br />
 
-          <button className="walletbtn">
-            <i className="bi bi-wallet"></i> Connect Wallet
-          </button>
+          {connected ? null : (
+            <button className="walletbtn" onClick={connectWallet}>
+              <i className="bi bi-wallet"></i> Connect Wallet
+            </button>
+          )}
         </div>
       </div>
     </>

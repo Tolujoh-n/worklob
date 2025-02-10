@@ -74,6 +74,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
               <label style={labelStyle}>Recipient Address</label>
               <input
                 type="text"
+                placeholder="0xb9b4....83a"
                 value={recipient}
                 onChange={handleRecipientChange}
                 style={formControlStyle}
@@ -83,28 +84,36 @@ const Transfermodal = ({ isOpen, onClose }) => {
               <label style={labelStyle}>Amount to Send</label>
               <input
                 type="number"
+                placeholder="$0.00"
                 value={amount}
                 onChange={handleAmountChange}
                 style={formControlStyle}
               />
             </div>
-            <button onClick={handleTransfer} style={transferButtonStyle}>
-              Transfer Token
-            </button>
+
+            <div className="wallet-buttons">
+              <button className="closemodall-button" onClick={onClose}>
+                Close
+              </button>
+              <button className="modall-button" onClick={handleTransfer}>
+                Transfer Token
+              </button>
+            </div>
           </>
         ) : (
           <>
             <h3 style={{ textAlign: "center" }}>Connect wallet to transfer</h3>
             <div style={{ textAlign: "center" }}>
-              <button onClick={connectWallet} style={connectButtonStyle}>
+              <button onClick={connectWallet} className="modall-button">
                 Connect Wallet
               </button>
             </div>
+            <br></br>
+            <button className="closemodall-button" onClick={onClose}>
+              Close
+            </button>
           </>
         )}
-        <button onClick={onClose} style={closeButtonStyle}>
-          Close
-        </button>
       </div>
     </div>
   );

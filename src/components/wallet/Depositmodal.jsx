@@ -45,14 +45,14 @@ const Depositmodal = ({ isOpen, onClose }) => {
             </h3>
             <br />
             <div style={{ textAlign: "center" }}>
-              <button onClick={connectWallet} className="chat-button">
+              <button onClick={connectWallet} className="modall-button">
                 Connect Wallet
               </button>
             </div>
           </>
         )}
         <br />
-        <button onClick={onClose} className="chat-button">
+        <button onClick={onClose} className="closemodall-button">
           Close
         </button>
       </div>
