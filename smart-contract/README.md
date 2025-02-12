@@ -1,4 +1,4 @@
-# Worklob COntract
+# Worklob Contract
 
 ## Install
 

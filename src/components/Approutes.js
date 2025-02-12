@@ -27,6 +27,7 @@ import Footer from "../components/Footer";
 import Gigdetails from "./Gigdetails";
 import Referrals from "./referrals/Referrals.jsx";
 import Wallet from "./wallet/Wallet.jsx";
+import Userprofile from "./Userprofile.jsx";
 
 // Future rootes
 import Trade from "./trade/Trade.jsx";
@@ -90,6 +91,7 @@ const Approutes = () => {
               <Route path="/governance" element={<Governance />} />
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/chatbot" element={<Chatbot />} />
+              <Route path="/userprofile" element={<Userprofile />} />
             </Routes>
           </div>
         </section>

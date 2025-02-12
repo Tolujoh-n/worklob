@@ -5,17 +5,16 @@ import { FaFileAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 
 function Profile({ user }) {
-
-  const token=localStorage.getItem('token')
-  const us=JSON.parse(localStorage.getItem('user'))
+  const token = localStorage.getItem("token");
+  const us = JSON.parse(localStorage.getItem("user"));
 
   let userName;
 
-  if(token){
-    const decodedToken=jwtDecode(token)
+  if (token) {
+    const decodedToken = jwtDecode(token);
   }
-  if(us && us.username){
-    userName=us.username
+  if (us && us.username) {
+    userName = us.username;
   }
   const [workExperience, setWorkExperience] = useState([
     {
@@ -58,6 +57,16 @@ function Profile({ user }) {
       description: "sk tdk uctcl ",
       files: ["git.zip"],
     },
+    {
+      projectName: "Oja app",
+      description: "sk tdk uctcl ",
+      files: ["git.zip"],
+    },
+    {
+      projectName: "Oja app",
+      description: "sk tdk uctcl ",
+      files: ["git.zip"],
+    },
   ]);
   return (
     <>
@@ -65,7 +74,7 @@ function Profile({ user }) {
         <section className="section profile">
           <div className="row">
             <div className="col-xl-12">
-              <div className="card">
+              <div className="card" style={{ position: "relative" }}>
                 <div className="card-body profile-card pt-4 d-flex flex-column align-items-center">
                   <img src={profile} alt="Profile" className="rounded-circle" />
                   <h2>{userName}</h2>
@@ -91,6 +100,12 @@ function Profile({ user }) {
                     success. I'd also love to be part of teams for hacks and any
                     collaborative opportunity.
                   </p>
+                  <a
+                    href="/dashboard/userprofile"
+                    className="link-icon linktopro"
+                  >
+                    <i className="bi bi-box-arrow-up-right"></i>
+                  </a>
                 </div>
               </div>
             </div>
