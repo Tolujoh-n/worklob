@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema(
         ref: "FreelanceJob",
       },
     ],
+    profile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
