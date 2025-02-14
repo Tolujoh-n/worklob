@@ -28,12 +28,12 @@ const Personalinfo = ({ username }) => {
       console.log("Profile Data fetched from API:", profileData); // Log the fetched profile data
 
       setPersonalInfo({
-        name: profileData.personalInfo.name,
-        website: profileData.personalInfo.website,
-        country: profileData.personalInfo.country,
-        bio: profileData.personalInfo.bio,
-        skills: profileData.personalInfo.skills,
-        profileImage: profileData.personalInfo.profileImage || person,
+        name: profileData.name || "",
+        website: profileData.website || "",
+        country: profileData.country || "",
+        bio: profileData.bio || "",
+        skills: profileData.skills || [],
+        profileImage: profileData.profileImage || person,
       });
       setIsNewProfile(false);
       toast.success("Profile loaded successfully");
@@ -76,18 +76,26 @@ const Personalinfo = ({ username }) => {
         formData.append("profileImage", profileImageFile);
       }
 
-      console.log("Form data to be sent:", personalInfo); // Debugging
-
       let response;
       if (isNewProfile) {
         response = await axios.post(
           `${API_URL}/api/v1/profile/${username}`,
-          formData
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
       } else {
         response = await axios.put(
           `${API_URL}/api/v1/profile/${username}`,
-          formData
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
       }
 
@@ -111,6 +119,7 @@ const Personalinfo = ({ username }) => {
       );
     }
   };
+
   return (
     <>
       <div className="card gigprofile-section">
@@ -132,6 +141,12 @@ const Personalinfo = ({ username }) => {
                   src={personalInfo.profileImage}
                   alt="Profile"
                   className="profile-image"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfileImageChange}
+                  className="form-control"
                 />
               </div>
               <div className="row">
@@ -234,7 +249,6 @@ const Personalinfo = ({ username }) => {
                     <p>
                       <strong>Name:</strong> {personalInfo.name}
                     </p>
-
                     <p>
                       <strong>Skills:</strong> {personalInfo.skills.join(", ")}
                     </p>

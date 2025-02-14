@@ -38,9 +38,57 @@ const userSchema = new mongoose.Schema(
         ref: "FreelanceJob",
       },
     ],
-    profile: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Profile",
+    personalInfo: {
+      name: String,
+      website: String,
+      country: String,
+      bio: String,
+      skills: [String],
+      profileImage: String,
+    },
+    workExperience: [
+      {
+        company: String,
+        role: String,
+        years: String,
+        currentlyWorking: Boolean,
+        description: String,
+      },
+    ],
+    education: [
+      {
+        institution: String,
+        graduationYear: String,
+        levelOfStudy: String,
+        major: String,
+      },
+    ],
+    socialLinks: {
+      linkedin: String,
+      facebook: String,
+      twitter: String,
+    },
+    freelanceInfo: {
+      specialization: String,
+      hourlyRate: String,
+      preferredPaymentOptions: [String],
+      portfolio: [
+        {
+          projectName: String,
+          description: String,
+          files: [String],
+        },
+      ],
+    },
+    fullTimeInfo: {
+      position: String,
+      experience: String,
+      cvFile: String,
+    },
+    contactInfo: {
+      email: String,
+      linkedin: String,
+      github: String,
     },
   },
   {
