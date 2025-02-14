@@ -1,28 +1,116 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { FaEdit } from "react-icons/fa";
 import person from "../../assets/address.jpg";
+import axios from "axios";
 
-const Personalinfo = () => {
+const Personalinfo = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
-
   const [personalInfo, setPersonalInfo] = useState({
-    name: "John Doe",
-    website: "https://johndoe.com",
-    country: "USA",
-    bio: "A passionate developer",
-    skills: ["JavaScript", "React", "Node.js"],
+    name: "",
+    website: "",
+    country: "",
+    bio: "",
+    skills: [],
     profileImage: person,
   });
+  const [isNewProfile, setIsNewProfile] = useState(true);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  const fetchProfile = async () => {
+    try {
+      console.log("Fetching profile for username:", username); // Debugging
+      console.log("API URL:", API_URL); // Debugging
+      const response = await axios.get(`${API_URL}/api/v1/profile/${username}`);
+      const profileData = response.data;
+      console.log("Profile Data fetched from API:", profileData); // Log the fetched profile data
+
+      setPersonalInfo({
+        name: profileData.personalInfo.name,
+        website: profileData.personalInfo.website,
+        country: profileData.personalInfo.country,
+        bio: profileData.personalInfo.bio,
+        skills: profileData.personalInfo.skills,
+        profileImage: profileData.personalInfo.profileImage || person,
+      });
+      setIsNewProfile(false);
+      toast.success("Profile loaded successfully");
+    } catch (error) {
+      console.error("Error fetching profile data:", error); // Improved logging
+      toast.error("Failed to fetch profile data");
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, [username, API_URL]);
 
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
     setPersonalInfo({ ...personalInfo, [name]: value });
   };
 
+  const handleProfileImageChange = (e) => {
+    setProfileImageFile(e.target.files[0]);
+    setPersonalInfo({
+      ...personalInfo,
+      profileImage: URL.createObjectURL(e.target.files[0]),
+    });
+  };
+
   const handleToggleEditing = (section) => {
     setEditingSection(editingSection === section ? null : section);
   };
 
+  const handleSaveChanges = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("name", personalInfo.name);
+      formData.append("website", personalInfo.website);
+      formData.append("country", personalInfo.country);
+      formData.append("bio", personalInfo.bio);
+      formData.append("skills", JSON.stringify(personalInfo.skills));
+      if (profileImageFile) {
+        formData.append("profileImage", profileImageFile);
+      }
+
+      console.log("Form data to be sent:", personalInfo); // Debugging
+
+      let response;
+      if (isNewProfile) {
+        response = await axios.post(
+          `${API_URL}/api/v1/profile/${username}`,
+          formData
+        );
+      } else {
+        response = await axios.put(
+          `${API_URL}/api/v1/profile/${username}`,
+          formData
+        );
+      }
+
+      console.log("Response from save changes:", response.data); // Debugging
+
+      if (response.status === 200 || response.status === 201) {
+        handleToggleEditing("personalInfo");
+        toast.success("Profile updated successfully");
+        fetchProfile();
+      } else {
+        toast.error(
+          `Failed to update profile data: ${response.status} - ${response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("Error updating profile data:", error);
+      toast.error(
+        `Failed to update profile data: ${
+          error.response ? error.response.data.error : error.message
+        }`
+      );
+    }
+  };
   return (
     <>
       <div className="card gigprofile-section">
@@ -124,7 +212,7 @@ const Personalinfo = () => {
                   <button
                     type="button"
                     className="usbutton"
-                    onClick={() => handleToggleEditing("personalInfo")}
+                    onClick={handleSaveChanges}
                   >
                     Save changes
                   </button>

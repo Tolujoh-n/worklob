@@ -7,6 +7,7 @@ const gigRouter = require("./gigJob");
 const applyJobRouter = require("./applyjob");
 const buyGigRouter = require("./buyGig");
 const chatRouter = require("./chatRouter");
+const profileRouter = require("./Profile");
 const z = require("zod");
 
 router.use("/user", userRouter);
@@ -15,5 +16,6 @@ router.use("/frjobs", freelanceJobRouter);
 router.use("/gigJob", gigRouter);
 router.use("/application", applyJobRouter, buyGigRouter);
 router.use("/chat", chatRouter);
+router.use("/profile", profileRouter);
 
 module.exports = router;
