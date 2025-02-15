@@ -1,74 +1,70 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 const User = require("../models/User");
 
-// Get user profile
+// Set up multer for handling file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "uploads");
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// Route to get user profile data
 router.get("/:username", async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const { username } = req.params;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
     res.json(user.personalInfo);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    console.error("Error fetching profile data:", error);
+    res.status(500).json({ error: "Failed to fetch profile data" });
   }
 });
 
-// Update user profile
-router.put("/:username", async (req, res) => {
+// Route to update user profile data
+router.put("/:username", upload.single("profileImage"), async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const { name, website, country, bio, skills } = req.body;
+    const profileImage = req.file ? req.file.path : null;
 
-    const updatedData = req.body;
-    if (req.file) {
-      updatedData["personalInfo.profileImage"] = req.file.path; // If there's a file, set the path
+    const updatedProfile = {
+      name,
+      website,
+      country,
+      bio,
+      skills: skills ? skills.split(",").map((skill) => skill.trim()) : [],
+    };
+
+    if (profileImage) {
+      updatedProfile.profileImage = profileImage;
     }
 
-    Object.keys(updatedData).forEach((key) => {
-      user.personalInfo[key] = updatedData[key];
-    });
+    const user = await User.findOneAndUpdate(
+      { username },
+      { personalInfo: updatedProfile },
+      { new: true }
+    );
 
-    await user.save();
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     res.json(user.personalInfo);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Create user profile (initial setup)
-router.post("/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    if (user.personalInfo)
-      return res.status(400).json({ error: "Profile already exists" });
-
-    user.personalInfo = req.body;
-    await user.save();
-
-    res.status(201).json(user.personalInfo);
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Delete user profile
-router.delete("/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    user.personalInfo = null;
-    await user.save();
-
-    res.json({ message: "Profile deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Failed to update profile" });
   }
 });
 

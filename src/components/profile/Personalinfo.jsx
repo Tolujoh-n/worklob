@@ -22,19 +22,11 @@ const Personalinfo = ({ username }) => {
   const fetchProfile = async () => {
     try {
       console.log("Fetching profile for username:", username); // Debugging
-      console.log("API URL:", API_URL); // Debugging
       const response = await axios.get(`${API_URL}/api/v1/profile/${username}`);
       const profileData = response.data;
       console.log("Profile Data fetched from API:", profileData); // Log the fetched profile data
 
-      setPersonalInfo({
-        name: profileData.name || "",
-        website: profileData.website || "",
-        country: profileData.country || "",
-        bio: profileData.bio || "",
-        skills: profileData.skills || [],
-        profileImage: profileData.profileImage || person,
-      });
+      setPersonalInfo(profileData);
       setIsNewProfile(false);
       toast.success("Profile loaded successfully");
     } catch (error) {
@@ -71,49 +63,33 @@ const Personalinfo = ({ username }) => {
       formData.append("website", personalInfo.website);
       formData.append("country", personalInfo.country);
       formData.append("bio", personalInfo.bio);
-      formData.append("skills", JSON.stringify(personalInfo.skills));
+      formData.append("skills", personalInfo.skills.join(", "));
       if (profileImageFile) {
         formData.append("profileImage", profileImageFile);
       }
 
-      let response;
-      if (isNewProfile) {
-        response = await axios.post(
-          `${API_URL}/api/v1/profile/${username}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-      } else {
-        response = await axios.put(
-          `${API_URL}/api/v1/profile/${username}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+      // Log the FormData content
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
       }
 
-      console.log("Response from save changes:", response.data); // Debugging
-
-      if (response.status === 200 || response.status === 201) {
-        handleToggleEditing("personalInfo");
-        toast.success("Profile updated successfully");
-        fetchProfile();
-      } else {
-        toast.error(
-          `Failed to update profile data: ${response.status} - ${response.statusText}`
-        );
-      }
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile/${username}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Response from API:", response.data); // Log the response from the backend
+      setPersonalInfo(response.data);
+      toast.success("Profile updated successfully");
+      setEditingSection(null); // Close the edit form
     } catch (error) {
-      console.error("Error updating profile data:", error);
+      console.error("Error updating profile:", error);
       toast.error(
-        `Failed to update profile data: ${
+        `Failed to update profile: ${
           error.response ? error.response.data.error : error.message
         }`
       );
