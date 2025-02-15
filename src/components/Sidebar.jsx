@@ -5,14 +5,7 @@ import worklob from "../assets/img/worklob-coin.png";
 import useimage from "../assets/address.jpg";
 import Modal from "./Modal";
 import { useWeb3 } from "../Web3Provider";
-
-const Hiring = [
-  { id: 1, title: "Tolujohn Bob", jobs: "1" },
-  { id: 2, title: "Fabrre don", jobs: "6" },
-  { id: 3, title: "Naccy colen", jobs: "3" },
-  { id: 4, title: "Petter collin", jobs: "5" },
-  { id: 5, title: "Rugberbs", jobs: "2" },
-];
+import Followhr from "./Followhr";
 
 const Sidebar = () => {
   const [isGamemodalOpen, setIsGamemodalOpen] = useState(false);
@@ -62,46 +55,7 @@ const Sidebar = () => {
 
         {/* News & Updates Traffic */}
         <div className="card">
-          <div className="card-body pb-0">
-            <h5 className="card-title">Top Hiring manager</h5>
-            <div className="news">
-              {Hiring.map((card) => (
-                <div
-                  key={card.id}
-                  className="post-item clearfix"
-                  style={{
-                    borderBottom: "1px solid gray",
-                    paddingBottom: "5px",
-                  }}
-                >
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <img
-                        style={{ height: "60px", width: "60px" }}
-                        src={useimage}
-                        alt=""
-                      />
-                      <h4>
-                        <a href="#">{card.title}</a>
-                      </h4>
-                      <span style={{ color: "#b1bad3", marginLeft: "10px" }}>
-                        Jobs: {card.jobs}
-                      </span>
-                    </div>
-                    <div>
-                      <button
-                        onClick={handleGamemodalClick}
-                        className="usbutton"
-                      >
-                        Follow
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* End sidebar recent posts */}
-          </div>
+          <Followhr />
         </div>
         {/* End News & Updates */}
       </div>
