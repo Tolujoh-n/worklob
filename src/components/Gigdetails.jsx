@@ -147,7 +147,7 @@ const Gigdetails = () => {
               <p className="gig-balance">
                 $ {jobs.budget} {jobs.fixedCompensation}
               </p>
-              <p className="gig-balance">6 purchases</p>
+              <p className="gig-balance">purchases: </p>
 
               <div className="gig-actions">
                 <button

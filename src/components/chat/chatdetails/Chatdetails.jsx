@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import Chatsidecard from "./Chatsidecard";
 
 const Chatdetails = () => {
   const [activeCategory, setActiveCategory] = useState("Thread");
@@ -288,78 +289,49 @@ const Chatdetails = () => {
                   </div>
                 )}
               </div>
-              {activeCategory === "Thread" &&
-                applicantId === receiverDet?._id && (
-                  <div className="chat-input-container">
-                    {mediaPreview && (
-                      <div className="media-preview">
-                        {mediaType === "image" ? (
-                          <img
-                            src={mediaPreview}
-                            alt="preview"
-                            className="preview-img"
-                          />
-                        ) : (
-                          <p className="preview-file">{mediaPreview}</p>
-                        )}
-                      </div>
-                    )}
-                    <label htmlFor="attach-file" className="attach-icon">
-                      <FaPaperclip />
-                    </label>
-                    <input
-                      type="file"
-                      id="attach-file"
-                      style={{ display: "none" }}
-                      onChange={handleAttachMedia}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Type your message"
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      className="chat-input"
-                    />
-                    <button onClick={handleSendMessage} className="usbutton">
-                      <FaPaperPlane />
-                    </button>
-                  </div>
-                )}
+              {activeCategory === "Thread" && (
+                <div className="chat-input-container">
+                  {mediaPreview && (
+                    <div className="media-preview">
+                      {mediaType === "image" ? (
+                        <img
+                          src={mediaPreview}
+                          alt="preview"
+                          className="preview-img"
+                        />
+                      ) : (
+                        <p className="preview-file">{mediaPreview}</p>
+                      )}
+                    </div>
+                  )}
+                  <label htmlFor="attach-file" className="attach-icon">
+                    <FaPaperclip />
+                  </label>
+                  <input
+                    type="file"
+                    id="attach-file"
+                    style={{ display: "none" }}
+                    onChange={handleAttachMedia}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Type your message"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    className="chat-input"
+                  />
+                  <button onClick={handleSendMessage} className="usbutton">
+                    <FaPaperPlane />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       <div className="col-lg-4">
-        {!isTalent && (
-          <div className="card info-card revenue-card">
-            <div className="card-body">
-              <h5 className="card-title">Job Details:(customer)</h5>
-              <h5 className="card-title">
-                <i className="fas fa-map-marker-alt"></i> Madrid, Spain
-              </h5>
-              <h5 className="card-title">
-                <i className="fas fa-clock"></i> Full time, Remote
-              </h5>
-              <h5 className="card-title">
-                <i className="fas fa-dollar-sign"></i> 150
-              </h5>
-            </div>
-          </div>
-        )}
-        {isTalent && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Your Offer:(talent)</h5>
-              <h5 className="card-title">
-                <i className="fas fa-clock"></i> 2 days delivery
-              </h5>
-              <h5 className="card-title">
-                <i className="fas fa-dollar-sign"></i> 150
-              </h5>
-            </div>
-          </div>
-        )}
+        <Chatsidecard />
       </div>
     </>
   );
