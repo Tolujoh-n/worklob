@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { FaEdit, FaPlus } from "react-icons/fa";
+import { toast } from "sonner";
 
-const Workexperience = () => {
+const Workexperience = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
+  const [workExperience, setWorkExperience] = useState([]);
 
-  const [workExperience, setWorkExperience] = useState([
-    {
-      company: "Company A",
-      role: "Developer",
-      years: "2019-2021",
-      currentlyWorking: false,
-      description: "",
-    },
-    {
-      company: "Company B",
-      role: "Designer",
-      years: "2019-2021",
-      currentlyWorking: false,
-      description: "",
-    },
-  ]);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  // Fetch work experience data from backend
+  const fetchWorkExperience = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/profile/${username}/workexperience`
+      );
+      setWorkExperience(response.data);
+      toast.success("Work experience loaded successfully");
+    } catch (error) {
+      console.error("Error fetching work experience data:", error);
+      toast.error("Failed to fetch work experience data");
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkExperience();
+  }, [username, API_URL]);
 
   const handleToggleEditing = (section) => {
     setEditingSection(editingSection === section ? null : section);
   };
+
   const handleWorkExperienceChange = (index, field, value) => {
     const newWorkExperience = [...workExperience];
     newWorkExperience[index] = { ...newWorkExperience[index], [field]: value };
@@ -41,6 +48,21 @@ const Workexperience = () => {
         description: "",
       },
     ]);
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile/${username}/workexperience`,
+        { workExperience }
+      );
+      setWorkExperience(response.data);
+      toast.success("Work experience updated successfully");
+      setEditingSection(null);
+    } catch (error) {
+      console.error("Error updating work experience:", error);
+      toast.error("Failed to update work experience");
+    }
   };
 
   return (
@@ -164,7 +186,7 @@ const Workexperience = () => {
                   <button
                     type="button"
                     className="usbutton"
-                    onClick={() => handleToggleEditing("workExperience")}
+                    onClick={handleSaveChanges}
                   >
                     Save changes
                   </button>

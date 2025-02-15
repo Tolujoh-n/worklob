@@ -1,14 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { FaEdit } from "react-icons/fa";
+import { toast } from "sonner";
 
-const Sociallink = () => {
+const Sociallink = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
-
   const [socialLinks, setSocialLinks] = useState({
-    linkedin: "https://linkedin.com/in/johndoe",
-    facebook: "https://facebook.com/johndoe",
-    twitter: "https://twitter.com/johndoe",
+    linkedin: "",
+    facebook: "",
+    twitter: "",
   });
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  // Fetch social links data from backend
+  const fetchSocialLinks = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/profile/${username}/sociallinks`
+      );
+      setSocialLinks(response.data);
+      toast.success("Social links loaded successfully");
+    } catch (error) {
+      console.error("Error fetching social links data:", error);
+      toast.error("Failed to fetch social links data");
+    }
+  };
+
+  useEffect(() => {
+    fetchSocialLinks();
+  }, [username, API_URL]);
 
   const handleToggleEditing = (section) => {
     setEditingSection(editingSection === section ? null : section);
@@ -17,6 +38,21 @@ const Sociallink = () => {
   const handleSocialLinksChange = (e) => {
     const { name, value } = e.target;
     setSocialLinks({ ...socialLinks, [name]: value });
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile/${username}/sociallinks`,
+        socialLinks
+      );
+      setSocialLinks(response.data);
+      toast.success("Social links updated successfully");
+      setEditingSection(null);
+    } catch (error) {
+      console.error("Error updating social links:", error);
+      toast.error("Failed to update social links");
+    }
   };
 
   return (
@@ -79,7 +115,7 @@ const Sociallink = () => {
                   <button
                     type="button"
                     className="usbutton"
-                    onClick={() => handleToggleEditing("socialLinks")}
+                    onClick={handleSaveChanges}
                   >
                     Save Changes
                   </button>

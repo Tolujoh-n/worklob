@@ -6,7 +6,6 @@ import Sociallink from "./Sociallink";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 
-
 const EditProfile = () => {
   const token = localStorage.getItem("token");
 
@@ -33,13 +32,13 @@ const EditProfile = () => {
       <Personalinfo username={username} />
 
       {/* Work Experience Section */}
-      <Workexperience />
+      <Workexperience username={username} />
 
       {/* Education Section */}
-      <Education />
+      <Education username={username} />
 
       {/* Social Links Section */}
-      <Sociallink />
+      <Sociallink username={username} />
     </div>
   );
 };

@@ -1,23 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { FaEdit, FaPlus } from "react-icons/fa";
+import { toast } from "sonner";
 
-const Education = () => {
+const Education = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
+  const [education, setEducation] = useState([]);
 
-  const [education, setEducation] = useState([
-    {
-      institution: "University X",
-      graduationYear: "2020",
-      levelOfStudy: "Bachelor",
-      major: "Computer Science",
-    },
-    {
-      institution: "University udus",
-      graduationYear: "2025",
-      levelOfStudy: "Bachelor",
-      major: "Computer Engineer",
-    },
-  ]);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  // Fetch education data from backend
+  const fetchEducation = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/profile/${username}/education`
+      );
+      setEducation(response.data);
+      toast.success("Education loaded successfully");
+    } catch (error) {
+      console.error("Error fetching education data:", error);
+      toast.error("Failed to fetch education data");
+    }
+  };
+
+  useEffect(() => {
+    fetchEducation();
+  }, [username, API_URL]);
 
   const handleToggleEditing = (section) => {
     setEditingSection(editingSection === section ? null : section);
@@ -34,6 +42,21 @@ const Education = () => {
       ...education,
       { institution: "", graduationYear: "", levelOfStudy: "", major: "" },
     ]);
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile/${username}/education`,
+        { education }
+      );
+      setEducation(response.data);
+      toast.success("Education updated successfully");
+      setEditingSection(null);
+    } catch (error) {
+      console.error("Error updating education:", error);
+      toast.error("Failed to update education");
+    }
   };
 
   return (
@@ -133,7 +156,7 @@ const Education = () => {
                   <button
                     type="button"
                     className="usbutton"
-                    onClick={() => handleToggleEditing("education")}
+                    onClick={handleSaveChanges}
                   >
                     Save changes
                   </button>
