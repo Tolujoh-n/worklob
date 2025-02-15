@@ -5,8 +5,29 @@ import Profile from "../components/profile/Profile";
 import Freelancepro from "../components/profile/Freelancepro";
 import Fulltimeprofile from "../components/profile/Fulltimeprofile";
 import Changepassword from "../components/Changepassword";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
 
 function Settings() {
+  const token = localStorage.getItem("token");
+
+  let userId;
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  let userRole = user?.role;
+  console.log("User Role:", userRole);
+  console.log("User ID:", user);
+
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    userId = decodedToken.userId;
+  }
+
+  // Add a fallback for user
+  const username = user ? user.username : "Guest";
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
   return (
     <>
       <div className="col-lg-12">
@@ -111,11 +132,11 @@ function Settings() {
                     </div>
 
                     <div className="tab-pane fade pt-3" id="game-settings">
-                      <Freelancepro />
+                      <Freelancepro username={username} />
                     </div>
 
                     <div className="tab-pane fade pt-3" id="game-list">
-                      <Fulltimeprofile />
+                      <Fulltimeprofile username={username} />
                     </div>
 
                     <div className="tab-pane fade pt-3" id="profile-settings">

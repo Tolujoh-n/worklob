@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import person from "../../assets/address.jpg";
 import { FaEdit, FaPlus, FaFileAlt } from "react-icons/fa";
+import { toast } from "sonner";
 
-const Freelancepro = () => {
+const Freelancepro = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
   const [personalInfo, setPersonalInfo] = useState({
     specialization: "",
@@ -13,6 +15,41 @@ const Freelancepro = () => {
   const [portfolio, setPortfolio] = useState([
     { projectName: "", description: "", files: [] },
   ]);
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  // Fetch freelance info from backend
+  const fetchFreelanceInfo = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/profile/${username}/freelanceinfo`
+      );
+
+      const freelanceData = response.data || {};
+
+      setPersonalInfo({
+        specialization: freelanceData.specialization || "",
+        hourlyRate: freelanceData.hourlyRate || "",
+        preferredPaymentOptions: freelanceData.preferredPaymentOptions || [],
+        profileImage: freelanceData.profileImage || person,
+      });
+
+      setPortfolio(
+        freelanceData.portfolio || [
+          { projectName: "", description: "", files: [] },
+        ]
+      );
+
+      toast.success("Freelance information loaded successfully");
+    } catch (error) {
+      console.error("Error fetching freelance information data:", error);
+      toast.error("Failed to fetch freelance information data");
+    }
+  };
+
+  useEffect(() => {
+    fetchFreelanceInfo();
+  }, [username, API_URL]);
 
   const handleToggleEditing = (section) => {
     setEditingSection(editingSection === section ? null : section);
@@ -63,6 +100,58 @@ const Freelancepro = () => {
     ]);
   };
 
+  const handleSaveChanges = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("specialization", personalInfo.specialization);
+      formData.append("hourlyRate", personalInfo.hourlyRate);
+      formData.append(
+        "preferredPaymentOptions",
+        JSON.stringify(personalInfo.preferredPaymentOptions)
+      );
+
+      portfolio.forEach((project, index) => {
+        formData.append(
+          `portfolio[${index}][projectName]`,
+          project.projectName
+        );
+        formData.append(
+          `portfolio[${index}][description]`,
+          project.description
+        );
+        project.files.forEach((file, fileIndex) => {
+          formData.append(`portfolio[${index}][files][${fileIndex}]`, file);
+        });
+      });
+
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile/${username}/freelanceinfo`,
+        formData
+      );
+
+      const updatedData = response.data;
+
+      setPersonalInfo({
+        specialization: updatedData.specialization || "",
+        hourlyRate: updatedData.hourlyRate || "",
+        preferredPaymentOptions: updatedData.preferredPaymentOptions || [],
+        profileImage: updatedData.profileImage || person,
+      });
+
+      setPortfolio(
+        updatedData.portfolio || [
+          { projectName: "", description: "", files: [] },
+        ]
+      );
+
+      toast.success("Freelance information updated successfully");
+      setEditingSection(null);
+    } catch (error) {
+      console.error("Error updating freelance information:", error);
+      toast.error("Failed to update freelance information");
+    }
+  };
+
   return (
     <div className="gigprofile container">
       {/* Freelancer Info Section */}
@@ -107,7 +196,7 @@ const Freelancepro = () => {
                   <div className="form-group">
                     <label>Preferred Payment Options</label>
                     <div className="payment-options">
-                      {["USDT", "USDC", "NEAR"].map((option) => (
+                      {["USDT", "USDC", "ETH"].map((option) => (
                         <button
                           key={option}
                           type="button"
@@ -154,7 +243,7 @@ const Freelancepro = () => {
                   <button
                     type="button"
                     className="usbutton"
-                    onClick={() => handleToggleEditing("personalInfo")}
+                    onClick={handleSaveChanges}
                   >
                     Save changes
                   </button>
@@ -264,7 +353,7 @@ const Freelancepro = () => {
                   <button
                     type="button"
                     className="usbutton"
-                    onClick={() => handleToggleEditing("portfolio")}
+                    onClick={handleSaveChanges}
                   >
                     Save changes
                   </button>

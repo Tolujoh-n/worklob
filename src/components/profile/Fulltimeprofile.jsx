@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { FaEdit, FaPlus, FaFileAlt } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { FaEdit, FaFileAlt } from "react-icons/fa";
+import { toast } from "sonner";
 
-const Fulltimeprofile = () => {
+const Fulltimeprofile = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
   const [employmentInfo, setEmploymentInfo] = useState({
     position: "",
@@ -14,6 +16,37 @@ const Fulltimeprofile = () => {
     linkedin: "",
     github: "",
   });
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
+  // Fetch full-time profile data from backend
+  const fetchFullTimeProfile = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/profile/${username}/fulltimeprofile`
+      );
+      setEmploymentInfo({
+        position: response.data.fullTimeInfo.position || "",
+        experience: response.data.fullTimeInfo.experience || "",
+        cvFile: null,
+      });
+      setContactInfo(
+        response.data.contactInfo || {
+          email: "",
+          linkedin: "",
+          github: "",
+        }
+      );
+      toast.success("Full-time profile loaded successfully");
+    } catch (error) {
+      console.error("Error fetching full-time profile data:", error);
+      toast.error("Failed to fetch full-time profile data");
+    }
+  };
+
+  useEffect(() => {
+    fetchFullTimeProfile();
+  }, [username, API_URL]);
 
   const handleToggleEditing = (section) => {
     setEditingSection(editingSection === section ? null : section);
@@ -31,6 +64,44 @@ const Fulltimeprofile = () => {
   const handleContactInfoChange = (e) => {
     const { name, value } = e.target;
     setContactInfo({ ...contactInfo, [name]: value });
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("position", employmentInfo.position);
+      formData.append("experience", employmentInfo.experience);
+      if (employmentInfo.cvFile) {
+        formData.append("cvFile", employmentInfo.cvFile);
+      }
+      formData.append("email", contactInfo.email);
+      formData.append("linkedin", contactInfo.linkedin);
+      formData.append("github", contactInfo.github);
+
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile/${username}/fulltimeprofile`,
+        formData
+      );
+
+      setEmploymentInfo({
+        position: response.data.fullTimeInfo.position || "",
+        experience: response.data.fullTimeInfo.experience || "",
+        cvFile: null,
+      });
+      setContactInfo(
+        response.data.contactInfo || {
+          email: "",
+          linkedin: "",
+          github: "",
+        }
+      );
+
+      toast.success("Full-time profile updated successfully");
+      setEditingSection(null);
+    } catch (error) {
+      console.error("Error updating full-time profile:", error);
+      toast.error("Failed to update full-time profile");
+    }
   };
 
   return (
@@ -104,7 +175,7 @@ const Fulltimeprofile = () => {
                 <button
                   type="button"
                   className="usbutton"
-                  onClick={() => handleToggleEditing("employmentInfo")}
+                  onClick={handleSaveChanges}
                 >
                   Save Changes
                 </button>
@@ -202,7 +273,7 @@ const Fulltimeprofile = () => {
                 <button
                   type="button"
                   className="usbutton"
-                  onClick={() => handleToggleEditing("contactInfo")}
+                  onClick={handleSaveChanges}
                 >
                   Save Changes
                 </button>
