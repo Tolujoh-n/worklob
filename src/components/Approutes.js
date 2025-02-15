@@ -91,7 +91,7 @@ const Approutes = () => {
               <Route path="/governance" element={<Governance />} />
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/chatbot" element={<Chatbot />} />
-              <Route path="/userprofile" element={<Userprofile />} />
+              <Route path="/:username" element={<Userprofile />} />
             </Routes>
           </div>
         </section>

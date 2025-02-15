@@ -40,7 +40,7 @@ const Freelancepro = ({ username }) => {
         ]
       );
 
-      toast.success("Freelance information loaded successfully");
+      // toast.success("Freelance information loaded successfully");
     } catch (error) {
       console.error("Error fetching freelance information data:", error);
       toast.error("Failed to fetch freelance information data");

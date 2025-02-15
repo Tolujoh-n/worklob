@@ -125,10 +125,10 @@ function Settings() {
                       className="tab-pane fade show active profile-edit"
                       id="profile-edit"
                     >
-                      <Profile />
+                      <Profile username={username} />
                     </div>
                     <div className="tab-pane fade pt-3" id="game-set">
-                      <Editprofile />
+                      <Editprofile username={username} />
                     </div>
 
                     <div className="tab-pane fade pt-3" id="game-settings">

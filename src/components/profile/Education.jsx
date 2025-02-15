@@ -16,7 +16,7 @@ const Education = ({ username }) => {
         `${API_URL}/api/v1/profile/${username}/education`
       );
       setEducation(response.data);
-      toast.success("Education loaded successfully");
+      // toast.success("Education loaded successfully");
     } catch (error) {
       console.error("Error fetching education data:", error);
       toast.error("Failed to fetch education data");

@@ -28,7 +28,7 @@ const Personalinfo = ({ username }) => {
 
       setPersonalInfo(profileData);
       setIsNewProfile(false);
-      toast.success("Profile loaded successfully");
+      // toast.success("Profile loaded successfully");
     } catch (error) {
       console.error("Error fetching profile data:", error); // Improved logging
       toast.error("Failed to fetch profile data");
@@ -114,7 +114,7 @@ const Personalinfo = ({ username }) => {
             <div className="gigprofile-section-content editing">
               <div className="gigprofile-profile-image">
                 <img
-                  src={personalInfo.profileImage}
+                  src={personalInfo.profileImage || person}
                   alt="Profile"
                   className="profile-image"
                 />
@@ -214,7 +214,7 @@ const Personalinfo = ({ username }) => {
             <div className="gigprofile-section-content">
               <div className="gigprofile-profile-image">
                 <img
-                  src={personalInfo.profileImage}
+                  src={personalInfo.profileImage || person}
                   alt="Profile"
                   className="profile-image"
                 />

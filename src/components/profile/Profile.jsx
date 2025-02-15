@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import profile from "../../assets/address.jpg";
 import { Link } from "react-router-dom";
 import { FaFileAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 
-function Profile({ user }) {
+function Profile({ username }) {
   const token = localStorage.getItem("token");
   const us = JSON.parse(localStorage.getItem("user"));
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   let userName;
 
@@ -16,58 +18,47 @@ function Profile({ user }) {
   if (us && us.username) {
     userName = us.username;
   }
-  const [workExperience, setWorkExperience] = useState([
-    {
-      company: "Company A",
-      role: "Developer",
-      years: "2019-2021",
-      currentlyWorking: false,
-      description: "",
-    },
-    {
-      company: "Company B",
-      role: "Designer",
-      years: "2019-2021",
-      currentlyWorking: false,
-      description: "",
-    },
-  ]);
-  const [education, setEducation] = useState([
-    {
-      institution: "University X",
-      graduationYear: "2020",
-      levelOfStudy: "Bachelor",
-      major: "Computer Science",
-    },
-    {
-      institution: "University udus",
-      graduationYear: "2025",
-      levelOfStudy: "Bachelor",
-      major: "Computer Engineer",
-    },
-  ]);
-  const [portfolio, setPortfolio] = useState([
-    {
-      projectName: "Blinka Projevy",
-      description: "sjdhv sdig ytdssjhg",
-      files: ["goat.jpg", "portal.png"],
-    },
-    {
-      projectName: "Oja app",
-      description: "sk tdk uctcl ",
-      files: ["git.zip"],
-    },
-    {
-      projectName: "Oja app",
-      description: "sk tdk uctcl ",
-      files: ["git.zip"],
-    },
-    {
-      projectName: "Oja app",
-      description: "sk tdk uctcl ",
-      files: ["git.zip"],
-    },
-  ]);
+
+  const [personalInfo, setPersonalInfo] = useState({});
+  const [workExperience, setWorkExperience] = useState([]);
+  const [education, setEducation] = useState([]);
+  const [portfolio, setPortfolio] = useState([]);
+  const [socialLinks, setSocialLinks] = useState({});
+
+  useEffect(() => {
+    // Fetch personal info
+    axios
+      .get(`${API_URL}/api/v1/profile/${username}`)
+      .then((response) => setPersonalInfo(response.data))
+      .catch((error) => console.error("Error fetching personal info:", error));
+
+    // Fetch social links
+    axios
+      .get(`${API_URL}/api/v1/profile/${username}/sociallinks`)
+      .then((response) => setSocialLinks(response.data))
+      .catch((error) => console.error("Error fetching social links:", error));
+
+    // Fetch work experience
+    axios
+      .get(`${API_URL}/api/v1/profile/${username}/workexperience`)
+      .then((response) => setWorkExperience(response.data))
+      .catch((error) =>
+        console.error("Error fetching work experience:", error)
+      );
+
+    // Fetch education
+    axios
+      .get(`${API_URL}/api/v1/profile/${username}/education`)
+      .then((response) => setEducation(response.data))
+      .catch((error) => console.error("Error fetching education:", error));
+
+    // Fetch portfolio
+    axios
+      .get(`${API_URL}/api/v1/profile/${username}/freelanceinfo`)
+      .then((response) => setPortfolio(response.data.portfolio))
+      .catch((error) => console.error("Error fetching portfolio:", error));
+  }, [username, API_URL]);
+
   return (
     <>
       <div className="col-lg-12">
@@ -76,32 +67,42 @@ function Profile({ user }) {
             <div className="col-xl-12">
               <div className="card" style={{ position: "relative" }}>
                 <div className="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                  <img src={profile} alt="Profile" className="rounded-circle" />
-                  <h2>{userName}</h2>
-                  {/* <h2>tolujohnofficial@gmail.com</h2> */}
+                  <img
+                    src={personalInfo.profileImage || profile}
+                    alt="Profile"
+                    className="rounded-circle"
+                  />
+                  <h2>{personalInfo.name}</h2>
+                  {/* <h2>{personalInfo.email}</h2> */}
                   <div className="social-links mt-2">
-                    <a href="#" className="twitter" target="_blank">
+                    <a
+                      href={socialLinks.twitter}
+                      className="twitter"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <i className="bi bi-twitter"></i>
                     </a>
-                    <a href="#" className="facebook" target="_blank">
+                    <a
+                      href={socialLinks.facebook}
+                      className="facebook"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <i className="bi bi-facebook"></i>
                     </a>
-                    <a href="#" className="instagram" target="_blank">
-                      <i className="bi bi-instagram"></i>
-                    </a>
-                    <a href="#" className="linkedin" target="_blank">
+                    <a
+                      href={socialLinks.linkedin}
+                      className="linkedin"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <i className="bi bi-linkedin"></i>
                     </a>
                   </div>
-                  <p className="small fst-italic">
-                    I'm an experienced full-stack blockchain developer with a
-                    focus on frontend development, I'm eager to join teams,
-                    contribute my expertise, and offer my skills to enhance its
-                    success. I'd also love to be part of teams for hacks and any
-                    collaborative opportunity.
-                  </p>
+                  <p className="small fst-italic">{personalInfo.bio}</p>
                   <a
-                    href="/dashboard/userprofile"
+                    href={`/dashboard/${username}`}
                     className="link-icon linktopro"
                   >
                     <i className="bi bi-box-arrow-up-right"></i>
@@ -219,7 +220,7 @@ function Profile({ user }) {
                                     style={{ color: "black" }}
                                     className="filetag-name"
                                   >
-                                    {file.name}
+                                    {file}
                                   </p>
                                 </div>
                               ))}

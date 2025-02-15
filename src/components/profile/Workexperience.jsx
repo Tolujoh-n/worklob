@@ -16,7 +16,7 @@ const Workexperience = ({ username }) => {
         `${API_URL}/api/v1/profile/${username}/workexperience`
       );
       setWorkExperience(response.data);
-      toast.success("Work experience loaded successfully");
+      // toast.success("Work experience loaded successfully");
     } catch (error) {
       console.error("Error fetching work experience data:", error);
       toast.error("Failed to fetch work experience data");

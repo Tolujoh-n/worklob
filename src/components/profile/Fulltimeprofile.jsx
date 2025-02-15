@@ -37,7 +37,7 @@ const Fulltimeprofile = ({ username }) => {
           github: "",
         }
       );
-      toast.success("Full-time profile loaded successfully");
+      // toast.success("Full-time profile loaded successfully");
     } catch (error) {
       console.error("Error fetching full-time profile data:", error);
       toast.error("Failed to fetch full-time profile data");

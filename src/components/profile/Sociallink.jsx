@@ -20,7 +20,7 @@ const Sociallink = ({ username }) => {
         `${API_URL}/api/v1/profile/${username}/sociallinks`
       );
       setSocialLinks(response.data);
-      toast.success("Social links loaded successfully");
+      // toast.success("Social links loaded successfully");
     } catch (error) {
       console.error("Error fetching social links data:", error);
       toast.error("Failed to fetch social links data");
