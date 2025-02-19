@@ -31,7 +31,7 @@ import Userprofile from "./Userprofile.jsx";
 
 // Future rootes
 import Trade from "./trade/Trade.jsx";
-import Staking from "./staking/Staking.jsx";
+import Stake from "./staking/Stake.jsx";
 import Governance from "./governance/Governance.jsx";
 import Blogs from "./blogs/Blogs.jsx";
 import Chatbot from "./ai/Chatbot.jsx";
@@ -87,7 +87,7 @@ const Approutes = () => {
               <Route path="/gigdetails/:jobId" element={<Gigdetails />} />
               <Route path="/referrals" element={<Referrals />} />
               <Route path="/trade" element={<Trade />} />
-              <Route path="/staking" element={<Staking />} />
+              <Route path="/staking" element={<Stake />} />
               <Route path="/governance" element={<Governance />} />
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/chatbot" element={<Chatbot />} />

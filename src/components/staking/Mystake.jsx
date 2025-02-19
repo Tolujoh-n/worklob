@@ -4,7 +4,7 @@ import btc from "../../assets/img/btc.png";
 import lobcoin from "../../assets/img/worklob-coin.png";
 import { useWeb3 } from "../../Web3Provider";
 
-const Staking = () => {
+const Mystake = () => {
   // Initialize state for transaction data
   const { baseETHBalance, lobBalance } = useWeb3();
   const [validators, setValidators] = useState([
@@ -85,78 +85,36 @@ const Staking = () => {
   );
   return (
     <>
-      {/* First Column (Left Side) */}
-      <div className="col-lg-3 col-md-4 col-sm-12">
-        <div className="stake-column">
-          <div className="stake-card">
-            <h5>Total Staked LOB</h5>
-            <h5>57,784,602.16</h5>
+      {/* Code price and button */}
+      <div className="container mystake-card">
+        <div className="row">
+          <div className="col-md-4">
+            <div className="mystake-item">
+              <p className="mystake-name">My Staking Amount</p>
+              <p className="mystake-price">0 INJ</p>
+            </div>
           </div>
-          <div className="stake-card">
-            {/* <h2>Stake Address</h2> */}
-            <div className="stake-header">
-              <h5>Staking Rewards APR</h5>
-              <h5>11.85%</h5>
+          <div className="col-md-4">
+            <div className="mystake-item">
+              <p className="mystake-name">Total Staking Value</p>
+              <p className="mystake-price">$0.00 USD</p>
+            </div>
+          </div>
+          <div className="col-md-4 col-lg-4">
+            <div className="mystake-item">
+              <p className="mystake-name">Claimable Rewards</p>
+              <p className="mystake-price">0 INJ $0.00</p>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Second Column (Right Side) */}
-      <div className="col-lg-9 col-md-8 col-sm-12">
-        <div className="stake-column">
-          {/* Third Stake Card - Staking Section */}
-          <div className="stake-card stake-staking-card">
-            <div className="stake-staking-left" style={{ marginRight: "20px" }}>
-              <h2>Stake LOB</h2>
-              <p>Enter staking amount to view estimated future rewards</p>
-              <div className="stake-input-container">
-                <div className="stake-input-top">
-                  <span>Amount</span>
-                  <span className="stake-available-text">Available: 0.00</span>
-                </div>
-                <div className="stake-input-box">
-                  <input
-                    type="number"
-                    placeholder="0.00"
-                    className="stake-input"
-                  />
-                  <img src={lobcoin} alt="BTC" className="stake-btc-logo" />
-                </div>
-              </div>
-              <button className="chat-button">Continue to Staking</button>
-            </div>
-            <div className="stake-staking-right">
-              <h4>Estimated Staking Rewards</h4>
-              <br />
-              <div className="stake-header">
-                <h5>
-                  <span>1 day</span> <br />
-                  $0.00
-                </h5>
-                <h5>
-                  <span>7 days</span> <br />
-                  $0.00
-                </h5>
-              </div>
-              <br />
-              <div className="stake-header">
-                <h5>
-                  <span>30 days</span> <br />
-                  $0.00
-                </h5>
-                <h5>
-                  <span>365 days</span> <br />
-                  $0.00
-                </h5>
-              </div>
-            </div>
+        <div className="row">
+          <div className="col-12 d-flex justify-content-between">
+            <button className="mystake-button">Claim All</button>
+            <button className="mystake-button">Claim and Restake</button>
           </div>
         </div>
       </div>
-
       {/* Transaction History */}
-
       <div className="col-lg-12">
         <div className="transaction-history-card">
           <div className="transaction-history">
@@ -219,4 +177,4 @@ const Staking = () => {
   );
 };
 
-export default Staking;
+export default Mystake;
