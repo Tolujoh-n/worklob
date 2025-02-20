@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IERC20
+ * @title IWorkLobERC20
  * @dev Simplified ERC20 interface.
  */
-interface IERC20 {
+interface IWorkLobERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external returns (bool);
@@ -48,7 +48,7 @@ contract Ownable {
  * @dev A staking contract where users can stake tokens to earn rewards.
  */
 contract WorkLobStaking is Ownable {
-    IERC20 public token;
+    IWorkLobERC20 public token;
 
     // Reward parameters
     uint256 public rewardRate;           // Reward tokens distributed per second.
@@ -74,7 +74,7 @@ contract WorkLobStaking is Ownable {
      * @dev Constructor sets the ERC20 token used for staking and rewards.
      * @param _token The ERC20 token address.
      */
-    constructor(IERC20 _token) {
+    constructor(IWorkLobERC20 _token) {
         token = _token;
     }
 
