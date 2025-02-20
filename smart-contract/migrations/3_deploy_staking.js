@@ -5,7 +5,7 @@ const WorkLobStaking = artifacts.require("WorkLobStaking");
 
 module.exports = async function (deployer, network, accounts) {
   // Option 1: Using an already deployed token address
-  const deployedTokenAddress = "0xYourTokenAddressHere"; // Replace with your LOB token's address
+  const deployedTokenAddress = "0x77950BA34F2EB2C3ce6cb0A0b73E894ba57B82b8"; // Replace with your LOB token's address
   await deployer.deploy(WorkLobStaking, deployedTokenAddress);
 
   // Option 2: Deploy a test ERC20 token first and then deploy the staking contract.
