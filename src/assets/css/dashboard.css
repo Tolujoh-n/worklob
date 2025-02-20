@@ -715,10 +715,18 @@
   border-radius: 5px;
   width: 200px;
 }
+/* Wrap table to enable horizontal scrolling */
+.transaction-history {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling for mobile */
+}
 
+/* Ensure table doesn't shrink too much */
 .transaction-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px; /* Adjust as needed */
 }
 
 .transaction-table th,
@@ -726,6 +734,7 @@
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  white-space: nowrap; /* Prevents text wrapping */
 }
 
 .transaction-table th {
@@ -735,12 +744,29 @@
 .table-header {
   background-color: #182b34;
   color: white;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
 }
 
 .table-row:hover {
   background-color: #1a2a33;
+}
+
+/* Ensure responsiveness but keep table row alignment */
+@media screen and (max-width: 768px) {
+  .transaction-history {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .transaction-table {
+    width: 100%;
+    min-width: 600px; /* Prevent table from collapsing */
+    display: table; /* Ensure table layout remains intact */
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    white-space: nowrap; /* Prevents content from wrapping */
+  }
 }
 
 .bonus-details p {
