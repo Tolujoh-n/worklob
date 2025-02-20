@@ -10,62 +10,25 @@ const Staking = () => {
   const [validators, setValidators] = useState([
     {
       validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 ETH",
-      commission: "5%",
-      votingPower: "50%",
-      uptime: "99.9%",
-      status: "active",
-    },
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 ETH",
-      commission: "5%",
-      votingPower: "50%",
-      uptime: "99.9%",
-      status: "active",
-    },
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 ETH",
-      commission: "5%",
-      votingPower: "50%",
-      uptime: "99.9%",
-      status: "active",
-    },
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 ETH",
-      commission: "5%",
-      votingPower: "50%",
-      uptime: "99.9%",
+      stakedAmount: "1000 LOB",
+      rewards: "500 LOB",
+      duration: "2 seconds",
       status: "active",
     },
     {
       validator: "0xabcdef123456789abcdef123456789abcdef12",
-      stakedAmount: "500 ETH",
-      commission: "4%",
-      votingPower: "30%",
-      uptime: "98.5%",
-      status: "inactive",
+      stakedAmount: "2000 LOB",
+      rewards: "600 LOB",
+      duration: "5 minutes",
+      status: "active",
     },
     {
-      validator: "0xabcdef123456789abcdef123456789abcdef12",
-      stakedAmount: "500 ETH",
-      commission: "4%",
-      votingPower: "30%",
-      uptime: "98.5%",
-      status: "inactive",
+      validator: "0x789abcdef123456789abcdef123456789abcd",
+      stakedAmount: "1500 LOB",
+      rewards: "300 LOB",
+      duration: "10 hours",
+      status: "active",
     },
-    {
-      validator: "0xabcdef123456789abcdef123456789abcdef12",
-      stakedAmount: "500 ETH",
-      commission: "4%",
-      votingPower: "30%",
-      uptime: "98.5%",
-      status: "inactive",
-    },
-
-    // Add more rows as needed
   ]);
 
   const [filter, setFilter] = useState("active");
@@ -83,6 +46,7 @@ const Staking = () => {
   const filteredValidators = validators.filter((validator) =>
     filter === "all" ? true : validator.status === filter
   );
+
   return (
     <>
       {/* First Column (Left Side) */}
@@ -93,9 +57,8 @@ const Staking = () => {
             <h5>57,784,602.16</h5>
           </div>
           <div className="stake-card">
-            {/* <h2>Stake Address</h2> */}
             <div className="stake-header">
-              <h5>Staking Rewards APR</h5>
+              <h5>Staking Rewards Rate</h5>
               <h5>11.85%</h5>
             </div>
           </div>
@@ -105,7 +68,7 @@ const Staking = () => {
       {/* Second Column (Right Side) */}
       <div className="col-lg-9 col-md-8 col-sm-12">
         <div className="stake-column">
-          {/* Third Stake Card - Staking Section */}
+          {/* Staking Section */}
           <div className="stake-card stake-staking-card">
             <div className="stake-staking-left" style={{ marginRight: "20px" }}>
               <h2>Stake LOB</h2>
@@ -156,23 +119,25 @@ const Staking = () => {
       </div>
 
       {/* Transaction History */}
-
       <div className="col-lg-12">
         <div className="transaction-history-card">
           <div className="transaction-history">
-            <h2>Validators</h2>
             <div className="controls">
               <button
-                className="chat-button"
+                className={`chat-button ${
+                  filter === "active" ? "active-filterdata" : ""
+                }`}
                 onClick={() => handleFilterChange("active")}
               >
                 Active
               </button>
               <button
-                className="chat-button"
-                onClick={() => handleFilterChange("inactive")}
+                className={`chat-button ${
+                  filter === "ended" ? "active-filterdata" : ""
+                }`}
+                onClick={() => handleFilterChange("ended")}
               >
-                Inactive
+                Ended
               </button>
               <input
                 type="text"
@@ -183,33 +148,44 @@ const Staking = () => {
             <table className="transaction-table">
               <thead>
                 <tr className="table-header">
-                  <th>Validator</th>
+                  <th>Staker Address</th>
                   <th>Staked Amount</th>
-                  <th>Commission</th>
-                  <th>Voting Power</th>
-                  <th>Uptime</th>
+                  <th>Rewards Earned</th>
+                  <th>Duration</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredValidators.map((validator, index) => (
-                  <tr key={index} className="table-row">
-                    <td className="col col-4" data-label="Validator">
-                      <h6>{truncateAddress(validator.validator)}</h6>
-                    </td>
-                    <td className="col col-2" data-label="Staked Amount">
-                      <h6>{validator.stakedAmount}</h6>
-                    </td>
-                    <td className="col col-2" data-label="Commission">
-                      <h6>{validator.commission}</h6>
-                    </td>
-                    <td className="col col-2" data-label="Voting Power">
-                      <h6>{validator.votingPower}</h6>
-                    </td>
-                    <td className="col col-2" data-label="Uptime">
-                      <h6>{validator.uptime}</h6>
+                {filteredValidators.length > 0 ? (
+                  filteredValidators.map((validator, index) => (
+                    <tr key={index} className="table-row">
+                      <td className="col col-4" data-label="Validator">
+                        <h6>{truncateAddress(validator.validator)}</h6>
+                      </td>
+                      <td className="col col-2" data-label="Staked Amount">
+                        <h6>{validator.stakedAmount}</h6>
+                      </td>
+                      <td className="col col-2" data-label="rewards">
+                        <h6>{validator.rewards}</h6>
+                      </td>
+                      <td className="col col-2" data-label="Duration">
+                        <h6>{validator.duration}</h6>
+                      </td>
+                      <td className="col col-2" data-label="Status">
+                        <h6>{validator.status}</h6>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5">
+                      <div className="notadata">
+                        <i className="bi bi-database"></i>
+                        <h4>No data</h4>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

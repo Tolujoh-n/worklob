@@ -890,7 +890,7 @@
 }
 
 .mystake-item {
-  background-color: #fff;
+  background-color: #213743;
   padding: 15px;
   border-radius: 5px;
   text-align: center;
@@ -904,12 +904,12 @@
 }
 
 .mystake-price {
-  font-size: 1rem;
-  color: #28a745;
+  font-size: 1.5rem;
+  color: #ccc;
 }
 
 .mystake-button {
-  background-color: #007bff;
+  background-color: #3b6175;
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -921,7 +921,22 @@
 }
 
 .mystake-button:hover {
-  background-color: #0056b3;
+  background-color: #5e95b3;
+}
+
+.claim-button {
+  background-color: #3b6175;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.claim-button:hover {
+  background-color: #5e95b3;
 }
 
 /* Responsive styles */
@@ -939,6 +954,15 @@
     width: 100%;
     margin-bottom: 10px;
   }
+}
+
+.notadata {
+  padding: 50px;
+  text-align: center;
+}
+.active-filterdata {
+  background-color: goldenrod !important;
+  color: white;
 }
 
 /* end stake */
