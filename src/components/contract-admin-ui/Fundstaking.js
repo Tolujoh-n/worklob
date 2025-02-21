@@ -66,11 +66,6 @@ const Fundstaking = () => {
         signer
       );
 
-      const rewardAmountInWei = ethers.utils.parseUnits(
-        rewardAmount.toString(),
-        "ether"
-      );
-
       // Check if the user has enough LOB tokens
       const lobContract = new ethers.Contract(
         LOB_TOKEN_ADDRESS,
@@ -79,7 +74,7 @@ const Fundstaking = () => {
       );
       const userLobBalanceWei = await lobContract.balanceOf(walletAddress);
 
-      if (userLobBalanceWei.lt(rewardAmountInWei)) {
+      if (userLobBalanceWei.lt(rewardAmount)) {
         throw new Error(
           "Not enough LOB tokens for reward. Please fund your wallet."
         );
@@ -88,7 +83,7 @@ const Fundstaking = () => {
       console.log("Approving staking contract to spend LOB tokens...");
       const approvalTx = await lobContract.approve(
         WorkLobStaking_address,
-        rewardAmountInWei
+        parseInt(rewardAmount)
       );
       await approvalTx.wait();
       console.log("Approval successful.");
@@ -97,8 +92,8 @@ const Fundstaking = () => {
       let gasEstimateValue;
       try {
         gasEstimateValue = await contract.estimateGas.notifyRewardAmount(
-          rewardAmountInWei,
-          duration
+          parseInt(rewardAmount),
+          parseInt(duration)
         );
         console.log("Estimated Gas:", gasEstimateValue.toString());
       } catch (gasError) {
@@ -108,17 +103,21 @@ const Fundstaking = () => {
 
       console.log("Executing transaction...");
       const transaction = await contract.notifyRewardAmount(
-        rewardAmountInWei,
-        duration,
+        parseInt(rewardAmount),
+        parseInt(duration), // Convert duration to integer
         {
           gasLimit: gasEstimateValue.add(ethers.BigNumber.from("10000")),
         }
       );
 
+      console.log("Reward Amount:", rewardAmount);
+      console.log("Duration:", duration);
       console.log("Transaction sent:", transaction.hash);
       await transaction.wait();
       console.log("Transaction confirmed.");
       toast.success("Contract funded successfully!");
+      // Reload the page
+      window.location.reload();
     } catch (error) {
       console.error("Transaction failed:", error);
       toast.error(`Failed to fund the contract: ${error.message}`);
