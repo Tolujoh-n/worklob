@@ -1,36 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWeb3 } from "../../Web3Provider";
 import { Toaster, toast } from "sonner";
 import Web3 from "web3";
-import { LOB_TOKEN_ADDRESS, LOB_TOKEN_ABI } from "../../Constants";
+import { LOB_TOKEN_ADDRESS, LOB_TOKEN_ABI } from "../Constants";
 
 const Transfermodal = ({ isOpen, onClose }) => {
   const { connectWallet, connected } = useWeb3();
   const [token, setToken] = useState("ETH");
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
+  const [sender, setSender] = useState("");
 
-  const handleTokenChange = (e) => setToken(e.target.value);
-  const handleRecipientChange = (e) => setRecipient(e.target.value);
-  const handleAmountChange = (e) => setAmount(e.target.value);
+  useEffect(() => {
+    const getAccount = async () => {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          setSender(accounts[0]);
+        } catch (error) {
+          console.error("Error fetching account:", error);
+          toast.error("Failed to fetch wallet address");
+        }
+      }
+    };
+
+    if (connected) {
+      getAccount();
+    }
+  }, [connected]);
 
   const handleTransfer = async () => {
     if (!recipient || !amount) {
-      toast.error("Please enter recipient address and amount to send.");
+      toast.error("Please enter recipient address and amount.");
       return;
     }
 
-    const web3 = new Web3(Web3.givenProvider);
+    if (!sender) {
+      toast.error("Wallet not connected. Please connect your wallet.");
+      return;
+    }
 
-    const contractAddress =
+    const web3 = new Web3(window.ethereum);
+    let contractAddress =
       token === "ETH"
         ? "0x0000000000000000000000000000000000000000"
         : LOB_TOKEN_ADDRESS;
 
-    try {
-      const accounts = await web3.eth.getAccounts();
-      const sender = accounts[0];
+    console.log("LOB contract address:", LOB_TOKEN_ADDRESS);
+    console.log("Sender address:", sender);
 
+    try {
       if (token === "ETH") {
         await web3.eth.sendTransaction({
           from: sender,
@@ -45,7 +66,9 @@ const Transfermodal = ({ isOpen, onClose }) => {
       }
 
       toast.success("Transfer successful!");
+      onClose();
     } catch (error) {
+      console.error("Transfer failed:", error);
       toast.error(`Transfer failed: ${error.message}`);
     }
   };
@@ -63,7 +86,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
               <label style={labelStyle}>Token</label>
               <select
                 value={token}
-                onChange={handleTokenChange}
+                onChange={(e) => setToken(e.target.value)}
                 style={formControlStyle}
               >
                 <option value="ETH">ETH (Base)</option>
@@ -76,7 +99,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
                 type="text"
                 placeholder="0xb9b4....83a"
                 value={recipient}
-                onChange={handleRecipientChange}
+                onChange={(e) => setRecipient(e.target.value)}
                 style={formControlStyle}
               />
             </div>
@@ -84,9 +107,9 @@ const Transfermodal = ({ isOpen, onClose }) => {
               <label style={labelStyle}>Amount to Send</label>
               <input
                 type="number"
-                placeholder="$0.00"
+                placeholder="0"
                 value={amount}
-                onChange={handleAmountChange}
+                onChange={(e) => setAmount(e.target.value)}
                 style={formControlStyle}
               />
             </div>
@@ -108,7 +131,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
                 Connect Wallet
               </button>
             </div>
-            <br></br>
+            <br />
             <button className="closemodall-button" onClick={onClose}>
               Close
             </button>

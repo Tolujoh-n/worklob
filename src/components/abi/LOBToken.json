@@ -9351,12 +9351,12 @@
     "84532": {
       "events": {},
       "links": {},
-      "address": "0x77950BA34F2EB2C3ce6cb0A0b73E894ba57B82b8",
-      "transactionHash": "0x8fa643cf4055b909654fb05d287003656a458d669926ca14f779c6e127f9846b"
+      "address": "0xa28C8a6dC4Ba993CBb8a2C704c60347bdE2a53a4",
+      "transactionHash": "0xd4d7cfd678e0008bde4c4600908cebee3c05a2246c1bcb40baaf6cbb77217143"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-20T04:27:58.652Z",
+  "updatedAt": "2025-02-21T03:54:28.191Z",
   "devdoc": {
     "errors": {
       "ERC20InsufficientAllowance(address,uint256,uint256)": [

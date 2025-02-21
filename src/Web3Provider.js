@@ -4,7 +4,7 @@ import {
   BASE_TESTNET_PARAMS,
   LOB_TOKEN_ABI,
   LOB_TOKEN_ADDRESS,
-} from "./Constants";
+} from "./components/Constants";
 
 const Web3Context = createContext();
 

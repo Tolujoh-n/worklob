@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useWeb3 } from "../../Web3Provider";
 import { Toaster, toast } from "sonner";
 import Web3 from "web3";
-import { LOB_TOKEN_ADDRESS, LOB_TOKEN_ABI } from "../../Constants";
+import { LOB_TOKEN_ADDRESS, LOB_TOKEN_ABI } from "../Constants";
 import ETHLogo from "../../assets/img/eth.png";
 import LOBLogo from "../../assets/img/worklob-coin.png";
 
@@ -112,7 +112,7 @@ const Swapmodal = ({ isOpen, onClose }) => {
               <label style={labelStyle}>Amount</label>
               <input
                 type="number"
-                placeholder="$0.00"
+                placeholder="0"
                 value={amount}
                 onChange={handleAmountChange}
                 style={formControlStyle}

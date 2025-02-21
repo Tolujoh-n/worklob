@@ -29,12 +29,16 @@ import Referrals from "./referrals/Referrals.jsx";
 import Wallet from "./wallet/Wallet.jsx";
 import Userprofile from "./Userprofile.jsx";
 
+
 // Future rootes
 import Trade from "./trade/Trade.jsx";
 import Stake from "./staking/Stake.jsx";
 import Governance from "./governance/Governance.jsx";
 import Blogs from "./blogs/Blogs.jsx";
 import Chatbot from "./ai/Chatbot.jsx";
+
+// Admin UI:
+import Fundstaking from "./contract-admin-ui/Fundstaking.js";
 
 // Css files
 import "../assets/vendor/simple-datatables/style.css";
@@ -92,6 +96,7 @@ const Approutes = () => {
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/chatbot" element={<Chatbot />} />
               <Route path="/:username" element={<Userprofile />} />
+              <Route path="/fundstaking" element={<Fundstaking />} />
             </Routes>
           </div>
         </section>

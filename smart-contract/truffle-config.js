@@ -10,7 +10,7 @@ module.exports = {
           process.env.MNEMONIC, // Your wallet's mnemonic
           "https://sepolia.base.org" // RPC URL for Base Testnet
         ),
-      network_id: 84532, // Network ID for Base Testnet
+      network_id: "*", // Network ID for Base Testnet: 84532
       gas: 8000000, // Gas limit
       gasPrice: 1000000000, // Gas price (1 Gwei)
       timeoutBlocks: 200, // Increase timeout for deployment

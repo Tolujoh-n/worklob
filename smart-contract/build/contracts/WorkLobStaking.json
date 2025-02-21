@@ -11844,12 +11844,12 @@
     "84532": {
       "events": {},
       "links": {},
-      "address": "0xC95D7CA63644bA75276b06022a40cb892EDd6137",
-      "transactionHash": "0xc4032cdf0648b5bd55b0b8e189b608a999484a1a886798a5dc7dc419a0b3bc9b"
+      "address": "0x444D88F88B1Aa5DC06bC625FD1123a6c3d257061",
+      "transactionHash": "0x54b0d9310c43c8933263916c05bdf215e66e70cbe5b11d6f4a42476159ffb996"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-20T04:28:11.904Z",
+  "updatedAt": "2025-02-21T03:54:42.384Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "A staking contract where users can stake tokens to earn rewards.",
