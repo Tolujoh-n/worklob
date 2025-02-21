@@ -1,53 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { useWeb3 } from "../../Web3Provider";
-import { WorkLobStaking_abi, WorkLobStaking_address } from "../Constants";
-import Web3 from "web3";
+import {
+  WorkLobStaking_abi,
+  WorkLobStaking_address,
+  LOB_TOKEN_ABI,
+  LOB_TOKEN_ADDRESS,
+} from "../Constants";
+import { ethers } from "ethers";
 import { Toaster, toast } from "sonner";
 
 const Fundstaking = () => {
   const { connected, walletAddress, connectWallet } = useWeb3();
   const [rewardAmount, setRewardAmount] = useState("");
   const [duration, setDuration] = useState("");
-  const [gasEstimate, setGasEstimate] = useState("");
-  const [rewardAmountWei, setRewardAmountWei] = useState("");
-  const [owner, setOwner] = useState("");
+  const [userBalance, setUserBalance] = useState("0");
+  const [lobBalance, setLobBalance] = useState("0");
 
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!connected || !walletAddress || !rewardAmount || !duration) return;
+      if (!connected || !walletAddress) return;
 
-      const web3 = new Web3(Web3.givenProvider);
-      const accounts = await web3.eth.getAccounts();
-      const currentOwner = walletAddress || accounts[0];
-      if (!currentOwner) throw new Error("No wallet connected.");
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
 
-      const contract = new web3.eth.Contract(
-        WorkLobStaking_abi,
-        WorkLobStaking_address
-      );
+        // Fetch ETH balance
+        const balance = await provider.getBalance(walletAddress);
+        setUserBalance(ethers.utils.formatEther(balance));
 
-      const rewardAmountInWei = web3.utils.toWei(
-        rewardAmount.toString(),
-        "ether"
-      );
-
-      const gasEstimateValue = await contract.methods
-        .notifyRewardAmount(rewardAmountInWei, duration)
-        .estimateGas({ from: currentOwner });
-
-      setRewardAmountWei(rewardAmountInWei);
-      setGasEstimate(gasEstimateValue);
-      setOwner(currentOwner);
-
-      console.log("Reward Amount in Wei:", rewardAmountInWei);
-      console.log("Duration:", duration);
-      console.log("Contract Address:", WorkLobStaking_address);
-      console.log("Wallet Address:", currentOwner);
-      console.log("Gas Estimate:", gasEstimateValue);
+        // Fetch LOB token balance
+        const lobContract = new ethers.Contract(
+          LOB_TOKEN_ADDRESS,
+          LOB_TOKEN_ABI,
+          signer
+        );
+        const lobBalanceWei = await lobContract.balanceOf(walletAddress);
+        setLobBalance(ethers.utils.formatEther(lobBalanceWei));
+      } catch (error) {
+        console.error("Error fetching details:", error);
+      }
     };
 
     fetchDetails();
-  }, [connected, walletAddress, rewardAmount, duration]);
+  }, [connected, walletAddress]);
 
   const handleRewardAmountChange = (e) => setRewardAmount(e.target.value);
   const handleDurationChange = (e) => setDuration(e.target.value);
@@ -62,39 +57,67 @@ const Fundstaking = () => {
         throw new Error("Reward Amount and Duration must not be empty.");
       }
 
-      const web3 = new Web3(Web3.givenProvider);
-      const accounts = await web3.eth.getAccounts();
-      const currentOwner = walletAddress || accounts[0];
-      if (!currentOwner) throw new Error("No wallet connected.");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
 
-      const contract = new web3.eth.Contract(
+      const contract = new ethers.Contract(
+        WorkLobStaking_address,
         WorkLobStaking_abi,
-        WorkLobStaking_address
+        signer
       );
 
-      const rewardAmountInWei = web3.utils.toWei(
+      const rewardAmountInWei = ethers.utils.parseUnits(
         rewardAmount.toString(),
         "ether"
       );
 
-      const gasEstimateValue = await contract.methods
-        .notifyRewardAmount(rewardAmountInWei, duration)
-        .estimateGas({ from: currentOwner });
+      // Check if the user has enough LOB tokens
+      const lobContract = new ethers.Contract(
+        LOB_TOKEN_ADDRESS,
+        LOB_TOKEN_ABI,
+        signer
+      );
+      const userLobBalanceWei = await lobContract.balanceOf(walletAddress);
 
-      console.log(`Estimated Gas: ${gasEstimateValue}`);
-      console.log("Reward Amount in Wei:", rewardAmountInWei);
-      console.log("Duration:", duration);
-      console.log("Contract Address:", WorkLobStaking_address);
-      console.log("Wallet Address:", currentOwner);
+      if (userLobBalanceWei.lt(rewardAmountInWei)) {
+        throw new Error(
+          "Not enough LOB tokens for reward. Please fund your wallet."
+        );
+      }
 
-      const receipt = await contract.methods
-        .notifyRewardAmount(rewardAmountInWei, duration)
-        .send({
-          from: currentOwner,
-          gas: gasEstimateValue + 10000, // Adding buffer to gas estimate
-        });
+      console.log("Approving staking contract to spend LOB tokens...");
+      const approvalTx = await lobContract.approve(
+        WorkLobStaking_address,
+        rewardAmountInWei
+      );
+      await approvalTx.wait();
+      console.log("Approval successful.");
 
-      console.log("Transaction successful:", receipt);
+      console.log("Estimating gas for notifyRewardAmount...");
+      let gasEstimateValue;
+      try {
+        gasEstimateValue = await contract.estimateGas.notifyRewardAmount(
+          rewardAmountInWei,
+          duration
+        );
+        console.log("Estimated Gas:", gasEstimateValue.toString());
+      } catch (gasError) {
+        console.warn("Gas estimation failed, using fallback gas limit.");
+        gasEstimateValue = ethers.BigNumber.from("500000");
+      }
+
+      console.log("Executing transaction...");
+      const transaction = await contract.notifyRewardAmount(
+        rewardAmountInWei,
+        duration,
+        {
+          gasLimit: gasEstimateValue.add(ethers.BigNumber.from("10000")),
+        }
+      );
+
+      console.log("Transaction sent:", transaction.hash);
+      await transaction.wait();
+      console.log("Transaction confirmed.");
       toast.success("Contract funded successfully!");
     } catch (error) {
       console.error("Transaction failed:", error);
@@ -134,6 +157,12 @@ const Fundstaking = () => {
           <button className="chat-button" onClick={handleFundContract}>
             Fund Contract
           </button>
+          <p className="mt-3">
+            Wallet Balance: <strong>{userBalance} ETH</strong>
+          </p>
+          <p className="mt-3">
+            LOB Balance: <strong>{lobBalance} LOB</strong>
+          </p>
         </div>
       </div>
       <Toaster />
