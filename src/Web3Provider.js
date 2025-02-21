@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { ethers } from "ethers";
+import Web3 from "web3";
 import {
   BASE_TESTNET_PARAMS,
   LOB_TOKEN_ABI,
@@ -13,7 +13,7 @@ export const Web3Provider = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState("");
   const [baseETHBalance, setBaseETHBalance] = useState("0");
   const [lobBalance, setLobBalance] = useState("0");
-  const [provider, setProvider] = useState(null);
+  const [web3, setWeb3] = useState(null);
 
   const saveBalancesToLocalStorage = (ethBalance, lobTokenBalance) => {
     localStorage.setItem(
@@ -85,22 +85,18 @@ export const Web3Provider = ({ children }) => {
     }
 
     try {
-      const providerInstance = new ethers.providers.Web3Provider(
-        window.ethereum
-      );
-      setProvider(providerInstance);
-
-      await providerInstance.send("eth_requestAccounts", []);
-      const signer = providerInstance.getSigner();
-      const address = await signer.getAddress();
-
-      setWalletAddress(address);
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
+      setWalletAddress(accounts[0]);
       setConnected(true);
 
       // Save wallet address to localStorage
-      localStorage.setItem("walletAddress", address);
+      localStorage.setItem("walletAddress", accounts[0]);
 
-      console.log("Connected address:", address);
+      console.log("Connected address:", accounts[0]);
 
       await switchToBaseTestnet();
       window.location.reload();
@@ -110,20 +106,21 @@ export const Web3Provider = ({ children }) => {
   };
 
   const fetchBalances = async (address) => {
-    if (!provider || !address) return;
+    if (!web3 || !address) return;
 
     try {
-      const balance = await provider.getBalance(address);
-      const ethBalance = ethers.utils.formatEther(balance);
+      const balance = await web3.eth.getBalance(address);
+      const ethBalance = web3.utils.fromWei(balance, "ether");
       setBaseETHBalance(ethBalance);
 
-      const lobTokenContract = new ethers.Contract(
-        LOB_TOKEN_ADDRESS,
+      const lobTokenContract = new web3.eth.Contract(
         LOB_TOKEN_ABI,
-        provider
+        LOB_TOKEN_ADDRESS
       );
-      const lobBalance = await lobTokenContract.balanceOf(address);
-      const lobTokenBalance = ethers.utils.formatEther(lobBalance);
+      const lobBalance = await lobTokenContract.methods
+        .balanceOf(address)
+        .call();
+      const lobTokenBalance = web3.utils.fromWei(lobBalance, "ether");
       setLobBalance(lobTokenBalance);
 
       // Save balances to localStorage
@@ -152,10 +149,8 @@ export const Web3Provider = ({ children }) => {
     const savedAddress = localStorage.getItem("walletAddress");
 
     if (savedAddress) {
-      const providerInstance = new ethers.providers.Web3Provider(
-        window.ethereum
-      );
-      setProvider(providerInstance);
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
       setWalletAddress(savedAddress);
       setConnected(true);
       console.log("Restoring wallet connection:", savedAddress);
@@ -169,7 +164,7 @@ export const Web3Provider = ({ children }) => {
     if (connected && walletAddress) {
       fetchBalances(walletAddress);
     }
-  }, [connected, walletAddress, provider]);
+  }, [connected, walletAddress, web3]);
 
   return (
     <Web3Context.Provider

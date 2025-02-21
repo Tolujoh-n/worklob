@@ -95,6 +95,7 @@ const Staking = () => {
       toast.error("Please enter a valid staking amount.");
       return;
     }
+
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -104,23 +105,45 @@ const Staking = () => {
         signer
       );
 
-      // Parse the staking amount into a BigNumber
-      const amountToStake = ethers.utils.parseUnits(
-        stakingAmount.toString(),
-        18
+      const tokenContract = new ethers.Contract(
+        LOB_TOKEN_ADDRESS,
+        LOB_TOKEN_ABI,
+        signer
       );
+      const amountToStake = ethers.utils.parseUnits(stakingAmount, 18);
 
-      // Log the parsed amount in a human-readable format
-      console.log("Stake tokens:", ethers.utils.formatUnits(amountToStake, 18)); // This will show the staking amount in readable format
+      // Approve the staking contract to transfer tokens on behalf of the user
+      await tokenContract.approve(WorkLobStaking_address, amountToStake);
 
-      // Proceed with the staking transaction
-      const tx = await stakingContract.stake(amountToStake);
-      await tx.wait();
+      console.log("Stake tokens:", ethers.utils.formatUnits(amountToStake, 18));
+
+      // Attempt to estimate gas dynamically
+      let estimatedGas;
+      try {
+        estimatedGas = await stakingContract.estimateGas.stake(amountToStake);
+      } catch (error) {
+        console.warn("Gas estimation failed, using fallback gas limit.");
+        estimatedGas = ethers.BigNumber.from("200000"); // Fallback value
+      }
+
+      // Send the transaction with the estimated gas (or fallback)
+      const tx = await stakingContract.stake(amountToStake, {
+        gasLimit: estimatedGas, // Use the estimated gas or fallback
+      });
+
+      await tx.wait(); // Wait for transaction confirmation
       toast.success("Successfully staked your tokens!");
-      window.location.reload(); // Reload the page after staking.
+      window.location.reload(); // Reload the page after staking
     } catch (error) {
       console.error("Error staking tokens:", error);
-      toast.error("Error staking tokens.");
+      // Handle specific errors
+      if (error.code === "UNPREDICTABLE_GAS_LIMIT") {
+        toast.error(
+          "Unable to estimate gas. Please check your transaction parameters or try again later."
+        );
+      } else {
+        toast.error("Error staking tokens.");
+      }
     }
   };
 
@@ -144,7 +167,10 @@ const Staking = () => {
         <div className="stake-column">
           <div className="stake-card">
             <h5>Total Staked LOB</h5>
-            <h5>{totalStaked ? totalStaked : "Loading..."}</h5>
+            <h5>
+              {" "}
+              {parseFloat(totalStaked ? totalStaked : "Loading...").toFixed(2)}
+            </h5>
           </div>
           <div className="stake-card">
             <div className="stake-header">
@@ -165,7 +191,7 @@ const Staking = () => {
                 <div className="stake-input-top">
                   <span>Amount</span>
                   <span className="stake-available-text">
-                    Available: {lobBalance}
+                    Available: {parseFloat(lobBalance).toFixed(2)}
                   </span>
                 </div>
                 <div className="stake-input-box">
