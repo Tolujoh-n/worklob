@@ -175,7 +175,11 @@ const Staking = () => {
           <div className="stake-card">
             <div className="stake-header">
               <h5>Staking Rewards Rate</h5>
-              <h5>{rewardRate ? `${rewardRate}%` : "Loading..."}</h5>
+              <h5>
+                {parseFloat(
+                  rewardRate ? `${rewardRate}%` : "Loading..."
+                ).toFixed(2)}
+              </h5>
             </div>
           </div>
         </div>

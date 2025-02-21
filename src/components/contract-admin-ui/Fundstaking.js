@@ -84,11 +84,12 @@ const Fundstaking = () => {
           "Not enough LOB tokens for reward. Please fund your wallet."
         );
       }
+      const amountToFund = ethers.utils.parseUnits(rewardAmount, 18);
 
       console.log("Approving staking contract to spend LOB tokens...");
       const approvalTx = await lobContract.approve(
         WorkLobStaking_address,
-        parseInt(rewardAmount)
+        amountToFund
       );
       await approvalTx.wait();
       console.log("Approval successful.");
@@ -97,7 +98,7 @@ const Fundstaking = () => {
       let gasEstimateValue;
       try {
         gasEstimateValue = await contract.estimateGas.notifyRewardAmount(
-          parseInt(rewardAmount),
+          amountToFund,
           parseInt(duration)
         );
         console.log("Estimated Gas:", gasEstimateValue.toString());
@@ -108,14 +109,14 @@ const Fundstaking = () => {
 
       console.log("Executing transaction...");
       const transaction = await contract.notifyRewardAmount(
-        parseInt(rewardAmount),
+        amountToFund,
         parseInt(duration), // Convert duration to integer
         {
           gasLimit: gasEstimateValue.add(ethers.BigNumber.from("10000")),
         }
       );
 
-      console.log("Reward Amount:", rewardAmount);
+      console.log("Reward Amount:", ethers.utils.formatUnits(rewardAmount, 18));
       console.log("Duration:", duration);
       console.log("Transaction sent:", transaction.hash);
       await transaction.wait();
