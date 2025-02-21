@@ -53,6 +53,11 @@ const Fundstaking = () => {
         await connectWallet();
       }
 
+      // Check if lobBalance is not returned
+      if (!lobBalance || lobBalance === "0") {
+        await connectWallet();
+      }
+
       if (!rewardAmount || !duration) {
         throw new Error("Reward Amount and Duration must not be empty.");
       }
