@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWeb3 } from "../../Web3Provider";
 import { WorkLobStaking_abi, WorkLobStaking_address } from "../Constants";
 import Web3 from "web3";
@@ -8,6 +8,46 @@ const Fundstaking = () => {
   const { connected, walletAddress, connectWallet } = useWeb3();
   const [rewardAmount, setRewardAmount] = useState("");
   const [duration, setDuration] = useState("");
+  const [gasEstimate, setGasEstimate] = useState("");
+  const [rewardAmountWei, setRewardAmountWei] = useState("");
+  const [owner, setOwner] = useState("");
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!connected || !walletAddress || !rewardAmount || !duration) return;
+
+      const web3 = new Web3(Web3.givenProvider);
+      const accounts = await web3.eth.getAccounts();
+      const currentOwner = walletAddress || accounts[0];
+      if (!currentOwner) throw new Error("No wallet connected.");
+
+      const contract = new web3.eth.Contract(
+        WorkLobStaking_abi,
+        WorkLobStaking_address
+      );
+
+      const rewardAmountInWei = web3.utils.toWei(
+        rewardAmount.toString(),
+        "ether"
+      );
+
+      const gasEstimateValue = await contract.methods
+        .notifyRewardAmount(rewardAmountInWei, duration)
+        .estimateGas({ from: currentOwner });
+
+      setRewardAmountWei(rewardAmountInWei);
+      setGasEstimate(gasEstimateValue);
+      setOwner(currentOwner);
+
+      console.log("Reward Amount in Wei:", rewardAmountInWei);
+      console.log("Duration:", duration);
+      console.log("Contract Address:", WorkLobStaking_address);
+      console.log("Wallet Address:", currentOwner);
+      console.log("Gas Estimate:", gasEstimateValue);
+    };
+
+    fetchDetails();
+  }, [connected, walletAddress, rewardAmount, duration]);
 
   const handleRewardAmountChange = (e) => setRewardAmount(e.target.value);
   const handleDurationChange = (e) => setDuration(e.target.value);
@@ -18,47 +58,46 @@ const Fundstaking = () => {
         await connectWallet();
       }
 
+      if (!rewardAmount || !duration) {
+        throw new Error("Reward Amount and Duration must not be empty.");
+      }
+
       const web3 = new Web3(Web3.givenProvider);
       const accounts = await web3.eth.getAccounts();
-      const owner = walletAddress || accounts[0];
-
-      if (!owner) throw new Error("No wallet connected.");
+      const currentOwner = walletAddress || accounts[0];
+      if (!currentOwner) throw new Error("No wallet connected.");
 
       const contract = new web3.eth.Contract(
         WorkLobStaking_abi,
         WorkLobStaking_address
       );
 
-      // Ensure the user is the contract owner
-      const contractOwner = await contract.methods.owner().call();
-      if (owner.toLowerCase() !== contractOwner.toLowerCase()) {
-        throw new Error(
-          "Only the contract owner can fund the staking contract."
-        );
-      }
-
-      // Convert reward amount to Wei
-      const rewardAmountWei = web3.utils.toWei(
+      const rewardAmountInWei = web3.utils.toWei(
         rewardAmount.toString(),
         "ether"
       );
 
-      // Estimate Gas
-      const gasEstimate = await contract.methods
-        .notifyRewardAmount(rewardAmountWei, duration)
-        .estimateGas({ from: owner });
+      const gasEstimateValue = await contract.methods
+        .notifyRewardAmount(rewardAmountInWei, duration)
+        .estimateGas({ from: currentOwner });
 
-      console.log(`Estimated Gas: ${gasEstimate}`);
+      console.log(`Estimated Gas: ${gasEstimateValue}`);
+      console.log("Reward Amount in Wei:", rewardAmountInWei);
+      console.log("Duration:", duration);
+      console.log("Contract Address:", WorkLobStaking_address);
+      console.log("Wallet Address:", currentOwner);
 
-      // Send Transaction with Gas Limit
       const receipt = await contract.methods
-        .notifyRewardAmount(rewardAmountWei, duration)
-        .send({ from: owner, gas: gasEstimate + 10000 });
+        .notifyRewardAmount(rewardAmountInWei, duration)
+        .send({
+          from: currentOwner,
+          gas: gasEstimateValue + 10000, // Adding buffer to gas estimate
+        });
 
-      console.log("Transaction receipt: ", receipt);
+      console.log("Transaction successful:", receipt);
       toast.success("Contract funded successfully!");
     } catch (error) {
-      console.error("Error funding contract: ", error);
+      console.error("Transaction failed:", error);
       toast.error(`Failed to fund the contract: ${error.message}`);
     }
   };
@@ -76,7 +115,6 @@ const Fundstaking = () => {
           </ol>
         </nav>
       </div>
-
       <div className="d-flex justify-content-center align-items-center vh-60">
         <div className="wallet-card d-flex justify-content-center align-items-center flex-column p-4">
           <input
