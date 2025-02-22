@@ -168,6 +168,43 @@ contract WorkLobStaking is Ownable {
     }
 
     /**
+ * @dev Returns the list of all stakers with their details.
+ */
+function getAllStakers() public view returns (address[] memory, uint256[] memory, uint256[] memory, uint256[] memory, bool[] memory) {
+    address[] memory stakerAddresses = new address[](totalStaked);
+    uint256[] memory stakedAmounts = new uint256[](totalStaked);
+    uint256[] memory rewardsEarned = new uint256[](totalStaked);
+    uint256[] memory durations = new uint256[](totalStaked);
+    bool[] memory statuses = new bool[](totalStaked);
+
+    uint256 index = 0;
+    for (uint256 i = 0; i < totalStaked; i++) {
+        address staker = stakerAddresses[i];
+        stakerAddresses[index] = staker;
+        stakedAmounts[index] = balances[staker];
+        rewardsEarned[index] = earned(staker);
+        durations[index] = block.timestamp - userRewardPerTokenPaid[staker];
+        statuses[index] = balances[staker] > 0;
+        index++;
+    }
+    return (stakerAddresses, stakedAmounts, rewardsEarned, durations, statuses);
+}
+
+/**
+ * @dev Returns the details of the specific connected address (user).
+ */
+function getStakerDetails(address account) public view returns (address, uint256, uint256, uint256, bool) {
+    return (
+        account,
+        balances[account],
+        earned(account),
+        block.timestamp - userRewardPerTokenPaid[account],
+        balances[account] > 0
+    );
+}
+
+
+    /**
      * @dev Owner-funded reward deposit.
      * The owner (platform treasury) can deposit reward tokens to fund the reward pool.
      * If the current reward period is still active, any leftover rewards are added.

@@ -11,7 +11,7 @@ import { ethers } from "ethers";
 import { Toaster, toast } from "sonner";
 
 const Staking = () => {
-  const { connectWallet, connected, account } = useWeb3();
+  const { connectWallet, connected } = useWeb3();
   const { baseETHBalance, lobBalance } = useWeb3();
   const [rewardRate, setRewardRate] = useState(0);
   const [totalStaked, setTotalStaked] = useState(0);
@@ -26,6 +26,34 @@ const Staking = () => {
 
   const [validators, setValidators] = useState([]);
   const [filter, setFilter] = useState("active");
+  const [filteredValidators, setFilteredValidators] = useState([]);
+  const [account, setAccount] = useState(null);
+
+  useEffect(() => {
+    const fetchStakers = async () => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const stakingContract = new ethers.Contract(
+        WorkLobStaking_address,
+        WorkLobStaking_abi,
+        signer
+      );
+      const accounts = await provider.send("eth_requestAccounts", []);
+      setAccount(accounts[0]);
+
+      const allStakers = await stakingContract.getAllStakers();
+      const stakers = allStakers[0].map((address, index) => ({
+        validator: address,
+        stakedAmount: ethers.utils.formatEther(allStakers[1][index]),
+        rewards: ethers.utils.formatEther(allStakers[2][index]),
+        duration: allStakers[3][index].toNumber(),
+        status: allStakers[4][index] ? "Active" : "Ended",
+      }));
+      setFilteredValidators(stakers);
+    };
+
+    fetchStakers();
+  }, []);
 
   useEffect(() => {
     if (connected) {
@@ -157,10 +185,6 @@ const Staking = () => {
     return `${start}...${end}`;
   };
 
-  const filteredValidators = validators.filter((validator) =>
-    filter === "all" ? true : validator.status === filter
-  );
-
   return (
     <>
       <div className="col-lg-3 col-md-4 col-sm-12">
@@ -266,6 +290,7 @@ const Staking = () => {
                 className="stake-search-bar"
               />
             </div>
+            (
             <table className="transaction-table">
               <thead>
                 <tr className="table-header">
