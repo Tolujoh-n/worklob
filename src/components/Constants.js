@@ -13,7 +13,7 @@ export const LOB_TOKEN_ADDRESS = "0xC677a1b3461B2417D7789331357606d8Bb17FD24"; /
 // Worklob Staking contract
 export const WorkLobStaking_abi = WorkLobStaking.abi;
 export const WorkLobStaking_address =
-  "0x5f7EA14645b5ccD53F069A9bF6399E78A725669C";
+  "0x5B4fB44257c4CC1c178B4a2f63B99d03528b5eFD";
 
 // Base Sepolia Testnet configuration
 export const BASE_TESTNET_PARAMS = {

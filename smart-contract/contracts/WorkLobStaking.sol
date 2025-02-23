@@ -131,33 +131,46 @@ contract WorkLobStaking is Ownable {
         periodFinish = block.timestamp + duration;
         emit RewardAdded(rewardAmount, duration);
     }
-    
+
     function getAllStakers() public view returns (address[] memory, uint256[] memory, uint256[] memory, uint256[] memory, bool[] memory) {
-        uint256 stakerCount = 0;
-        for (uint256 i = 0; i < stakers.length; i++) {
-            if (balances[stakers[i]] > 0) {
-                stakerCount++;
-            }
+    uint256 stakerCount = 0;
+
+    for (uint256 i = 0; i < stakers.length; i++) {
+        if (balances[stakers[i]] > 0) {
+            stakerCount++;
         }
-        
-        address[] memory stakerAddresses = new address[](stakerCount);
-        uint256[] memory stakedAmounts = new uint256[](stakerCount);
-        uint256[] memory rewardsEarned = new uint256[](stakerCount);
-        uint256[] memory durations = new uint256[](stakerCount);
-        bool[] memory statuses = new bool[](stakerCount);
-        
-        uint256 index = 0;
-        for (uint256 i = 0; i < stakers.length; i++) {
-            address staker = stakers[i];
-            if (balances[staker] > 0) {
-                stakerAddresses[index] = staker;
-                stakedAmounts[index] = balances[staker];
-                rewardsEarned[index] = earned(staker);
-                durations[index] = block.timestamp - userRewardPerTokenPaid[staker];
-                statuses[index] = balances[staker] > 0;
-                index++;
-            }
+    }
+
+    address[] memory stakerAddresses = new address[](stakerCount);
+    uint256[] memory stakedAmounts = new uint256[](stakerCount);
+    uint256[] memory rewardsEarned = new uint256[](stakerCount);
+    uint256[] memory durations = new uint256[](stakerCount);
+    bool[] memory statuses = new bool[](stakerCount);
+
+    uint256 index = 0;
+    for (uint256 i = 0; i < stakers.length; i++) {
+        address staker = stakers[i];
+        if (balances[staker] > 0) {
+            stakerAddresses[index] = staker;
+            stakedAmounts[index] = balances[staker];
+            rewardsEarned[index] = earned(staker);
+            durations[index] = block.timestamp - userRewardPerTokenPaid[staker]; // Ensure this doesn't result in underflow
+            statuses[index] = balances[staker] > 0;
+            index++;
         }
-        return (stakerAddresses, stakedAmounts, rewardsEarned, durations, statuses);
+    }
+
+    return (stakerAddresses, stakedAmounts, rewardsEarned, durations, statuses);
+}
+
+    
+    function getStakerDetails(address account) public view returns (address, uint256, uint256, uint256, bool) {
+        return (
+            account,
+            balances[account],
+            earned(account),
+            block.timestamp - userRewardPerTokenPaid[account],
+            balances[account] > 0
+        );
     }
 }
