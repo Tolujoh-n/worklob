@@ -1,67 +1,149 @@
-import React, { useState } from "react";
-import ETH from "../../assets/img/eth.png";
-import btc from "../../assets/img/btc.png";
+import React, { useState, useEffect } from "react";
 import lobcoin from "../../assets/img/worklob-coin.png";
 import { useWeb3 } from "../../Web3Provider";
+import {
+  WorkLobStaking_abi,
+  WorkLobStaking_address,
+  LOB_TOKEN_ABI,
+  LOB_TOKEN_ADDRESS,
+} from "../Constants";
+import { ethers } from "ethers";
+import { Toaster, toast } from "sonner";
 
 const Mystake = () => {
-  // Initialize state for transaction data
-  const { baseETHBalance, lobBalance } = useWeb3();
-  const [validators, setValidators] = useState([
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 LOB",
-      rewards: "500 LOB",
-      duration: "2 seconds",
-      status: "active",
-    },
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 LOB",
-      rewards: "200 LOB",
-      duration: "40 seconds",
-      status: "active",
-    },
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 LOB",
-      rewards: "40 LOB",
-      duration: "1 minutes",
-      status: "active",
-    },
-    {
-      validator: "0x123456789abcdef123456789abcdef12345678",
-      stakedAmount: "1000 LOB",
-      rewards: "44 LOB",
-      duration: "2 miute",
-      status: "ended",
-    },
-    {
-      validator: "0xabcdef123456789abcdef123456789abcdef12",
-      stakedAmount: "500 LOB",
-      rewards: "68 LOB",
-      duration: "20 days",
-      status: "ended",
-    },
-    {
-      validator: "0xabcdef123456789abcdef123456789abcdef12",
-      stakedAmount: "500 LOB",
-      rewards: "53 LOB",
-      duration: "20 days",
-      status: "ended",
-    },
-    {
-      validator: "0xabcdef123456789abcdef123456789abcdef12",
-      stakedAmount: "500 LOB",
-      rewards: "100 LOB",
-      duration: "20 days",
-      status: "ended",
-    },
+  const { connectWallet, connected } = useWeb3();
+  const { baseETHBalance, lobBalance, account } = useWeb3();
+  const [stakingAmount, setStakingAmount] = useState("");
+  const [rewardRate, setRewardRate] = useState(0);
+  const [totalStaked, setTotalStaked] = useState(0);
+  const [userStakedAmount, setUserStakedAmount] = useState(0);
+  const [userRewards, setUserRewards] = useState(0);
+  const [userTotalStaked, setUserTotalStaked] = useState(0);
+  const [userClaimableRewards, setUserClaimableRewards] = useState(0);
+  const [stakingData, setStakingData] = useState([]);
+  const [filter, setFilter] = useState("active");
 
-    // Add more rows as needed
-  ]);
+  useEffect(() => {
+    if (connected) {
+      loadStakingData();
+    }
+  }, [connected]);
 
-  const [filter, setFilter] = useState("all");
+  const loadStakingData = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const stakingContract = new ethers.Contract(
+        WorkLobStaking_address,
+        WorkLobStaking_abi,
+        signer
+      );
+
+      // Fetch total staked and reward rate
+      const rate = await stakingContract.rewardRate();
+      setRewardRate(ethers.utils.formatUnits(rate, 18));
+
+      const totalStakedAmount = await stakingContract.totalStaked();
+      setTotalStaked(ethers.utils.formatUnits(totalStakedAmount, 18));
+
+      // Fetch user staking data
+      const userDetails = await stakingContract.getStakerDetails(account);
+      setUserStakedAmount(ethers.utils.formatUnits(userDetails[1], 18));
+      setUserRewards(ethers.utils.formatUnits(userDetails[2], 18));
+      setUserClaimableRewards(ethers.utils.formatUnits(userDetails[2], 18));
+      setUserTotalStaked(ethers.utils.formatUnits(userDetails[3], 18));
+    } catch (error) {
+      console.error("Error loading staking data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const stakingContract = new ethers.Contract(
+        WorkLobStaking_address,
+        WorkLobStaking_abi,
+        signer
+      );
+
+      const allStakers = await stakingContract.getAllStakers();
+      const stakers = allStakers[0].map((address, index) => ({
+        validator: address,
+        stakedAmount: ethers.utils.formatEther(allStakers[1][index]),
+        rewards: ethers.utils.formatEther(allStakers[2][index]),
+        duration: allStakers[3][index].toNumber(),
+        status: allStakers[4][index] ? "Active" : "Ended",
+      }));
+      setStakingData(stakers);
+    };
+
+    fetchStakingData();
+  }, [account]);
+
+  const handleStakingAmountChange = (e) => {
+    setStakingAmount(e.target.value);
+  };
+
+  const handleContinueToStaking = async () => {
+    if (!connected) {
+      connectWallet();
+      return;
+    }
+    if (!stakingAmount || parseFloat(stakingAmount) <= 0) {
+      toast.error("Please enter a valid staking amount.");
+      return;
+    }
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const stakingContract = new ethers.Contract(
+        WorkLobStaking_address,
+        WorkLobStaking_abi,
+        signer
+      );
+      const tokenContract = new ethers.Contract(
+        LOB_TOKEN_ADDRESS,
+        LOB_TOKEN_ABI,
+        signer
+      );
+
+      const amountToStake = ethers.utils.parseUnits(stakingAmount, 18);
+
+      // Approve the staking contract to transfer tokens on behalf of the user
+      await tokenContract.approve(WorkLobStaking_address, amountToStake);
+
+      // Stake the tokens
+      const tx = await stakingContract.stake(amountToStake);
+      await tx.wait();
+      toast.success("Successfully staked your tokens!");
+      loadStakingData();
+    } catch (error) {
+      console.error("Error staking tokens:", error);
+      toast.error("Error staking tokens.");
+    }
+  };
+
+  const handleClaimRewards = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const stakingContract = new ethers.Contract(
+        WorkLobStaking_address,
+        WorkLobStaking_abi,
+        signer
+      );
+
+      const tx = await stakingContract.getReward();
+      await tx.wait();
+      toast.success("Successfully claimed your rewards!");
+      loadStakingData();
+    } catch (error) {
+      console.error("Error claiming rewards:", error);
+      toast.error("Error claiming rewards.");
+    }
+  };
 
   const handleFilterChange = (status) => {
     setFilter(status);
@@ -73,53 +155,52 @@ const Mystake = () => {
     return `${start}...${end}`;
   };
 
-  const filteredValidators = validators.filter((validator) =>
-    filter === "all" ? true : validator.status === filter
+  const filteredStakingData = stakingData.filter((data) =>
+    filter === "active" ? data.status === "Active" : data.status === "Ended"
   );
+
   return (
     <>
-      {/* Code price and button */}
       <div className="container mystake-card">
         <div className="row">
           <div className="col-md-4">
             <div className="mystake-item">
-              <p className="mystake-name">My Staking Amount</p>
-              <p className="mystake-price">0 LOB</p>
+              <p className="mystake-name">My Staked Amount</p>
+              <p className="mystake-price">{totalStaked} LOB</p>
             </div>
           </div>
           <div className="col-md-4">
             <div className="mystake-item">
               <p className="mystake-name">Total Staking Value</p>
-              <p className="mystake-price">$0.00 USD</p>
+              <p className="mystake-price">{totalStaked} LOB $0.00</p>
             </div>
           </div>
-          <div className="col-md-4 col-lg-4">
+          <div className="col-md-4">
             <div className="mystake-item">
               <p className="mystake-name">Claimable Rewards</p>
-              <p className="mystake-price">0 LOB $0.00</p>
+              <p className="mystake-price">{userClaimableRewards} LOB $0.00</p>
             </div>
           </div>
         </div>
         <div className="row">
           <div className="col-12 d-flex justify-content-end">
-            <button className="mystake-button">Claim All</button>
-            <button className="mystake-button">Claim and Restake</button>
+            <button className="mystake-button" onClick={handleClaimRewards}>
+              Claim Rewards
+            </button>
+            <button
+              className="mystake-button"
+              onClick={handleContinueToStaking}
+            >
+              Stake More
+            </button>
           </div>
         </div>
       </div>
-      {/* Transaction History */}
+
       <div className="col-lg-12">
         <div className="transaction-history-card">
           <div className="transaction-history">
             <div className="controls">
-              <button
-                className={`chat-button ${
-                  filter === "all" ? "active-filterdata" : ""
-                }`}
-                onClick={() => handleFilterChange("all")}
-              >
-                All
-              </button>
               <button
                 className={`chat-button ${
                   filter === "active" ? "active-filterdata" : ""
@@ -137,6 +218,7 @@ const Mystake = () => {
                 Ended
               </button>
             </div>
+
             <table className="transaction-table">
               <thead>
                 <tr className="table-header">
@@ -145,30 +227,26 @@ const Mystake = () => {
                   <th>Rewards Earned</th>
                   <th>Duration</th>
                   <th>Status</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {filteredValidators.length > 0 ? (
-                  filteredValidators.map((validator, index) => (
+                {filteredStakingData.length > 0 ? (
+                  filteredStakingData.map((data, index) => (
                     <tr key={index} className="table-row">
-                      <td className="col col-4" data-label="Validator">
-                        <h6>{truncateAddress(validator.validator)}</h6>
+                      <td className="col col-4" data-label="Address">
+                        <h6>{truncateAddress(data.validator)}</h6>
                       </td>
                       <td className="col col-2" data-label="Staked Amount">
-                        <h6>{validator.stakedAmount}</h6>
+                        <h6>{data.stakedAmount} LOB</h6>
                       </td>
-                      <td className="col col-2" data-label="rewards">
-                        <h6>{validator.rewards}</h6>
+                      <td className="col col-2" data-label="Rewards Earned">
+                        <h6>{data.rewards} LOB</h6>
                       </td>
-                      <td className="col col-2" data-label="Voting Power">
-                        <h6>{validator.duration}</h6>
+                      <td className="col col-2" data-label="Duration">
+                        <h6>{data.duration}</h6>
                       </td>
-                      <td className="col col-2" data-label="Uptime">
-                        <h6>{validator.status}</h6>
-                      </td>
-                      <td className="col col-2" data-label="Uptime">
-                        <button className="claim-button">Claim</button>
+                      <td className="col col-2" data-label="Status">
+                        <h6>{data.status}</h6>
                       </td>
                     </tr>
                   ))
