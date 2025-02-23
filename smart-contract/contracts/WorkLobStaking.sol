@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-/**
- * @title IWorkLobERC20
- * @dev Simplified ERC20 interface.
- */
 interface IWorkLobERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
@@ -18,10 +14,6 @@ interface IWorkLobERC20 {
     ) external returns (bool);
 }
 
-/**
- * @title Ownable
- * @dev Basic access control mechanism with an owner.
- */
 contract Ownable {
     address public owner;
     
@@ -43,72 +35,47 @@ contract Ownable {
     }
 }
 
-/**
- * @title WorkLobStaking
- * @dev A staking contract where users can stake tokens to earn rewards.
- */
 contract WorkLobStaking is Ownable {
     IWorkLobERC20 public token;
 
-    // Reward parameters
-    uint256 public rewardRate;           // Reward tokens distributed per second.
-    uint256 public periodFinish;         // Timestamp when the current reward period ends.
-    uint256 public lastUpdateTime;       // Last timestamp that rewards were updated.
-    uint256 public rewardPerTokenStored; // Accumulated reward per staked token (scaled by 1e18).
+    uint256 public rewardRate;
+    uint256 public periodFinish;
+    uint256 public lastUpdateTime;
+    uint256 public rewardPerTokenStored;
 
-    // Total tokens staked by all users.
     uint256 public totalStaked;
 
-    // User-specific data
-    mapping(address => uint256) public balances;               // Amount staked per user.
-    mapping(address => uint256) public userRewardPerTokenPaid;   // User's snapshot of rewardPerTokenStored.
-    mapping(address => uint256) public rewards;                  // Accumulated (but not yet claimed) rewards.
+    mapping(address => uint256) public balances;
+    mapping(address => uint256) public userRewardPerTokenPaid;
+    mapping(address => uint256) public rewards;
+    
+    address[] public stakers;
+    mapping(address => bool) public hasStaked;
 
-    // Events to log key actions
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event RewardPaid(address indexed user, uint256 reward);
     event RewardAdded(uint256 rewardAmount, uint256 duration);
 
-    /**
-     * @dev Constructor sets the ERC20 token used for staking and rewards.
-     * @param _token The ERC20 token address.
-     */
     constructor(IWorkLobERC20 _token) {
         token = _token;
     }
 
-    /**
-     * @dev Returns the last time reward was applicable (current time or period finish, whichever is lower).
-     */
     function lastTimeRewardApplicable() public view returns (uint256) {
         return block.timestamp < periodFinish ? block.timestamp : periodFinish;
     }
 
-    /**
-     * @dev Calculates the current reward per token accumulated.
-     */
     function rewardPerToken() public view returns (uint256) {
         if (totalStaked == 0) {
             return rewardPerTokenStored;
         }
-        return
-            rewardPerTokenStored +
-            (((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * 1e18) / totalStaked);
+        return rewardPerTokenStored + (((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * 1e18) / totalStaked);
     }
 
-    /**
-     * @dev Returns the total rewards earned by an account.
-     * @param account The address of the staker.
-     */
     function earned(address account) public view returns (uint256) {
         return ((balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account])) / 1e18) + rewards[account];
     }
 
-    /**
-     * @dev Updates the reward variables for an account.
-     * @param account The address to update rewards for.
-     */
     function updateReward(address account) internal {
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();
@@ -118,24 +85,21 @@ contract WorkLobStaking is Ownable {
         }
     }
 
-    /**
-     * @dev Stake a specific amount of tokens.
-     * @param amount The number of tokens to stake.
-     */
     function stake(uint256 amount) external {
         require(amount > 0, "Cannot stake 0");
         updateReward(msg.sender);
-        // Transfer tokens from user to this contract.
         require(token.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+
+        if (!hasStaked[msg.sender]) {
+            stakers.push(msg.sender);
+            hasStaked[msg.sender] = true;
+        }
+
         balances[msg.sender] += amount;
         totalStaked += amount;
         emit Staked(msg.sender, amount);
     }
 
-    /**
-     * @dev Withdraw staked tokens.
-     * @param amount The number of tokens to withdraw.
-     */
     function withdraw(uint256 amount) public {
         require(amount > 0, "Cannot withdraw 0");
         require(balances[msg.sender] >= amount, "Insufficient staked balance");
@@ -146,9 +110,6 @@ contract WorkLobStaking is Ownable {
         emit Withdrawn(msg.sender, amount);
     }
 
-    /**
-     * @dev Claim accumulated reward tokens.
-     */
     function getReward() public {
         updateReward(msg.sender);
         uint256 reward = rewards[msg.sender];
@@ -159,63 +120,55 @@ contract WorkLobStaking is Ownable {
         }
     }
 
-    /**
-     * @dev Withdraw staked tokens and claim rewards.
-     */
     function exit() external {
         withdraw(balances[msg.sender]);
         getReward();
     }
 
-    /**
- * @dev Returns the list of all stakers with their details.
- */
-function getAllStakers() public view returns (address[] memory, uint256[] memory, uint256[] memory, uint256[] memory, bool[] memory) {
-    address[] memory stakerAddresses = new address[](totalStaked);
-    uint256[] memory stakedAmounts = new uint256[](totalStaked);
-    uint256[] memory rewardsEarned = new uint256[](totalStaked);
-    uint256[] memory durations = new uint256[](totalStaked);
-    bool[] memory statuses = new bool[](totalStaked);
+    function getAllStakers() public view returns (address[] memory, uint256[] memory, uint256[] memory, uint256[] memory, bool[] memory) {
+        uint256 stakerCount = 0;
 
-    uint256 index = 0;
-    for (uint256 i = 0; i < totalStaked; i++) {
-        address staker = stakerAddresses[i];
-        stakerAddresses[index] = staker;
-        stakedAmounts[index] = balances[staker];
-        rewardsEarned[index] = earned(staker);
-        durations[index] = block.timestamp - userRewardPerTokenPaid[staker];
-        statuses[index] = balances[staker] > 0;
-        index++;
+        for (uint256 i = 0; i < stakers.length; i++) {
+            if (balances[stakers[i]] > 0) {
+                stakerCount++;
+            }
+        }
+
+        address[] memory stakerAddresses = new address[](stakerCount);
+        uint256[] memory stakedAmounts = new uint256[](stakerCount);
+        uint256[] memory rewardsEarned = new uint256[](stakerCount);
+        uint256[] memory durations = new uint256[](stakerCount);
+        bool[] memory statuses = new bool[](stakerCount);
+
+        uint256 index = 0;
+        for (uint256 i = 0; i < stakers.length; i++) {
+            address staker = stakers[i];
+            if (balances[staker] > 0) {
+                stakerAddresses[index] = staker;
+                stakedAmounts[index] = balances[staker];
+                rewardsEarned[index] = earned(staker);
+                durations[index] = block.timestamp - userRewardPerTokenPaid[staker];
+                statuses[index] = balances[staker] > 0;
+                index++;
+            }
+        }
+
+        return (stakerAddresses, stakedAmounts, rewardsEarned, durations, statuses);
     }
-    return (stakerAddresses, stakedAmounts, rewardsEarned, durations, statuses);
-}
 
-/**
- * @dev Returns the details of the specific connected address (user).
- */
-function getStakerDetails(address account) public view returns (address, uint256, uint256, uint256, bool) {
-    return (
-        account,
-        balances[account],
-        earned(account),
-        block.timestamp - userRewardPerTokenPaid[account],
-        balances[account] > 0
-    );
-}
+    function getStakerDetails(address account) public view returns (address, uint256, uint256, uint256, bool) {
+        return (
+            account,
+            balances[account],
+            earned(account),
+            block.timestamp - userRewardPerTokenPaid[account],
+            balances[account] > 0
+        );
+    }
 
-
-    /**
-     * @dev Owner-funded reward deposit.
-     * The owner (platform treasury) can deposit reward tokens to fund the reward pool.
-     * If the current reward period is still active, any leftover rewards are added.
-     * @param rewardAmount The total reward tokens to be distributed.
-     * @param duration The duration (in seconds) over which to distribute the rewards.
-     */
     function notifyRewardAmount(uint256 rewardAmount, uint256 duration) external onlyOwner {
-        // Update reward variables before modifying reward parameters.
         updateReward(address(0));
 
-        // If the previous reward period is still running, add any leftover rewards.
         if (block.timestamp >= periodFinish) {
             rewardRate = rewardAmount / duration;
         } else {
@@ -224,7 +177,6 @@ function getStakerDetails(address account) public view returns (address, uint256
             rewardRate = (rewardAmount + leftover) / duration;
         }
 
-        // Ensure the contract has enough tokens to cover the new rewards.
         uint256 availableBalance = token.balanceOf(address(this));
         require(rewardRate * duration <= availableBalance, "Not enough tokens for reward");
 

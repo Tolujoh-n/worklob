@@ -290,7 +290,7 @@ const Staking = () => {
                 className="stake-search-bar"
               />
             </div>
-            (
+
             <table className="transaction-table">
               <thead>
                 <tr className="table-header">

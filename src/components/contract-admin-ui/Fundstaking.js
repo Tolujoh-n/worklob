@@ -53,11 +53,6 @@ const Fundstaking = () => {
         await connectWallet();
       }
 
-      // Check if lobBalance is not returned
-      if (!lobBalance || lobBalance === "0") {
-        await connectWallet();
-      }
-
       if (!rewardAmount || !duration) {
         throw new Error("Reward Amount and Duration must not be empty.");
       }
@@ -79,44 +74,30 @@ const Fundstaking = () => {
       );
       const userLobBalanceWei = await lobContract.balanceOf(walletAddress);
 
-      if (userLobBalanceWei.lt(rewardAmount)) {
+      const rewardAmountWei = ethers.utils.parseUnits(rewardAmount, 18);
+
+      if (userLobBalanceWei.lt(rewardAmountWei)) {
         throw new Error(
           "Not enough LOB tokens for reward. Please fund your wallet."
         );
       }
-      const amountToFund = ethers.utils.parseUnits(rewardAmount, 18);
 
       console.log("Approving staking contract to spend LOB tokens...");
       const approvalTx = await lobContract.approve(
         WorkLobStaking_address,
-        amountToFund
+        rewardAmountWei
       );
       await approvalTx.wait();
       console.log("Approval successful.");
 
-      console.log("Estimating gas for notifyRewardAmount...");
-      let gasEstimateValue;
-      try {
-        gasEstimateValue = await contract.estimateGas.notifyRewardAmount(
-          amountToFund,
-          parseInt(duration)
-        );
-        console.log("Estimated Gas:", gasEstimateValue.toString());
-      } catch (gasError) {
-        console.warn("Gas estimation failed, using fallback gas limit.");
-        gasEstimateValue = ethers.BigNumber.from("500000");
-      }
-
       console.log("Executing transaction...");
       const transaction = await contract.notifyRewardAmount(
-        amountToFund,
+        rewardAmountWei,
         parseInt(duration), // Convert duration to integer
-        {
-          gasLimit: gasEstimateValue.add(ethers.BigNumber.from("10000")),
-        }
+        { gasLimit: 6000000 } // Setting a higher gas limit
       );
 
-      console.log("Reward Amount:", ethers.utils.formatUnits(rewardAmount, 18));
+      console.log("Reward Amount:", rewardAmountWei.toString());
       console.log("Duration:", duration);
       console.log("Transaction sent:", transaction.hash);
       await transaction.wait();

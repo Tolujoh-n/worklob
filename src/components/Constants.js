@@ -8,12 +8,12 @@ import WorkLobStaking from "./abi/WorkLobStaking.json"; // Add the ABI file for 
 
 // LOB Token contract details
 export const LOB_TOKEN_ABI = LOBToken.abi;
-export const LOB_TOKEN_ADDRESS = "0x51dA94735189ef7B2cb0c333BdACB1425d6f2943"; // Replace with your LOB token contract address
+export const LOB_TOKEN_ADDRESS = "0xC677a1b3461B2417D7789331357606d8Bb17FD24"; // Replace with your LOB token contract address
 
 // Worklob Staking contract
 export const WorkLobStaking_abi = WorkLobStaking.abi;
 export const WorkLobStaking_address =
-  "0x1c425205DB98F9dd3Ff59Ab804d9793eA6705862";
+  "0x2c342f775Fbba851654915061b679015e8Bf3eC7";
 
 // Base Sepolia Testnet configuration
 export const BASE_TESTNET_PARAMS = {
