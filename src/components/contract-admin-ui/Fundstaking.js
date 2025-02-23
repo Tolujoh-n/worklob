@@ -66,21 +66,13 @@ const Fundstaking = () => {
         signer
       );
 
-      // Check if the user has enough LOB tokens
       const lobContract = new ethers.Contract(
         LOB_TOKEN_ADDRESS,
         LOB_TOKEN_ABI,
         signer
       );
-      const userLobBalanceWei = await lobContract.balanceOf(walletAddress);
 
       const rewardAmountWei = ethers.utils.parseUnits(rewardAmount, 18);
-
-      if (userLobBalanceWei.lt(rewardAmountWei)) {
-        throw new Error(
-          "Not enough LOB tokens for reward. Please fund your wallet."
-        );
-      }
 
       console.log("Approving staking contract to spend LOB tokens...");
       const approvalTx = await lobContract.approve(
@@ -90,20 +82,25 @@ const Fundstaking = () => {
       await approvalTx.wait();
       console.log("Approval successful.");
 
-      console.log("Executing transaction...");
+      console.log("Sending tokens to the staking contract...");
+      const transferTx = await lobContract.transfer(
+        WorkLobStaking_address,
+        rewardAmountWei
+      );
+      await transferTx.wait();
+      console.log("Tokens transferred to contract.");
+
+      console.log("Executing notifyRewardAmount...");
       const transaction = await contract.notifyRewardAmount(
         rewardAmountWei,
-        parseInt(duration), // Convert duration to integer
-        { gasLimit: 6000000 } // Setting a higher gas limit
+        parseInt(duration),
+        { gasLimit: 6000000 }
       );
 
-      console.log("Reward Amount:", rewardAmountWei.toString());
-      console.log("Duration:", duration);
       console.log("Transaction sent:", transaction.hash);
       await transaction.wait();
       console.log("Transaction confirmed.");
       toast.success("Contract funded successfully!");
-      // Reload the page
       window.location.reload();
     } catch (error) {
       console.error("Transaction failed:", error);
