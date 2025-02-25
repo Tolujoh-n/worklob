@@ -1,10 +1,11 @@
 // Constants.js
-// import WorkPlatform from "./abi/Ownable.json";
+import WorkLOB from "./abi/WorkLOB.json";
 import LOBToken from "./abi/LOBToken.json"; // Add the ABI file for LOB token
 import WorkLobStaking from "./abi/WorkLobStaking.json"; // Add the ABI file for LOB token
 
-// export const ABI = WorkPlatform.abi;
-// export const CONTRACT_ADDRESS = "0xAcc0993377b716f4C9814751fb64022247427eF9"; // Replace with your quiz platform contract address
+export const JOB_ABI = WorkLOB.abi;
+export const JOB_CONTRACT_ADDRESS =
+  "0xaFB3777fC863C06240eB917f8752417cB4B93aE6"; // Replace with your quiz platform contract address
 
 // LOB Token contract details
 export const LOB_TOKEN_ABI = LOBToken.abi;

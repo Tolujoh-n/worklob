@@ -1,5 +1,5 @@
 {
-  "contractName": "IERC20",
+  "contractName": "ILOBToken",
   "abi": [
     {
       "inputs": [
@@ -26,7 +26,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/JobContract.sol\":\"IERC20\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/JobContract.sol\":{\"keccak256\":\"0xd321b3960a7c886a51f32bc520166dab1bdd6530cc205484b69c48a71404784c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e5dc7bdbde4abd7c379e29bf20efd4c0430ea9731796b0dc875ac8cbe9d469d8\",\"dweb:/ipfs/QmPP1EfhyFzKNsdcssMKnX3TEaSJm2avWfeHguihyTnZXf\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/JobContract.sol\":\"ILOBToken\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/JobContract.sol\":{\"keccak256\":\"0x8e466caaa6c1c2779d9dba5ca0adc6786564aeb971c43194af8d5b0b1f8a221e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://23fabe6fe78b4d1333c5e06bcf1b69ed0583a8682ca1093abb2d8c7d8ed92ce3\",\"dweb:/ipfs/QmZeNfbU6mfc8iPfG8JC6wXaNduQgEAfUpSUCozvQzDbWB\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -34,12 +34,12 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract WorkLOB {\r\n    struct Job {\r\n        uint256 jobId;\r\n        uint256 customerId;\r\n        uint256 talentId;\r\n        address customerWallet;\r\n        address talentWallet;\r\n        uint256 amount;\r\n        uint256 status; // 0: Not started, 1: Deposited, 2: Completed, 3: Confirmed\r\n        uint256 chatId;\r\n    }\r\n\r\n    mapping(uint256 => Job) public jobs;\r\n    address public LOBToken;\r\n    address public owner;\r\n    uint256 public rewardAmount = 500; // Reward amount of LOB tokens\r\n\r\n    constructor(address _LOBToken) {\r\n        LOBToken = _LOBToken;\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Only owner can call this function\");\r\n        _;\r\n    }\r\n\r\n    function deposit(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _customerWallet, uint256 _amount, uint256 _chatId) public payable {\r\n        require(msg.value == _amount, \"Amount mismatch\");\r\n        Job storage job = jobs[_jobId];\r\n        job.jobId = _jobId;\r\n        job.customerId = _customerId;\r\n        job.talentId = _talentId;\r\n        job.customerWallet = _customerWallet;\r\n        job.amount = _amount;\r\n        job.chatId = _chatId;\r\n        job.status = 1;\r\n    }\r\n\r\n    function complete(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _talentWallet, uint256 _chatId) public onlyOwner {\r\n        Job storage job = jobs[_jobId];\r\n        require(job.customerId == _customerId && job.talentId == _talentId, \"Invalid customer or talent ID\");\r\n        require(job.status == 1, \"Job is not deposited yet\");\r\n        job.talentWallet = _talentWallet;\r\n        job.chatId = _chatId;\r\n        job.status = 2;\r\n    }\r\n\r\n    function confirm(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _customerWallet, address _talentWallet, uint256 _chatId) public onlyOwner {\r\n        Job storage job = jobs[_jobId];\r\n        require(job.customerId == _customerId && job.talentId == _talentId, \"Invalid customer or talent ID\");\r\n        require(job.status == 2, \"Job is not completed yet\");\r\n        job.customerWallet = _customerWallet;\r\n        job.talentWallet = _talentWallet;\r\n        job.chatId = _chatId;\r\n        job.status = 3;\r\n\r\n        uint256 amountToTalent = (job.amount * 95) / 100;\r\n        uint256 remainingAmount = job.amount - amountToTalent;\r\n\r\n        payable(job.talentWallet).transfer(amountToTalent);\r\n        payable(owner).transfer(remainingAmount);\r\n\r\n        IERC20(LOBToken).transfer(job.customerWallet, rewardAmount);\r\n        IERC20(LOBToken).transfer(job.talentWallet, rewardAmount);\r\n    }\r\n}\r\n\r\ninterface IERC20 {\r\n    function transfer(address recipient, uint256 amount) external returns (bool);\r\n}\r\n",
+  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract WorkLOB {\r\n    struct Job {\r\n        uint256 jobId;\r\n        uint256 customerId;\r\n        uint256 talentId;\r\n        address customerWallet;\r\n        address talentWallet;\r\n        uint256 amount;\r\n        uint256 status; // 0: Not started, 1: Deposited, 2: Completed, 3: Confirmed\r\n        uint256 chatId;\r\n    }\r\n\r\n    mapping(uint256 => Job) public jobs;\r\n    address public LOBToken;\r\n    address public owner;\r\n    uint256 public rewardAmount = 500; // Reward amount of LOB tokens\r\n\r\n    constructor(address _LOBToken) {\r\n        LOBToken = _LOBToken;\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Only owner can call this function\");\r\n        _;\r\n    }\r\n\r\n    function deposit(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _customerWallet, uint256 _amount, uint256 _chatId) public payable {\r\n        require(msg.value == _amount, \"Amount mismatch\");\r\n        Job storage job = jobs[_jobId];\r\n        job.jobId = _jobId;\r\n        job.customerId = _customerId;\r\n        job.talentId = _talentId;\r\n        job.customerWallet = _customerWallet;\r\n        job.amount = _amount;\r\n        job.chatId = _chatId;\r\n        job.status = 1;\r\n    }\r\n\r\n    function complete(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _talentWallet, uint256 _chatId) public onlyOwner {\r\n        Job storage job = jobs[_jobId];\r\n        require(job.customerId == _customerId && job.talentId == _talentId, \"Invalid customer or talent ID\");\r\n        require(job.status == 1, \"Job is not deposited yet\");\r\n        job.talentWallet = _talentWallet;\r\n        job.chatId = _chatId;\r\n        job.status = 2;\r\n    }\r\n\r\n    function confirm(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _customerWallet, address _talentWallet, uint256 _chatId) public onlyOwner {\r\n        Job storage job = jobs[_jobId];\r\n        require(job.customerId == _customerId && job.talentId == _talentId, \"Invalid customer or talent ID\");\r\n        require(job.status == 2, \"Job is not completed yet\");\r\n        job.customerWallet = _customerWallet;\r\n        job.talentWallet = _talentWallet;\r\n        job.chatId = _chatId;\r\n        job.status = 3;\r\n\r\n        uint256 amountToTalent = (job.amount * 95) / 100;\r\n        uint256 remainingAmount = job.amount - amountToTalent;\r\n\r\n        payable(job.talentWallet).transfer(amountToTalent);\r\n        payable(owner).transfer(remainingAmount);\r\n\r\n        ILOBToken(LOBToken).transfer(job.customerWallet, rewardAmount);\r\n        ILOBToken(LOBToken).transfer(job.talentWallet, rewardAmount);\r\n    }\r\n}\r\n\r\ninterface ILOBToken {\r\n    function transfer(address recipient, uint256 amount) external returns (bool);\r\n}\r\n",
   "sourcePath": "C:\\Users\\John PC\\Desktop\\startups\\worklob\\smart-contract\\contracts\\JobContract.sol",
   "ast": {
     "absolutePath": "project:/contracts/JobContract.sol",
     "exportedSymbols": {
-      "IERC20": [
+      "ILOBToken": [
         1111
       ],
       "WorkLOB": [
@@ -2385,7 +2385,7 @@
             "body": {
               "id": 1099,
               "nodeType": "Block",
-              "src": "1910:748:5",
+              "src": "1910:754:5",
               "statements": [
                 {
                   "assignments": [
@@ -3537,7 +3537,7 @@
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
                           "referencedDeclaration": 997,
-                          "src": "2549:3:5",
+                          "src": "2552:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                             "typeString": "struct WorkLOB.Job storage pointer"
@@ -3548,11 +3548,11 @@
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "2553:14:5",
+                        "memberLocation": "2556:14:5",
                         "memberName": "customerWallet",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": 795,
-                        "src": "2549:18:5",
+                        "src": "2552:18:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -3564,7 +3564,7 @@
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 816,
-                        "src": "2569:12:5",
+                        "src": "2572:12:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -3590,7 +3590,7 @@
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 811,
-                            "src": "2530:8:5",
+                            "src": "2533:8:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -3605,14 +3605,14 @@
                             }
                           ],
                           "id": 1081,
-                          "name": "IERC20",
+                          "name": "ILOBToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
                           "referencedDeclaration": 1111,
-                          "src": "2523:6:5",
+                          "src": "2523:9:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IERC20_$1111_$",
-                            "typeString": "type(contract IERC20)"
+                            "typeIdentifier": "t_type$_t_contract$_ILOBToken_$1111_$",
+                            "typeString": "type(contract ILOBToken)"
                           }
                         },
                         "id": 1083,
@@ -3624,11 +3624,11 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "2523:16:5",
+                        "src": "2523:19:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20_$1111",
-                          "typeString": "contract IERC20"
+                          "typeIdentifier": "t_contract$_ILOBToken_$1111",
+                          "typeString": "contract ILOBToken"
                         }
                       },
                       "id": 1084,
@@ -3636,11 +3636,11 @@
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "2540:8:5",
+                      "memberLocation": "2543:8:5",
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 1110,
-                      "src": "2523:25:5",
+                      "src": "2523:28:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
                         "typeString": "function (address,uint256) external returns (bool)"
@@ -3655,7 +3655,7 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "2523:59:5",
+                    "src": "2523:62:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -3664,7 +3664,7 @@
                   },
                   "id": 1089,
                   "nodeType": "ExpressionStatement",
-                  "src": "2523:59:5"
+                  "src": "2523:62:5"
                 },
                 {
                   "expression": {
@@ -3676,7 +3676,7 @@
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
                           "referencedDeclaration": 997,
-                          "src": "2619:3:5",
+                          "src": "2625:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                             "typeString": "struct WorkLOB.Job storage pointer"
@@ -3687,11 +3687,11 @@
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "2623:12:5",
+                        "memberLocation": "2629:12:5",
                         "memberName": "talentWallet",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": 797,
-                        "src": "2619:16:5",
+                        "src": "2625:16:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -3703,7 +3703,7 @@
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 816,
-                        "src": "2637:12:5",
+                        "src": "2643:12:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -3729,7 +3729,7 @@
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 811,
-                            "src": "2600:8:5",
+                            "src": "2606:8:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -3744,14 +3744,14 @@
                             }
                           ],
                           "id": 1090,
-                          "name": "IERC20",
+                          "name": "ILOBToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
                           "referencedDeclaration": 1111,
-                          "src": "2593:6:5",
+                          "src": "2596:9:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IERC20_$1111_$",
-                            "typeString": "type(contract IERC20)"
+                            "typeIdentifier": "t_type$_t_contract$_ILOBToken_$1111_$",
+                            "typeString": "type(contract ILOBToken)"
                           }
                         },
                         "id": 1092,
@@ -3763,11 +3763,11 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "2593:16:5",
+                        "src": "2596:19:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20_$1111",
-                          "typeString": "contract IERC20"
+                          "typeIdentifier": "t_contract$_ILOBToken_$1111",
+                          "typeString": "contract ILOBToken"
                         }
                       },
                       "id": 1093,
@@ -3775,11 +3775,11 @@
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "2610:8:5",
+                      "memberLocation": "2616:8:5",
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 1110,
-                      "src": "2593:25:5",
+                      "src": "2596:28:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
                         "typeString": "function (address,uint256) external returns (bool)"
@@ -3794,7 +3794,7 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "2593:57:5",
+                    "src": "2596:60:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -3803,7 +3803,7 @@
                   },
                   "id": 1098,
                   "nodeType": "ExpressionStatement",
-                  "src": "2593:57:5"
+                  "src": "2596:60:5"
                 }
               ]
             },
@@ -4010,21 +4010,21 @@
               "src": "1910:0:5"
             },
             "scope": 1101,
-            "src": "1755:903:5",
+            "src": "1755:909:5",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
         "scope": 1112,
-        "src": "60:2601:5",
+        "src": "60:2607:5",
         "usedErrors": [],
         "usedEvents": []
       },
       {
         "abstract": false,
         "baseContracts": [],
-        "canonicalName": "IERC20",
+        "canonicalName": "ILOBToken",
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
@@ -4032,8 +4032,8 @@
         "linearizedBaseContracts": [
           1111
         ],
-        "name": "IERC20",
-        "nameLocation": "2675:6:5",
+        "name": "ILOBToken",
+        "nameLocation": "2681:9:5",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
@@ -4043,7 +4043,7 @@
             "kind": "function",
             "modifiers": [],
             "name": "transfer",
-            "nameLocation": "2698:8:5",
+            "nameLocation": "2707:8:5",
             "nodeType": "FunctionDefinition",
             "parameters": {
               "id": 1106,
@@ -4054,10 +4054,10 @@
                   "id": 1103,
                   "mutability": "mutable",
                   "name": "recipient",
-                  "nameLocation": "2715:9:5",
+                  "nameLocation": "2724:9:5",
                   "nodeType": "VariableDeclaration",
                   "scope": 1110,
-                  "src": "2707:17:5",
+                  "src": "2716:17:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4068,7 +4068,7 @@
                     "id": 1102,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2707:7:5",
+                    "src": "2716:7:5",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -4082,10 +4082,10 @@
                   "id": 1105,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "2734:6:5",
+                  "nameLocation": "2743:6:5",
                   "nodeType": "VariableDeclaration",
                   "scope": 1110,
-                  "src": "2726:14:5",
+                  "src": "2735:14:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4096,7 +4096,7 @@
                     "id": 1104,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2726:7:5",
+                    "src": "2735:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -4105,7 +4105,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2706:35:5"
+              "src": "2715:35:5"
             },
             "returnParameters": {
               "id": 1109,
@@ -4119,7 +4119,7 @@
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
                   "scope": 1110,
-                  "src": "2760:4:5",
+                  "src": "2769:4:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4130,7 +4130,7 @@
                     "id": 1107,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2760:4:5",
+                    "src": "2769:4:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -4139,22 +4139,22 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2759:6:5"
+              "src": "2768:6:5"
             },
             "scope": 1111,
-            "src": "2689:77:5",
+            "src": "2698:77:5",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
         "scope": 1112,
-        "src": "2665:104:5",
+        "src": "2671:107:5",
         "usedErrors": [],
         "usedEvents": []
       }
     ],
-    "src": "33:2738:5"
+    "src": "33:2747:5"
   },
   "compiler": {
     "name": "solc",
@@ -4162,7 +4162,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-25T00:35:36.283Z",
+  "updatedAt": "2025-02-25T00:39:01.487Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

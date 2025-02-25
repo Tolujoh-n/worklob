@@ -18,10 +18,10 @@ npm install --save @openzeppelin/contracts
 
 ##
 
-- CONTRACT_ADDRESS:
 - LOB_TOKEN_ADDRESS: 0xC677a1b3461B2417D7789331357606d8Bb17FD24
 - STAKING_ADDRESS: 0x5B4fB44257c4CC1c178B4a2f63B99d03528b5eFD
+- JOB_CONTRACT_ADDRESS: 0xaFB3777fC863C06240eB917f8752417cB4B93aE6
 
 ##
 
-- Replace the Token contract address in the stacking migration file if you redeploy the token contract. as the contract address will change
+- Replace the Token contract address in the stacking and job_contract migration file if you redeploy the token contract. as the contract address will change
