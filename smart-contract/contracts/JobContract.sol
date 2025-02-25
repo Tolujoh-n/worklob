@@ -3,17 +3,17 @@ pragma solidity ^0.8.0;
 
 contract WorkLOB {
     struct Job {
-        uint256 jobId;
-        uint256 customerId;
-        uint256 talentId;
+        string jobId;
+        string customerId;
+        string talentId;
         address customerWallet;
         address talentWallet;
         uint256 amount;
         uint256 status; // 0: Not started, 1: Deposited, 2: Completed, 3: Confirmed
-        uint256 chatId;
+        string chatId;  // Updated to string
     }
 
-    mapping(uint256 => Job) public jobs;
+    mapping(string => Job) public jobs; // Updated to use string as the key
     address public LOBToken;
     address public owner;
     uint256 public rewardAmount = 500; // Reward amount of LOB tokens
@@ -28,7 +28,14 @@ contract WorkLOB {
         _;
     }
 
-    function deposit(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _customerWallet, uint256 _amount, uint256 _chatId) public payable {
+    function deposit(
+        string memory _jobId,
+        string memory _customerId,
+        string memory _talentId,
+        address _customerWallet,
+        uint256 _amount,
+        string memory _chatId  // Updated to string
+    ) public payable {
         require(msg.value == _amount, "Amount mismatch");
         Job storage job = jobs[_jobId];
         job.jobId = _jobId;
@@ -36,32 +43,55 @@ contract WorkLOB {
         job.talentId = _talentId;
         job.customerWallet = _customerWallet;
         job.amount = _amount;
-        job.chatId = _chatId;
+        job.chatId = _chatId;  // Updated to string
         job.status = 1;
     }
 
-    function complete(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _talentWallet, uint256 _chatId) public onlyOwner {
+    function complete(
+        string memory _jobId,
+        string memory _customerId,
+        string memory _talentId,
+        address _talentWallet,
+        string memory _chatId  // Updated to string
+    ) public onlyOwner {
         Job storage job = jobs[_jobId];
-        require(job.customerId == _customerId && job.talentId == _talentId, "Invalid customer or talent ID");
+        require(
+            keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&
+                keccak256(bytes(job.talentId)) == keccak256(bytes(_talentId)),
+            "Invalid customer or talent ID"
+        );
         require(job.status == 1, "Job is not deposited yet");
         job.talentWallet = _talentWallet;
-        job.chatId = _chatId;
+        job.chatId = _chatId;  // Updated to string
         job.status = 2;
     }
 
-    function confirm(uint256 _jobId, uint256 _customerId, uint256 _talentId, address _customerWallet, address _talentWallet, uint256 _chatId) public onlyOwner {
+    function confirm(
+        string memory _jobId,
+        string memory _customerId,
+        string memory _talentId,
+        address _customerWallet,
+        string memory _chatId  // Updated to string
+    ) public onlyOwner {
         Job storage job = jobs[_jobId];
-        require(job.customerId == _customerId && job.talentId == _talentId, "Invalid customer or talent ID");
+        require(
+            keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&
+                keccak256(bytes(job.talentId)) == keccak256(bytes(_talentId)),
+            "Invalid customer or talent ID"
+        );
         require(job.status == 2, "Job is not completed yet");
+
         job.customerWallet = _customerWallet;
-        job.talentWallet = _talentWallet;
-        job.chatId = _chatId;
+        job.chatId = _chatId;  // Updated to string
         job.status = 3;
+
+        address talentWallet = job.talentWallet;
+        require(talentWallet != address(0), "Talent wallet not set");
 
         uint256 amountToTalent = (job.amount * 95) / 100;
         uint256 remainingAmount = job.amount - amountToTalent;
 
-        payable(job.talentWallet).transfer(amountToTalent);
+        payable(talentWallet).transfer(amountToTalent);
         payable(owner).transfer(remainingAmount);
 
         ILOBToken(LOBToken).transfer(job.customerWallet, rewardAmount);

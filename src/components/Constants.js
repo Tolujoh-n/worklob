@@ -5,7 +5,7 @@ import WorkLobStaking from "./abi/WorkLobStaking.json"; // Add the ABI file for 
 
 export const JOB_ABI = WorkLOB.abi;
 export const JOB_CONTRACT_ADDRESS =
-  "0xaFB3777fC863C06240eB917f8752417cB4B93aE6"; // Replace with your quiz platform contract address
+  "0xA449D4B18F04C5b6873cB619340ff8bC3F337531"; // Replace with your quiz platform contract address
 
 // LOB Token contract details
 export const LOB_TOKEN_ABI = LOBToken.abi;

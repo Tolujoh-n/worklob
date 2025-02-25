@@ -4,6 +4,7 @@ import { useWeb3 } from "../../../Web3Provider";
 import { toast } from "sonner";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { deposit, complete, confirm } from "./EscrowChainIntegration";
 
 const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
   const { connectWallet, walletAddress, connected } = useWeb3();
@@ -75,7 +76,7 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
 
   const handleClick = async (index, status, requiredRole) => {
     if (userRole !== requiredRole) {
-      toast.error(`Switch to ${requiredRole} role this action.`);
+      toast.error(`Switch to ${requiredRole} role for this action.`);
       return;
     }
 
@@ -84,22 +85,42 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
       updatedStates[index] = true;
       setButtonStates(updatedStates);
 
-      await handleStatusUpdate(status);
+      await handleStatusUpdate(status, index);
     }
   };
 
-  const handleStatusUpdate = async (newStatus) => {
+  const handleStatusUpdate = async (newStatus, index) => {
     if (!connected) {
       await connectWallet();
     }
 
     try {
-      console.log("Sending update request with:", {
-        walletAddress,
-        status: newStatus,
-        userId,
-        userRole,
-      });
+      if (index === 1) {
+        await deposit(
+          jobId,
+          chat.customerId,
+          chat.talentId,
+          walletAddress,
+          chatId
+        );
+      } else if (index === 3) {
+        await complete(
+          jobId,
+          chat.customerId,
+          chat.talentId,
+          walletAddress,
+          chatId
+        );
+      } else if (index === 4) {
+        await confirm(
+          jobId,
+          chat.customerId,
+          chat.talentId,
+          walletAddress,
+          chat.talentWallet,
+          chatId
+        );
+      }
 
       const response = await axios.put(
         `${API_URL}/api/v1/chat/chatdetails/${jobId}/chat/${chatId}`,
@@ -114,7 +135,7 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
       toast.success("Status updated successfully!");
     } catch (error) {
       console.error("Error updating status:", error.message);
-      toast.error("Failed to update status(Not the role Permited).");
+      toast.error("Failed to update status.");
     }
   };
 
