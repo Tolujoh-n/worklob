@@ -148,11 +148,12 @@ export async function confirm(
   try {
     console.log("Attempting job confirmation...");
     const tx = await workLOB.confirm(
-      jobId, // Now passed as string
-      customerId._id, // Now passed as string
-      talentId._id, // Now passed as string
+      jobId,
+      customerId,
+      talentId,
       customerWallet,
-      chatId // `chatId` is now a string
+      chatId,
+      { gasLimit: 500000 } // Example of setting a higher gas limit
     );
     await tx.wait();
 

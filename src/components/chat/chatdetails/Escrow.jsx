@@ -41,6 +41,12 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
         );
         setChat(response.data);
         console.log("Chat details fetched:", response.data);
+        // Make sure chatId exists
+        if (!response.data._id) {
+          console.error("chatId is missing in the response");
+        } else {
+          console.log("Chat ID is:", response.data._id); // This should be the `chatId`
+        }
 
         console.log("User Role:", userRole);
         console.log("User ID:", userId);
@@ -95,6 +101,7 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
     }
 
     try {
+      // Trigger the appropriate function (deposit, complete, or confirm) based on index
       if (index === 1) {
         await deposit(
           jobId,
@@ -117,11 +124,11 @@ const Escrow = ({ jobId, chatId, currentStatus, trackWalletAddress }) => {
           chat.customerId,
           chat.talentId,
           walletAddress,
-          chat.talentWallet,
           chatId
         );
       }
 
+      // Now update the status
       const response = await axios.put(
         `${API_URL}/api/v1/chat/chatdetails/${jobId}/chat/${chatId}`,
         {
