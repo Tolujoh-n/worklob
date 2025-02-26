@@ -53,7 +53,7 @@ contract WorkLOB {
         string memory _talentId,
         address _talentWallet,
         string memory _chatId  // Updated to string
-    ) public onlyOwner {
+    ) public {
         Job storage job = jobs[_jobId];
         require(
             keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&
@@ -72,7 +72,7 @@ contract WorkLOB {
         string memory _talentId,
         address _customerWallet,
         string memory _chatId  // Updated to string
-    ) public onlyOwner {
+    ) public {
         Job storage job = jobs[_jobId];
         require(
             keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&

@@ -26,7 +26,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/JobContract.sol\":\"ILOBToken\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/JobContract.sol\":{\"keccak256\":\"0x34d88fc5b859b6cdcf20a63bfc28f2af31c440cfe96662c5e55819309830360a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8b50a4b19ae44848fbbe321358a2f0fbe0ceae101de8c59ec708c90a206572cb\",\"dweb:/ipfs/QmZnp3zWk7QQqvcsT9tpHKinw5SWzJA7XTJLzpcS7PCmSJ\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/JobContract.sol\":\"ILOBToken\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/JobContract.sol\":{\"keccak256\":\"0x5532f1975ec9711481dd7dd493e8e20031aa29bf89a73a4a5775eaf221e46737\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://cf5d02e9e811bd7ede822fab2c7fb1f622255f8cedd66bfac2fed6abbd07b4f3\",\"dweb:/ipfs/QmWM1iMPqUuS3pS38tbmkJMtAT3exZKmMLXXYBPDN8WJsW\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -34,19 +34,19 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract WorkLOB {\r\n    struct Job {\r\n        string jobId;\r\n        string customerId;\r\n        string talentId;\r\n        address customerWallet;\r\n        address talentWallet;\r\n        uint256 amount;\r\n        uint256 status; // 0: Not started, 1: Deposited, 2: Completed, 3: Confirmed\r\n        string chatId;  // Updated to string\r\n    }\r\n\r\n    mapping(string => Job) public jobs; // Updated to use string as the key\r\n    address public LOBToken;\r\n    address public owner;\r\n    uint256 public rewardAmount = 500; // Reward amount of LOB tokens\r\n\r\n    constructor(address _LOBToken) {\r\n        LOBToken = _LOBToken;\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Only owner can call this function\");\r\n        _;\r\n    }\r\n\r\n    function deposit(\r\n        string memory _jobId,\r\n        string memory _customerId,\r\n        string memory _talentId,\r\n        address _customerWallet,\r\n        uint256 _amount,\r\n        string memory _chatId  // Updated to string\r\n    ) public payable {\r\n        require(msg.value == _amount, \"Amount mismatch\");\r\n        Job storage job = jobs[_jobId];\r\n        job.jobId = _jobId;\r\n        job.customerId = _customerId;\r\n        job.talentId = _talentId;\r\n        job.customerWallet = _customerWallet;\r\n        job.amount = _amount;\r\n        job.chatId = _chatId;  // Updated to string\r\n        job.status = 1;\r\n    }\r\n\r\n    function complete(\r\n        string memory _jobId,\r\n        string memory _customerId,\r\n        string memory _talentId,\r\n        address _talentWallet,\r\n        string memory _chatId  // Updated to string\r\n    ) public onlyOwner {\r\n        Job storage job = jobs[_jobId];\r\n        require(\r\n            keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&\r\n                keccak256(bytes(job.talentId)) == keccak256(bytes(_talentId)),\r\n            \"Invalid customer or talent ID\"\r\n        );\r\n        require(job.status == 1, \"Job is not deposited yet\");\r\n        job.talentWallet = _talentWallet;\r\n        job.chatId = _chatId;  // Updated to string\r\n        job.status = 2;\r\n    }\r\n\r\n    function confirm(\r\n        string memory _jobId,\r\n        string memory _customerId,\r\n        string memory _talentId,\r\n        address _customerWallet,\r\n        string memory _chatId  // Updated to string\r\n    ) public onlyOwner {\r\n        Job storage job = jobs[_jobId];\r\n        require(\r\n            keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&\r\n                keccak256(bytes(job.talentId)) == keccak256(bytes(_talentId)),\r\n            \"Invalid customer or talent ID\"\r\n        );\r\n        require(job.status == 2, \"Job is not completed yet\");\r\n\r\n        job.customerWallet = _customerWallet;\r\n        job.chatId = _chatId;  // Updated to string\r\n        job.status = 3;\r\n\r\n        address talentWallet = job.talentWallet;\r\n        require(talentWallet != address(0), \"Talent wallet not set\");\r\n\r\n        uint256 amountToTalent = (job.amount * 95) / 100;\r\n        uint256 remainingAmount = job.amount - amountToTalent;\r\n\r\n        payable(talentWallet).transfer(amountToTalent);\r\n        payable(owner).transfer(remainingAmount);\r\n\r\n        ILOBToken(LOBToken).transfer(job.customerWallet, rewardAmount);\r\n        ILOBToken(LOBToken).transfer(job.talentWallet, rewardAmount);\r\n    }\r\n}\r\n\r\ninterface ILOBToken {\r\n    function transfer(address recipient, uint256 amount) external returns (bool);\r\n}\r\n",
+  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ncontract WorkLOB {\r\n    struct Job {\r\n        string jobId;\r\n        string customerId;\r\n        string talentId;\r\n        address customerWallet;\r\n        address talentWallet;\r\n        uint256 amount;\r\n        uint256 status; // 0: Not started, 1: Deposited, 2: Completed, 3: Confirmed\r\n        string chatId;  // Updated to string\r\n    }\r\n\r\n    mapping(string => Job) public jobs; // Updated to use string as the key\r\n    address public LOBToken;\r\n    address public owner;\r\n    uint256 public rewardAmount = 500; // Reward amount of LOB tokens\r\n\r\n    constructor(address _LOBToken) {\r\n        LOBToken = _LOBToken;\r\n        owner = msg.sender;\r\n    }\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Only owner can call this function\");\r\n        _;\r\n    }\r\n\r\n    function deposit(\r\n        string memory _jobId,\r\n        string memory _customerId,\r\n        string memory _talentId,\r\n        address _customerWallet,\r\n        uint256 _amount,\r\n        string memory _chatId  // Updated to string\r\n    ) public payable {\r\n        require(msg.value == _amount, \"Amount mismatch\");\r\n        Job storage job = jobs[_jobId];\r\n        job.jobId = _jobId;\r\n        job.customerId = _customerId;\r\n        job.talentId = _talentId;\r\n        job.customerWallet = _customerWallet;\r\n        job.amount = _amount;\r\n        job.chatId = _chatId;  // Updated to string\r\n        job.status = 1;\r\n    }\r\n\r\n    function complete(\r\n        string memory _jobId,\r\n        string memory _customerId,\r\n        string memory _talentId,\r\n        address _talentWallet,\r\n        string memory _chatId  // Updated to string\r\n    ) public {\r\n        Job storage job = jobs[_jobId];\r\n        require(\r\n            keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&\r\n                keccak256(bytes(job.talentId)) == keccak256(bytes(_talentId)),\r\n            \"Invalid customer or talent ID\"\r\n        );\r\n        require(job.status == 1, \"Job is not deposited yet\");\r\n        job.talentWallet = _talentWallet;\r\n        job.chatId = _chatId;  // Updated to string\r\n        job.status = 2;\r\n    }\r\n\r\n    function confirm(\r\n        string memory _jobId,\r\n        string memory _customerId,\r\n        string memory _talentId,\r\n        address _customerWallet,\r\n        string memory _chatId  // Updated to string\r\n    ) public {\r\n        Job storage job = jobs[_jobId];\r\n        require(\r\n            keccak256(bytes(job.customerId)) == keccak256(bytes(_customerId)) &&\r\n                keccak256(bytes(job.talentId)) == keccak256(bytes(_talentId)),\r\n            \"Invalid customer or talent ID\"\r\n        );\r\n        require(job.status == 2, \"Job is not completed yet\");\r\n\r\n        job.customerWallet = _customerWallet;\r\n        job.chatId = _chatId;  // Updated to string\r\n        job.status = 3;\r\n\r\n        address talentWallet = job.talentWallet;\r\n        require(talentWallet != address(0), \"Talent wallet not set\");\r\n\r\n        uint256 amountToTalent = (job.amount * 95) / 100;\r\n        uint256 remainingAmount = job.amount - amountToTalent;\r\n\r\n        payable(talentWallet).transfer(amountToTalent);\r\n        payable(owner).transfer(remainingAmount);\r\n\r\n        ILOBToken(LOBToken).transfer(job.customerWallet, rewardAmount);\r\n        ILOBToken(LOBToken).transfer(job.talentWallet, rewardAmount);\r\n    }\r\n}\r\n\r\ninterface ILOBToken {\r\n    function transfer(address recipient, uint256 amount) external returns (bool);\r\n}\r\n",
   "sourcePath": "C:\\Users\\John PC\\Desktop\\startups\\worklob\\smart-contract\\contracts\\JobContract.sol",
   "ast": {
     "absolutePath": "project:/contracts/JobContract.sol",
     "exportedSymbols": {
       "ILOBToken": [
-        1157
+        1153
       ],
       "WorkLOB": [
-        1147
+        1143
       ]
     },
-    "id": 1158,
+    "id": 1154,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
@@ -68,9 +68,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 1147,
+        "id": 1143,
         "linearizedBaseContracts": [
-          1147
+          1143
         ],
         "name": "WorkLOB",
         "nameLocation": "69:7:5",
@@ -302,7 +302,7 @@
             "name": "Job",
             "nameLocation": "91:3:5",
             "nodeType": "StructDefinition",
-            "scope": 1147,
+            "scope": 1143,
             "src": "84:316:5",
             "visibility": "public"
           },
@@ -314,7 +314,7 @@
             "name": "jobs",
             "nameLocation": "438:4:5",
             "nodeType": "VariableDeclaration",
-            "scope": 1147,
+            "scope": 1143,
             "src": "408:34:5",
             "stateVariable": true,
             "storageLocation": "default",
@@ -375,7 +375,7 @@
             "name": "LOBToken",
             "nameLocation": "500:8:5",
             "nodeType": "VariableDeclaration",
-            "scope": 1147,
+            "scope": 1143,
             "src": "485:23:5",
             "stateVariable": true,
             "storageLocation": "default",
@@ -404,7 +404,7 @@
             "name": "owner",
             "nameLocation": "530:5:5",
             "nodeType": "VariableDeclaration",
-            "scope": 1147,
+            "scope": 1143,
             "src": "515:20:5",
             "stateVariable": true,
             "storageLocation": "default",
@@ -433,7 +433,7 @@
             "name": "rewardAmount",
             "nameLocation": "557:12:5",
             "nodeType": "VariableDeclaration",
-            "scope": 1147,
+            "scope": 1143,
             "src": "542:33:5",
             "stateVariable": true,
             "storageLocation": "default",
@@ -626,7 +626,7 @@
               "parameters": [],
               "src": "646:0:5"
             },
-            "scope": 1147,
+            "scope": 1143,
             "src": "615:99:5",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1596,7 +1596,7 @@
               "parameters": [],
               "src": "1101:0:5"
             },
-            "scope": 1147,
+            "scope": 1143,
             "src": "847:621:5",
             "stateMutability": "payable",
             "virtual": false,
@@ -1604,24 +1604,24 @@
           },
           {
             "body": {
-              "id": 997,
+              "id": 995,
               "nodeType": "Block",
-              "src": "1705:470:5",
+              "src": "1695:470:5",
               "statements": [
                 {
                   "assignments": [
-                    933
+                    931
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 933,
+                      "id": 931,
                       "mutability": "mutable",
                       "name": "job",
-                      "nameLocation": "1728:3:5",
+                      "nameLocation": "1718:3:5",
                       "nodeType": "VariableDeclaration",
-                      "scope": 997,
-                      "src": "1716:15:5",
+                      "scope": 995,
+                      "src": "1706:15:5",
                       "stateVariable": false,
                       "storageLocation": "storage",
                       "typeDescriptions": {
@@ -1629,20 +1629,20 @@
                         "typeString": "struct WorkLOB.Job"
                       },
                       "typeName": {
-                        "id": 932,
+                        "id": 930,
                         "nodeType": "UserDefinedTypeName",
                         "pathNode": {
-                          "id": 931,
+                          "id": 929,
                           "name": "Job",
                           "nameLocations": [
-                            "1716:3:5"
+                            "1706:3:5"
                           ],
                           "nodeType": "IdentifierPath",
                           "referencedDeclaration": 804,
-                          "src": "1716:3:5"
+                          "src": "1706:3:5"
                         },
                         "referencedDeclaration": 804,
-                        "src": "1716:3:5",
+                        "src": "1706:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job"
@@ -1651,28 +1651,28 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 937,
+                  "id": 935,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 934,
+                      "id": 932,
                       "name": "jobs",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 809,
-                      "src": "1734:4:5",
+                      "src": "1724:4:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_struct$_Job_$804_storage_$",
                         "typeString": "mapping(string memory => struct WorkLOB.Job storage ref)"
                       }
                     },
-                    "id": 936,
+                    "id": 934,
                     "indexExpression": {
-                      "id": 935,
+                      "id": 933,
                       "name": "_jobId",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 918,
-                      "src": "1739:6:5",
+                      "src": "1729:6:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
                         "typeString": "string memory"
@@ -1683,14 +1683,14 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "1734:12:5",
+                    "src": "1724:12:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_Job_$804_storage",
                       "typeString": "struct WorkLOB.Job storage ref"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "1716:30:5"
+                  "src": "1706:30:5"
                 },
                 {
                   "expression": {
@@ -1700,7 +1700,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 967,
+                        "id": 965,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1710,7 +1710,7 @@
                             "typeIdentifier": "t_bytes32",
                             "typeString": "bytes32"
                           },
-                          "id": 952,
+                          "id": 950,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1721,27 +1721,27 @@
                                 "arguments": [
                                   {
                                     "expression": {
-                                      "id": 942,
+                                      "id": 940,
                                       "name": "job",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 933,
-                                      "src": "1795:3:5",
+                                      "referencedDeclaration": 931,
+                                      "src": "1785:3:5",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                                         "typeString": "struct WorkLOB.Job storage pointer"
                                       }
                                     },
-                                    "id": 943,
+                                    "id": 941,
                                     "isConstant": false,
                                     "isLValue": true,
                                     "isPure": false,
                                     "lValueRequested": false,
-                                    "memberLocation": "1799:10:5",
+                                    "memberLocation": "1789:10:5",
                                     "memberName": "customerId",
                                     "nodeType": "MemberAccess",
                                     "referencedDeclaration": 791,
-                                    "src": "1795:14:5",
+                                    "src": "1785:14:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_storage",
                                       "typeString": "string storage ref"
@@ -1755,26 +1755,26 @@
                                       "typeString": "string storage ref"
                                     }
                                   ],
-                                  "id": 941,
+                                  "id": 939,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "1789:5:5",
+                                  "src": "1779:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 940,
+                                    "id": 938,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "1789:5:5",
+                                    "src": "1779:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 944,
+                                "id": 942,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -1783,7 +1783,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "1789:21:5",
+                                "src": "1779:21:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_storage_ptr",
@@ -1798,18 +1798,18 @@
                                   "typeString": "bytes storage pointer"
                                 }
                               ],
-                              "id": 939,
+                              "id": 937,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "1779:9:5",
+                              "src": "1769:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 945,
+                            "id": 943,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -1818,7 +1818,7 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "1779:32:5",
+                            "src": "1769:32:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -1832,12 +1832,12 @@
                               {
                                 "arguments": [
                                   {
-                                    "id": 949,
+                                    "id": 947,
                                     "name": "_customerId",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
                                     "referencedDeclaration": 920,
-                                    "src": "1831:11:5",
+                                    "src": "1821:11:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_memory_ptr",
                                       "typeString": "string memory"
@@ -1851,26 +1851,26 @@
                                       "typeString": "string memory"
                                     }
                                   ],
-                                  "id": 948,
+                                  "id": 946,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "1825:5:5",
+                                  "src": "1815:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 947,
+                                    "id": 945,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "1825:5:5",
+                                    "src": "1815:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 950,
+                                "id": 948,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -1879,7 +1879,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "1825:18:5",
+                                "src": "1815:18:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory_ptr",
@@ -1894,18 +1894,18 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "id": 946,
+                              "id": 944,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "1815:9:5",
+                              "src": "1805:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 951,
+                            "id": 949,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -1914,14 +1914,14 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "1815:29:5",
+                            "src": "1805:29:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
                             }
                           },
-                          "src": "1779:65:5",
+                          "src": "1769:65:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
@@ -1934,7 +1934,7 @@
                             "typeIdentifier": "t_bytes32",
                             "typeString": "bytes32"
                           },
-                          "id": 966,
+                          "id": 964,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1945,27 +1945,27 @@
                                 "arguments": [
                                   {
                                     "expression": {
-                                      "id": 956,
+                                      "id": 954,
                                       "name": "job",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 933,
-                                      "src": "1881:3:5",
+                                      "referencedDeclaration": 931,
+                                      "src": "1871:3:5",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                                         "typeString": "struct WorkLOB.Job storage pointer"
                                       }
                                     },
-                                    "id": 957,
+                                    "id": 955,
                                     "isConstant": false,
                                     "isLValue": true,
                                     "isPure": false,
                                     "lValueRequested": false,
-                                    "memberLocation": "1885:8:5",
+                                    "memberLocation": "1875:8:5",
                                     "memberName": "talentId",
                                     "nodeType": "MemberAccess",
                                     "referencedDeclaration": 793,
-                                    "src": "1881:12:5",
+                                    "src": "1871:12:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_storage",
                                       "typeString": "string storage ref"
@@ -1979,26 +1979,26 @@
                                       "typeString": "string storage ref"
                                     }
                                   ],
-                                  "id": 955,
+                                  "id": 953,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "1875:5:5",
+                                  "src": "1865:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 954,
+                                    "id": 952,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "1875:5:5",
+                                    "src": "1865:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 958,
+                                "id": 956,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -2007,7 +2007,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "1875:19:5",
+                                "src": "1865:19:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_storage_ptr",
@@ -2022,18 +2022,18 @@
                                   "typeString": "bytes storage pointer"
                                 }
                               ],
-                              "id": 953,
+                              "id": 951,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "1865:9:5",
+                              "src": "1855:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 959,
+                            "id": 957,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -2042,7 +2042,7 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "1865:30:5",
+                            "src": "1855:30:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -2056,12 +2056,12 @@
                               {
                                 "arguments": [
                                   {
-                                    "id": 963,
+                                    "id": 961,
                                     "name": "_talentId",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
                                     "referencedDeclaration": 922,
-                                    "src": "1915:9:5",
+                                    "src": "1905:9:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_memory_ptr",
                                       "typeString": "string memory"
@@ -2075,26 +2075,26 @@
                                       "typeString": "string memory"
                                     }
                                   ],
-                                  "id": 962,
+                                  "id": 960,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "1909:5:5",
+                                  "src": "1899:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 961,
+                                    "id": 959,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "1909:5:5",
+                                    "src": "1899:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 964,
+                                "id": 962,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -2103,7 +2103,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "1909:16:5",
+                                "src": "1899:16:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory_ptr",
@@ -2118,18 +2118,18 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "id": 960,
+                              "id": 958,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "1899:9:5",
+                              "src": "1889:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 965,
+                            "id": 963,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -2138,20 +2138,20 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "1899:27:5",
+                            "src": "1889:27:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
                             }
                           },
-                          "src": "1865:61:5",
+                          "src": "1855:61:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "src": "1779:147:5",
+                        "src": "1769:147:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -2159,14 +2159,14 @@
                       },
                       {
                         "hexValue": "496e76616c696420637573746f6d6572206f722074616c656e74204944",
-                        "id": 968,
+                        "id": 966,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "1941:31:5",
+                        "src": "1931:31:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_8cd47b8fdfd52f34ba1b669f2633790b0792855e6db599b938dc473108dde464",
                           "typeString": "literal_string \"Invalid customer or talent ID\""
@@ -2185,7 +2185,7 @@
                           "typeString": "literal_string \"Invalid customer or talent ID\""
                         }
                       ],
-                      "id": 938,
+                      "id": 936,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -2193,13 +2193,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "1757:7:5",
+                      "src": "1747:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 969,
+                    "id": 967,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2208,16 +2208,16 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1757:226:5",
+                    "src": "1747:226:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 970,
+                  "id": 968,
                   "nodeType": "ExpressionStatement",
-                  "src": "1757:226:5"
+                  "src": "1747:226:5"
                 },
                 {
                   "expression": {
@@ -2227,34 +2227,34 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 975,
+                        "id": 973,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "expression": {
-                            "id": 972,
+                            "id": 970,
                             "name": "job",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 933,
-                            "src": "2002:3:5",
+                            "referencedDeclaration": 931,
+                            "src": "1992:3:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                               "typeString": "struct WorkLOB.Job storage pointer"
                             }
                           },
-                          "id": 973,
+                          "id": 971,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
-                          "memberLocation": "2006:6:5",
+                          "memberLocation": "1996:6:5",
                           "memberName": "status",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": 801,
-                          "src": "2002:10:5",
+                          "src": "1992:10:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
@@ -2264,21 +2264,21 @@
                         "operator": "==",
                         "rightExpression": {
                           "hexValue": "31",
-                          "id": 974,
+                          "id": 972,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "kind": "number",
                           "lValueRequested": false,
                           "nodeType": "Literal",
-                          "src": "2016:1:5",
+                          "src": "2006:1:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_rational_1_by_1",
                             "typeString": "int_const 1"
                           },
                           "value": "1"
                         },
-                        "src": "2002:15:5",
+                        "src": "1992:15:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -2286,14 +2286,14 @@
                       },
                       {
                         "hexValue": "4a6f62206973206e6f74206465706f736974656420796574",
-                        "id": 976,
+                        "id": 974,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "2019:26:5",
+                        "src": "2009:26:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_539ce6435baf2eb41a5fef1bf8cfefb776c5cbb4bb0c4a7fb44095df42b7be29",
                           "typeString": "literal_string \"Job is not deposited yet\""
@@ -2312,7 +2312,7 @@
                           "typeString": "literal_string \"Job is not deposited yet\""
                         }
                       ],
-                      "id": 971,
+                      "id": 969,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -2320,13 +2320,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "1994:7:5",
+                      "src": "1984:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 977,
+                    "id": 975,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2335,47 +2335,47 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1994:52:5",
+                    "src": "1984:52:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 978,
+                  "id": 976,
                   "nodeType": "ExpressionStatement",
-                  "src": "1994:52:5"
+                  "src": "1984:52:5"
                 },
                 {
                   "expression": {
-                    "id": 983,
+                    "id": 981,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 979,
+                        "id": 977,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 933,
-                        "src": "2057:3:5",
+                        "referencedDeclaration": 931,
+                        "src": "2047:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 981,
+                      "id": 979,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
-                      "memberLocation": "2061:12:5",
+                      "memberLocation": "2051:12:5",
                       "memberName": "talentWallet",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 797,
-                      "src": "2057:16:5",
+                      "src": "2047:16:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -2384,57 +2384,57 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 982,
+                      "id": 980,
                       "name": "_talentWallet",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 924,
-                      "src": "2076:13:5",
+                      "src": "2066:13:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "2057:32:5",
+                    "src": "2047:32:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 984,
+                  "id": 982,
                   "nodeType": "ExpressionStatement",
-                  "src": "2057:32:5"
+                  "src": "2047:32:5"
                 },
                 {
                   "expression": {
-                    "id": 989,
+                    "id": 987,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 985,
+                        "id": 983,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 933,
-                        "src": "2100:3:5",
+                        "referencedDeclaration": 931,
+                        "src": "2090:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 987,
+                      "id": 985,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
-                      "memberLocation": "2104:6:5",
+                      "memberLocation": "2094:6:5",
                       "memberName": "chatId",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 803,
-                      "src": "2100:10:5",
+                      "src": "2090:10:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_storage",
                         "typeString": "string storage ref"
@@ -2443,57 +2443,57 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 988,
+                      "id": 986,
                       "name": "_chatId",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 926,
-                      "src": "2113:7:5",
+                      "src": "2103:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
                         "typeString": "string memory"
                       }
                     },
-                    "src": "2100:20:5",
+                    "src": "2090:20:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage",
                       "typeString": "string storage ref"
                     }
                   },
-                  "id": 990,
+                  "id": 988,
                   "nodeType": "ExpressionStatement",
-                  "src": "2100:20:5"
+                  "src": "2090:20:5"
                 },
                 {
                   "expression": {
-                    "id": 995,
+                    "id": 993,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 991,
+                        "id": 989,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 933,
-                        "src": "2153:3:5",
+                        "referencedDeclaration": 931,
+                        "src": "2143:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 993,
+                      "id": 991,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
-                      "memberLocation": "2157:6:5",
+                      "memberLocation": "2147:6:5",
                       "memberName": "status",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 801,
-                      "src": "2153:10:5",
+                      "src": "2143:10:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -2503,54 +2503,37 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "32",
-                      "id": 994,
+                      "id": 992,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "2166:1:5",
+                      "src": "2156:1:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_2_by_1",
                         "typeString": "int_const 2"
                       },
                       "value": "2"
                     },
-                    "src": "2153:14:5",
+                    "src": "2143:14:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 996,
+                  "id": 994,
                   "nodeType": "ExpressionStatement",
-                  "src": "2153:14:5"
+                  "src": "2143:14:5"
                 }
               ]
             },
             "functionSelector": "e713231d",
-            "id": 998,
+            "id": 996,
             "implemented": true,
             "kind": "function",
-            "modifiers": [
-              {
-                "id": 929,
-                "kind": "modifierInvocation",
-                "modifierName": {
-                  "id": 928,
-                  "name": "onlyOwner",
-                  "nameLocations": [
-                    "1695:9:5"
-                  ],
-                  "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 843,
-                  "src": "1695:9:5"
-                },
-                "nodeType": "ModifierInvocation",
-                "src": "1695:9:5"
-              }
-            ],
+            "modifiers": [],
             "name": "complete",
             "nameLocation": "1485:8:5",
             "nodeType": "FunctionDefinition",
@@ -2565,7 +2548,7 @@
                   "name": "_jobId",
                   "nameLocation": "1518:6:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 998,
+                  "scope": 996,
                   "src": "1504:20:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2592,7 +2575,7 @@
                   "name": "_customerId",
                   "nameLocation": "1549:11:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 998,
+                  "scope": 996,
                   "src": "1535:25:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2619,7 +2602,7 @@
                   "name": "_talentId",
                   "nameLocation": "1585:9:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 998,
+                  "scope": 996,
                   "src": "1571:23:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2646,7 +2629,7 @@
                   "name": "_talentWallet",
                   "nameLocation": "1613:13:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 998,
+                  "scope": 996,
                   "src": "1605:21:5",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2674,7 +2657,7 @@
                   "name": "_chatId",
                   "nameLocation": "1651:7:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 998,
+                  "scope": 996,
                   "src": "1637:21:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2698,37 +2681,37 @@
               "src": "1493:194:5"
             },
             "returnParameters": {
-              "id": 930,
+              "id": 928,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1705:0:5"
+              "src": "1695:0:5"
             },
-            "scope": 1147,
-            "src": "1476:699:5",
+            "scope": 1143,
+            "src": "1476:689:5",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 1145,
+              "id": 1141,
               "nodeType": "Block",
-              "src": "2413:980:5",
+              "src": "2393:980:5",
               "statements": [
                 {
                   "assignments": [
-                    1015
+                    1011
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1015,
+                      "id": 1011,
                       "mutability": "mutable",
                       "name": "job",
-                      "nameLocation": "2436:3:5",
+                      "nameLocation": "2416:3:5",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1145,
-                      "src": "2424:15:5",
+                      "scope": 1141,
+                      "src": "2404:15:5",
                       "stateVariable": false,
                       "storageLocation": "storage",
                       "typeDescriptions": {
@@ -2736,20 +2719,20 @@
                         "typeString": "struct WorkLOB.Job"
                       },
                       "typeName": {
-                        "id": 1014,
+                        "id": 1010,
                         "nodeType": "UserDefinedTypeName",
                         "pathNode": {
-                          "id": 1013,
+                          "id": 1009,
                           "name": "Job",
                           "nameLocations": [
-                            "2424:3:5"
+                            "2404:3:5"
                           ],
                           "nodeType": "IdentifierPath",
                           "referencedDeclaration": 804,
-                          "src": "2424:3:5"
+                          "src": "2404:3:5"
                         },
                         "referencedDeclaration": 804,
-                        "src": "2424:3:5",
+                        "src": "2404:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job"
@@ -2758,28 +2741,28 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1019,
+                  "id": 1015,
                   "initialValue": {
                     "baseExpression": {
-                      "id": 1016,
+                      "id": 1012,
                       "name": "jobs",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 809,
-                      "src": "2442:4:5",
+                      "src": "2422:4:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_struct$_Job_$804_storage_$",
                         "typeString": "mapping(string memory => struct WorkLOB.Job storage ref)"
                       }
                     },
-                    "id": 1018,
+                    "id": 1014,
                     "indexExpression": {
-                      "id": 1017,
+                      "id": 1013,
                       "name": "_jobId",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1000,
-                      "src": "2447:6:5",
+                      "referencedDeclaration": 998,
+                      "src": "2427:6:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
                         "typeString": "string memory"
@@ -2790,14 +2773,14 @@
                     "isPure": false,
                     "lValueRequested": false,
                     "nodeType": "IndexAccess",
-                    "src": "2442:12:5",
+                    "src": "2422:12:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_Job_$804_storage",
                       "typeString": "struct WorkLOB.Job storage ref"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "2424:30:5"
+                  "src": "2404:30:5"
                 },
                 {
                   "expression": {
@@ -2807,7 +2790,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 1049,
+                        "id": 1045,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2817,7 +2800,7 @@
                             "typeIdentifier": "t_bytes32",
                             "typeString": "bytes32"
                           },
-                          "id": 1034,
+                          "id": 1030,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -2828,27 +2811,27 @@
                                 "arguments": [
                                   {
                                     "expression": {
-                                      "id": 1024,
+                                      "id": 1020,
                                       "name": "job",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 1015,
-                                      "src": "2503:3:5",
+                                      "referencedDeclaration": 1011,
+                                      "src": "2483:3:5",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                                         "typeString": "struct WorkLOB.Job storage pointer"
                                       }
                                     },
-                                    "id": 1025,
+                                    "id": 1021,
                                     "isConstant": false,
                                     "isLValue": true,
                                     "isPure": false,
                                     "lValueRequested": false,
-                                    "memberLocation": "2507:10:5",
+                                    "memberLocation": "2487:10:5",
                                     "memberName": "customerId",
                                     "nodeType": "MemberAccess",
                                     "referencedDeclaration": 791,
-                                    "src": "2503:14:5",
+                                    "src": "2483:14:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_storage",
                                       "typeString": "string storage ref"
@@ -2862,26 +2845,26 @@
                                       "typeString": "string storage ref"
                                     }
                                   ],
-                                  "id": 1023,
+                                  "id": 1019,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "2497:5:5",
+                                  "src": "2477:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 1022,
+                                    "id": 1018,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "2497:5:5",
+                                    "src": "2477:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 1026,
+                                "id": 1022,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -2890,7 +2873,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "2497:21:5",
+                                "src": "2477:21:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_storage_ptr",
@@ -2905,18 +2888,18 @@
                                   "typeString": "bytes storage pointer"
                                 }
                               ],
-                              "id": 1021,
+                              "id": 1017,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "2487:9:5",
+                              "src": "2467:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 1027,
+                            "id": 1023,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -2925,7 +2908,7 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "2487:32:5",
+                            "src": "2467:32:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -2939,12 +2922,12 @@
                               {
                                 "arguments": [
                                   {
-                                    "id": 1031,
+                                    "id": 1027,
                                     "name": "_customerId",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
-                                    "referencedDeclaration": 1002,
-                                    "src": "2539:11:5",
+                                    "referencedDeclaration": 1000,
+                                    "src": "2519:11:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_memory_ptr",
                                       "typeString": "string memory"
@@ -2958,26 +2941,26 @@
                                       "typeString": "string memory"
                                     }
                                   ],
-                                  "id": 1030,
+                                  "id": 1026,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "2533:5:5",
+                                  "src": "2513:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 1029,
+                                    "id": 1025,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "2533:5:5",
+                                    "src": "2513:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 1032,
+                                "id": 1028,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -2986,7 +2969,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "2533:18:5",
+                                "src": "2513:18:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory_ptr",
@@ -3001,18 +2984,18 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "id": 1028,
+                              "id": 1024,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "2523:9:5",
+                              "src": "2503:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 1033,
+                            "id": 1029,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -3021,14 +3004,14 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "2523:29:5",
+                            "src": "2503:29:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
                             }
                           },
-                          "src": "2487:65:5",
+                          "src": "2467:65:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
@@ -3041,7 +3024,7 @@
                             "typeIdentifier": "t_bytes32",
                             "typeString": "bytes32"
                           },
-                          "id": 1048,
+                          "id": 1044,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -3052,27 +3035,27 @@
                                 "arguments": [
                                   {
                                     "expression": {
-                                      "id": 1038,
+                                      "id": 1034,
                                       "name": "job",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 1015,
-                                      "src": "2589:3:5",
+                                      "referencedDeclaration": 1011,
+                                      "src": "2569:3:5",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                                         "typeString": "struct WorkLOB.Job storage pointer"
                                       }
                                     },
-                                    "id": 1039,
+                                    "id": 1035,
                                     "isConstant": false,
                                     "isLValue": true,
                                     "isPure": false,
                                     "lValueRequested": false,
-                                    "memberLocation": "2593:8:5",
+                                    "memberLocation": "2573:8:5",
                                     "memberName": "talentId",
                                     "nodeType": "MemberAccess",
                                     "referencedDeclaration": 793,
-                                    "src": "2589:12:5",
+                                    "src": "2569:12:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_storage",
                                       "typeString": "string storage ref"
@@ -3086,26 +3069,26 @@
                                       "typeString": "string storage ref"
                                     }
                                   ],
-                                  "id": 1037,
+                                  "id": 1033,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "2583:5:5",
+                                  "src": "2563:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 1036,
+                                    "id": 1032,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "2583:5:5",
+                                    "src": "2563:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 1040,
+                                "id": 1036,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -3114,7 +3097,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "2583:19:5",
+                                "src": "2563:19:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_storage_ptr",
@@ -3129,18 +3112,18 @@
                                   "typeString": "bytes storage pointer"
                                 }
                               ],
-                              "id": 1035,
+                              "id": 1031,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "2573:9:5",
+                              "src": "2553:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 1041,
+                            "id": 1037,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -3149,7 +3132,7 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "2573:30:5",
+                            "src": "2553:30:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -3163,12 +3146,12 @@
                               {
                                 "arguments": [
                                   {
-                                    "id": 1045,
+                                    "id": 1041,
                                     "name": "_talentId",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
-                                    "referencedDeclaration": 1004,
-                                    "src": "2623:9:5",
+                                    "referencedDeclaration": 1002,
+                                    "src": "2603:9:5",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_string_memory_ptr",
                                       "typeString": "string memory"
@@ -3182,26 +3165,26 @@
                                       "typeString": "string memory"
                                     }
                                   ],
-                                  "id": 1044,
+                                  "id": 1040,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "2617:5:5",
+                                  "src": "2597:5:5",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                                     "typeString": "type(bytes storage pointer)"
                                   },
                                   "typeName": {
-                                    "id": 1043,
+                                    "id": 1039,
                                     "name": "bytes",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "2617:5:5",
+                                    "src": "2597:5:5",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 1046,
+                                "id": 1042,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -3210,7 +3193,7 @@
                                 "nameLocations": [],
                                 "names": [],
                                 "nodeType": "FunctionCall",
-                                "src": "2617:16:5",
+                                "src": "2597:16:5",
                                 "tryCall": false,
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory_ptr",
@@ -3225,18 +3208,18 @@
                                   "typeString": "bytes memory"
                                 }
                               ],
-                              "id": 1042,
+                              "id": 1038,
                               "name": "keccak256",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967288,
-                              "src": "2607:9:5",
+                              "src": "2587:9:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
                                 "typeString": "function (bytes memory) pure returns (bytes32)"
                               }
                             },
-                            "id": 1047,
+                            "id": 1043,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -3245,20 +3228,20 @@
                             "nameLocations": [],
                             "names": [],
                             "nodeType": "FunctionCall",
-                            "src": "2607:27:5",
+                            "src": "2587:27:5",
                             "tryCall": false,
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
                               "typeString": "bytes32"
                             }
                           },
-                          "src": "2573:61:5",
+                          "src": "2553:61:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
                             "typeString": "bool"
                           }
                         },
-                        "src": "2487:147:5",
+                        "src": "2467:147:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -3266,14 +3249,14 @@
                       },
                       {
                         "hexValue": "496e76616c696420637573746f6d6572206f722074616c656e74204944",
-                        "id": 1050,
+                        "id": 1046,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "2649:31:5",
+                        "src": "2629:31:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_8cd47b8fdfd52f34ba1b669f2633790b0792855e6db599b938dc473108dde464",
                           "typeString": "literal_string \"Invalid customer or talent ID\""
@@ -3292,7 +3275,7 @@
                           "typeString": "literal_string \"Invalid customer or talent ID\""
                         }
                       ],
-                      "id": 1020,
+                      "id": 1016,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -3300,13 +3283,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "2465:7:5",
+                      "src": "2445:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 1051,
+                    "id": 1047,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -3315,16 +3298,16 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "2465:226:5",
+                    "src": "2445:226:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1052,
+                  "id": 1048,
                   "nodeType": "ExpressionStatement",
-                  "src": "2465:226:5"
+                  "src": "2445:226:5"
                 },
                 {
                   "expression": {
@@ -3334,34 +3317,34 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 1057,
+                        "id": 1053,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "expression": {
-                            "id": 1054,
+                            "id": 1050,
                             "name": "job",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1015,
-                            "src": "2710:3:5",
+                            "referencedDeclaration": 1011,
+                            "src": "2690:3:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                               "typeString": "struct WorkLOB.Job storage pointer"
                             }
                           },
-                          "id": 1055,
+                          "id": 1051,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
-                          "memberLocation": "2714:6:5",
+                          "memberLocation": "2694:6:5",
                           "memberName": "status",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": 801,
-                          "src": "2710:10:5",
+                          "src": "2690:10:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
@@ -3371,21 +3354,21 @@
                         "operator": "==",
                         "rightExpression": {
                           "hexValue": "32",
-                          "id": 1056,
+                          "id": 1052,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "kind": "number",
                           "lValueRequested": false,
                           "nodeType": "Literal",
-                          "src": "2724:1:5",
+                          "src": "2704:1:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_rational_2_by_1",
                             "typeString": "int_const 2"
                           },
                           "value": "2"
                         },
-                        "src": "2710:15:5",
+                        "src": "2690:15:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -3393,14 +3376,14 @@
                       },
                       {
                         "hexValue": "4a6f62206973206e6f7420636f6d706c6574656420796574",
-                        "id": 1058,
+                        "id": 1054,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "2727:26:5",
+                        "src": "2707:26:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_106108a0d23991576c0158ccc2e7e50c62c755f86eb421dbdd15e4333d4e4910",
                           "typeString": "literal_string \"Job is not completed yet\""
@@ -3419,7 +3402,7 @@
                           "typeString": "literal_string \"Job is not completed yet\""
                         }
                       ],
-                      "id": 1053,
+                      "id": 1049,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -3427,13 +3410,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "2702:7:5",
+                      "src": "2682:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 1059,
+                    "id": 1055,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -3442,47 +3425,47 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "2702:52:5",
+                    "src": "2682:52:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1060,
+                  "id": 1056,
                   "nodeType": "ExpressionStatement",
-                  "src": "2702:52:5"
+                  "src": "2682:52:5"
                 },
                 {
                   "expression": {
-                    "id": 1065,
+                    "id": 1061,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 1061,
+                        "id": 1057,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1015,
-                        "src": "2767:3:5",
+                        "referencedDeclaration": 1011,
+                        "src": "2747:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 1063,
+                      "id": 1059,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
-                      "memberLocation": "2771:14:5",
+                      "memberLocation": "2751:14:5",
                       "memberName": "customerWallet",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 795,
-                      "src": "2767:18:5",
+                      "src": "2747:18:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -3491,57 +3474,57 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 1064,
+                      "id": 1060,
                       "name": "_customerWallet",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1006,
-                      "src": "2788:15:5",
+                      "referencedDeclaration": 1004,
+                      "src": "2768:15:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "2767:36:5",
+                    "src": "2747:36:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 1066,
+                  "id": 1062,
                   "nodeType": "ExpressionStatement",
-                  "src": "2767:36:5"
+                  "src": "2747:36:5"
                 },
                 {
                   "expression": {
-                    "id": 1071,
+                    "id": 1067,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 1067,
+                        "id": 1063,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1015,
-                        "src": "2814:3:5",
+                        "referencedDeclaration": 1011,
+                        "src": "2794:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 1069,
+                      "id": 1065,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
-                      "memberLocation": "2818:6:5",
+                      "memberLocation": "2798:6:5",
                       "memberName": "chatId",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 803,
-                      "src": "2814:10:5",
+                      "src": "2794:10:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_storage",
                         "typeString": "string storage ref"
@@ -3550,57 +3533,57 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 1070,
+                      "id": 1066,
                       "name": "_chatId",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1008,
-                      "src": "2827:7:5",
+                      "referencedDeclaration": 1006,
+                      "src": "2807:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
                         "typeString": "string memory"
                       }
                     },
-                    "src": "2814:20:5",
+                    "src": "2794:20:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage",
                       "typeString": "string storage ref"
                     }
                   },
-                  "id": 1072,
+                  "id": 1068,
                   "nodeType": "ExpressionStatement",
-                  "src": "2814:20:5"
+                  "src": "2794:20:5"
                 },
                 {
                   "expression": {
-                    "id": 1077,
+                    "id": 1073,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 1073,
+                        "id": 1069,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1015,
-                        "src": "2867:3:5",
+                        "referencedDeclaration": 1011,
+                        "src": "2847:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 1075,
+                      "id": 1071,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
-                      "memberLocation": "2871:6:5",
+                      "memberLocation": "2851:6:5",
                       "memberName": "status",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 801,
-                      "src": "2867:10:5",
+                      "src": "2847:10:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -3610,44 +3593,44 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "33",
-                      "id": 1076,
+                      "id": 1072,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "2880:1:5",
+                      "src": "2860:1:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_3_by_1",
                         "typeString": "int_const 3"
                       },
                       "value": "3"
                     },
-                    "src": "2867:14:5",
+                    "src": "2847:14:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 1078,
+                  "id": 1074,
                   "nodeType": "ExpressionStatement",
-                  "src": "2867:14:5"
+                  "src": "2847:14:5"
                 },
                 {
                   "assignments": [
-                    1080
+                    1076
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1080,
+                      "id": 1076,
                       "mutability": "mutable",
                       "name": "talentWallet",
-                      "nameLocation": "2902:12:5",
+                      "nameLocation": "2882:12:5",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1145,
-                      "src": "2894:20:5",
+                      "scope": 1141,
+                      "src": "2874:20:5",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -3655,10 +3638,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 1079,
+                        "id": 1075,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "2894:7:5",
+                        "src": "2874:7:5",
                         "stateMutability": "nonpayable",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -3668,37 +3651,37 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1083,
+                  "id": 1079,
                   "initialValue": {
                     "expression": {
-                      "id": 1081,
+                      "id": 1077,
                       "name": "job",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1015,
-                      "src": "2917:3:5",
+                      "referencedDeclaration": 1011,
+                      "src": "2897:3:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                         "typeString": "struct WorkLOB.Job storage pointer"
                       }
                     },
-                    "id": 1082,
+                    "id": 1078,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
-                    "memberLocation": "2921:12:5",
+                    "memberLocation": "2901:12:5",
                     "memberName": "talentWallet",
                     "nodeType": "MemberAccess",
                     "referencedDeclaration": 797,
-                    "src": "2917:16:5",
+                    "src": "2897:16:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "2894:39:5"
+                  "src": "2874:39:5"
                 },
                 {
                   "expression": {
@@ -3708,18 +3691,18 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 1090,
+                        "id": 1086,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 1085,
+                          "id": 1081,
                           "name": "talentWallet",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1080,
-                          "src": "2952:12:5",
+                          "referencedDeclaration": 1076,
+                          "src": "2932:12:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -3731,14 +3714,14 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 1088,
+                              "id": 1084,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "kind": "number",
                               "lValueRequested": false,
                               "nodeType": "Literal",
-                              "src": "2976:1:5",
+                              "src": "2956:1:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_rational_0_by_1",
                                 "typeString": "int_const 0"
@@ -3753,26 +3736,26 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 1087,
+                            "id": 1083,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "2968:7:5",
+                            "src": "2948:7:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 1086,
+                              "id": 1082,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "2968:7:5",
+                              "src": "2948:7:5",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 1089,
+                          "id": 1085,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -3781,14 +3764,14 @@
                           "nameLocations": [],
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "2968:10:5",
+                          "src": "2948:10:5",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
                           }
                         },
-                        "src": "2952:26:5",
+                        "src": "2932:26:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -3796,14 +3779,14 @@
                       },
                       {
                         "hexValue": "54616c656e742077616c6c6574206e6f7420736574",
-                        "id": 1091,
+                        "id": 1087,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "2980:23:5",
+                        "src": "2960:23:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_8860463786d687cc353bb151b890da489feafcfc5983f38a4dcc30f4b190486e",
                           "typeString": "literal_string \"Talent wallet not set\""
@@ -3822,7 +3805,7 @@
                           "typeString": "literal_string \"Talent wallet not set\""
                         }
                       ],
-                      "id": 1084,
+                      "id": 1080,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -3830,13 +3813,13 @@
                         4294967278
                       ],
                       "referencedDeclaration": 4294967278,
-                      "src": "2944:7:5",
+                      "src": "2924:7:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 1092,
+                    "id": 1088,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -3845,31 +3828,31 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "2944:60:5",
+                    "src": "2924:60:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1093,
+                  "id": 1089,
                   "nodeType": "ExpressionStatement",
-                  "src": "2944:60:5"
+                  "src": "2924:60:5"
                 },
                 {
                   "assignments": [
-                    1095
+                    1091
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1095,
+                      "id": 1091,
                       "mutability": "mutable",
                       "name": "amountToTalent",
-                      "nameLocation": "3025:14:5",
+                      "nameLocation": "3005:14:5",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1145,
-                      "src": "3017:22:5",
+                      "scope": 1141,
+                      "src": "2997:22:5",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -3877,10 +3860,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 1094,
+                        "id": 1090,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "3017:7:5",
+                        "src": "2997:7:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -3889,13 +3872,13 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1103,
+                  "id": 1099,
                   "initialValue": {
                     "commonType": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 1102,
+                    "id": 1098,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -3907,34 +3890,34 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 1099,
+                          "id": 1095,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftExpression": {
                             "expression": {
-                              "id": 1096,
+                              "id": 1092,
                               "name": "job",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 1015,
-                              "src": "3043:3:5",
+                              "referencedDeclaration": 1011,
+                              "src": "3023:3:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                                 "typeString": "struct WorkLOB.Job storage pointer"
                               }
                             },
-                            "id": 1097,
+                            "id": 1093,
                             "isConstant": false,
                             "isLValue": true,
                             "isPure": false,
                             "lValueRequested": false,
-                            "memberLocation": "3047:6:5",
+                            "memberLocation": "3027:6:5",
                             "memberName": "amount",
                             "nodeType": "MemberAccess",
                             "referencedDeclaration": 799,
-                            "src": "3043:10:5",
+                            "src": "3023:10:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
@@ -3944,35 +3927,35 @@
                           "operator": "*",
                           "rightExpression": {
                             "hexValue": "3935",
-                            "id": 1098,
+                            "id": 1094,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "kind": "number",
                             "lValueRequested": false,
                             "nodeType": "Literal",
-                            "src": "3056:2:5",
+                            "src": "3036:2:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_rational_95_by_1",
                               "typeString": "int_const 95"
                             },
                             "value": "95"
                           },
-                          "src": "3043:15:5",
+                          "src": "3023:15:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           }
                         }
                       ],
-                      "id": 1100,
+                      "id": 1096,
                       "isConstant": false,
                       "isInlineArray": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "nodeType": "TupleExpression",
-                      "src": "3042:17:5",
+                      "src": "3022:17:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -3982,43 +3965,43 @@
                     "operator": "/",
                     "rightExpression": {
                       "hexValue": "313030",
-                      "id": 1101,
+                      "id": 1097,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "3062:3:5",
+                      "src": "3042:3:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_100_by_1",
                         "typeString": "int_const 100"
                       },
                       "value": "100"
                     },
-                    "src": "3042:23:5",
+                    "src": "3022:23:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "3017:48:5"
+                  "src": "2997:48:5"
                 },
                 {
                   "assignments": [
-                    1105
+                    1101
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1105,
+                      "id": 1101,
                       "mutability": "mutable",
                       "name": "remainingAmount",
-                      "nameLocation": "3084:15:5",
+                      "nameLocation": "3064:15:5",
                       "nodeType": "VariableDeclaration",
-                      "scope": 1145,
-                      "src": "3076:23:5",
+                      "scope": 1141,
+                      "src": "3056:23:5",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -4026,10 +4009,10 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 1104,
+                        "id": 1100,
                         "name": "uint256",
                         "nodeType": "ElementaryTypeName",
-                        "src": "3076:7:5",
+                        "src": "3056:7:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -4038,40 +4021,40 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1110,
+                  "id": 1106,
                   "initialValue": {
                     "commonType": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 1109,
+                    "id": 1105,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "expression": {
-                        "id": 1106,
+                        "id": 1102,
                         "name": "job",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1015,
-                        "src": "3102:3:5",
+                        "referencedDeclaration": 1011,
+                        "src": "3082:3:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                           "typeString": "struct WorkLOB.Job storage pointer"
                         }
                       },
-                      "id": 1107,
+                      "id": 1103,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "3106:6:5",
+                      "memberLocation": "3086:6:5",
                       "memberName": "amount",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 799,
-                      "src": "3102:10:5",
+                      "src": "3082:10:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -4080,36 +4063,36 @@
                     "nodeType": "BinaryOperation",
                     "operator": "-",
                     "rightExpression": {
-                      "id": 1108,
+                      "id": 1104,
                       "name": "amountToTalent",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1095,
-                      "src": "3115:14:5",
+                      "referencedDeclaration": 1091,
+                      "src": "3095:14:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "3102:27:5",
+                    "src": "3082:27:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "3076:53:5"
+                  "src": "3056:53:5"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 1116,
+                        "id": 1112,
                         "name": "amountToTalent",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1095,
-                        "src": "3173:14:5",
+                        "referencedDeclaration": 1091,
+                        "src": "3153:14:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -4126,12 +4109,12 @@
                       "expression": {
                         "arguments": [
                           {
-                            "id": 1113,
+                            "id": 1109,
                             "name": "talentWallet",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1080,
-                            "src": "3150:12:5",
+                            "referencedDeclaration": 1076,
+                            "src": "3130:12:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -4145,27 +4128,27 @@
                               "typeString": "address"
                             }
                           ],
-                          "id": 1112,
+                          "id": 1108,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "3142:8:5",
+                          "src": "3122:8:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_payable_$",
                             "typeString": "type(address payable)"
                           },
                           "typeName": {
-                            "id": 1111,
+                            "id": 1107,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "3142:8:5",
+                            "src": "3122:8:5",
                             "stateMutability": "payable",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 1114,
+                        "id": 1110,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -4174,28 +4157,28 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "3142:21:5",
+                        "src": "3122:21:5",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address_payable",
                           "typeString": "address payable"
                         }
                       },
-                      "id": 1115,
+                      "id": 1111,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "3164:8:5",
+                      "memberLocation": "3144:8:5",
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "src": "3142:30:5",
+                      "src": "3122:30:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_transfer_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 1117,
+                    "id": 1113,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4204,27 +4187,27 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3142:46:5",
+                    "src": "3122:46:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1118,
+                  "id": 1114,
                   "nodeType": "ExpressionStatement",
-                  "src": "3142:46:5"
+                  "src": "3122:46:5"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 1124,
+                        "id": 1120,
                         "name": "remainingAmount",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1105,
-                        "src": "3223:15:5",
+                        "referencedDeclaration": 1101,
+                        "src": "3203:15:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -4241,12 +4224,12 @@
                       "expression": {
                         "arguments": [
                           {
-                            "id": 1121,
+                            "id": 1117,
                             "name": "owner",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 813,
-                            "src": "3207:5:5",
+                            "src": "3187:5:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -4260,27 +4243,27 @@
                               "typeString": "address"
                             }
                           ],
-                          "id": 1120,
+                          "id": 1116,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "3199:8:5",
+                          "src": "3179:8:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_payable_$",
                             "typeString": "type(address payable)"
                           },
                           "typeName": {
-                            "id": 1119,
+                            "id": 1115,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "3199:8:5",
+                            "src": "3179:8:5",
                             "stateMutability": "payable",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 1122,
+                        "id": 1118,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -4289,28 +4272,28 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "3199:14:5",
+                        "src": "3179:14:5",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address_payable",
                           "typeString": "address payable"
                         }
                       },
-                      "id": 1123,
+                      "id": 1119,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "3214:8:5",
+                      "memberLocation": "3194:8:5",
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "src": "3199:23:5",
+                      "src": "3179:23:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_transfer_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 1125,
+                    "id": 1121,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4319,55 +4302,55 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3199:40:5",
+                    "src": "3179:40:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1126,
+                  "id": 1122,
                   "nodeType": "ExpressionStatement",
-                  "src": "3199:40:5"
+                  "src": "3179:40:5"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
                         "expression": {
-                          "id": 1131,
+                          "id": 1127,
                           "name": "job",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1015,
-                          "src": "3281:3:5",
+                          "referencedDeclaration": 1011,
+                          "src": "3261:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                             "typeString": "struct WorkLOB.Job storage pointer"
                           }
                         },
-                        "id": 1132,
+                        "id": 1128,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "3285:14:5",
+                        "memberLocation": "3265:14:5",
                         "memberName": "customerWallet",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": 795,
-                        "src": "3281:18:5",
+                        "src": "3261:18:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 1133,
+                        "id": 1129,
                         "name": "rewardAmount",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 816,
-                        "src": "3301:12:5",
+                        "src": "3281:12:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -4388,12 +4371,12 @@
                       "expression": {
                         "arguments": [
                           {
-                            "id": 1128,
+                            "id": 1124,
                             "name": "LOBToken",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 811,
-                            "src": "3262:8:5",
+                            "src": "3242:8:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -4407,18 +4390,18 @@
                               "typeString": "address"
                             }
                           ],
-                          "id": 1127,
+                          "id": 1123,
                           "name": "ILOBToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1157,
-                          "src": "3252:9:5",
+                          "referencedDeclaration": 1153,
+                          "src": "3232:9:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ILOBToken_$1157_$",
+                            "typeIdentifier": "t_type$_t_contract$_ILOBToken_$1153_$",
                             "typeString": "type(contract ILOBToken)"
                           }
                         },
-                        "id": 1129,
+                        "id": 1125,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -4427,29 +4410,29 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "3252:19:5",
+                        "src": "3232:19:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ILOBToken_$1157",
+                          "typeIdentifier": "t_contract$_ILOBToken_$1153",
                           "typeString": "contract ILOBToken"
                         }
                       },
-                      "id": 1130,
+                      "id": 1126,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "3272:8:5",
+                      "memberLocation": "3252:8:5",
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1156,
-                      "src": "3252:28:5",
+                      "referencedDeclaration": 1152,
+                      "src": "3232:28:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
                         "typeString": "function (address,uint256) external returns (bool)"
                       }
                     },
-                    "id": 1134,
+                    "id": 1130,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4458,55 +4441,55 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3252:62:5",
+                    "src": "3232:62:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
-                  "id": 1135,
+                  "id": 1131,
                   "nodeType": "ExpressionStatement",
-                  "src": "3252:62:5"
+                  "src": "3232:62:5"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
                         "expression": {
-                          "id": 1140,
+                          "id": 1136,
                           "name": "job",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1015,
-                          "src": "3354:3:5",
+                          "referencedDeclaration": 1011,
+                          "src": "3334:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_struct$_Job_$804_storage_ptr",
                             "typeString": "struct WorkLOB.Job storage pointer"
                           }
                         },
-                        "id": 1141,
+                        "id": 1137,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "3358:12:5",
+                        "memberLocation": "3338:12:5",
                         "memberName": "talentWallet",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": 797,
-                        "src": "3354:16:5",
+                        "src": "3334:16:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 1142,
+                        "id": 1138,
                         "name": "rewardAmount",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 816,
-                        "src": "3372:12:5",
+                        "src": "3352:12:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -4527,12 +4510,12 @@
                       "expression": {
                         "arguments": [
                           {
-                            "id": 1137,
+                            "id": 1133,
                             "name": "LOBToken",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 811,
-                            "src": "3335:8:5",
+                            "src": "3315:8:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
                               "typeString": "address"
@@ -4546,18 +4529,18 @@
                               "typeString": "address"
                             }
                           ],
-                          "id": 1136,
+                          "id": 1132,
                           "name": "ILOBToken",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1157,
-                          "src": "3325:9:5",
+                          "referencedDeclaration": 1153,
+                          "src": "3305:9:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ILOBToken_$1157_$",
+                            "typeIdentifier": "t_type$_t_contract$_ILOBToken_$1153_$",
                             "typeString": "type(contract ILOBToken)"
                           }
                         },
-                        "id": 1138,
+                        "id": 1134,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -4566,29 +4549,29 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "3325:19:5",
+                        "src": "3305:19:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ILOBToken_$1157",
+                          "typeIdentifier": "t_contract$_ILOBToken_$1153",
                           "typeString": "contract ILOBToken"
                         }
                       },
-                      "id": 1139,
+                      "id": 1135,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "3345:8:5",
+                      "memberLocation": "3325:8:5",
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1156,
-                      "src": "3325:28:5",
+                      "referencedDeclaration": 1152,
+                      "src": "3305:28:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
                         "typeString": "function (address,uint256) external returns (bool)"
                       }
                     },
-                    "id": 1143,
+                    "id": 1139,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4597,57 +4580,67 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3325:60:5",
+                    "src": "3305:60:5",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
-                  "id": 1144,
+                  "id": 1140,
                   "nodeType": "ExpressionStatement",
-                  "src": "3325:60:5"
+                  "src": "3305:60:5"
                 }
               ]
             },
             "functionSelector": "52db0243",
-            "id": 1146,
+            "id": 1142,
             "implemented": true,
             "kind": "function",
-            "modifiers": [
-              {
-                "id": 1011,
-                "kind": "modifierInvocation",
-                "modifierName": {
-                  "id": 1010,
-                  "name": "onlyOwner",
-                  "nameLocations": [
-                    "2403:9:5"
-                  ],
-                  "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 843,
-                  "src": "2403:9:5"
-                },
-                "nodeType": "ModifierInvocation",
-                "src": "2403:9:5"
-              }
-            ],
+            "modifiers": [],
             "name": "confirm",
-            "nameLocation": "2192:7:5",
+            "nameLocation": "2182:7:5",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1009,
+              "id": 1007,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1000,
+                  "id": 998,
                   "mutability": "mutable",
                   "name": "_jobId",
-                  "nameLocation": "2224:6:5",
+                  "nameLocation": "2214:6:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1146,
-                  "src": "2210:20:5",
+                  "scope": 1142,
+                  "src": "2200:20:5",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 997,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2200:6:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1000,
+                  "mutability": "mutable",
+                  "name": "_customerId",
+                  "nameLocation": "2245:11:5",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1142,
+                  "src": "2231:25:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -4658,7 +4651,7 @@
                     "id": 999,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2210:6:5",
+                    "src": "2231:6:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -4670,11 +4663,11 @@
                   "constant": false,
                   "id": 1002,
                   "mutability": "mutable",
-                  "name": "_customerId",
-                  "nameLocation": "2255:11:5",
+                  "name": "_talentId",
+                  "nameLocation": "2281:9:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1146,
-                  "src": "2241:25:5",
+                  "scope": 1142,
+                  "src": "2267:23:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -4685,7 +4678,7 @@
                     "id": 1001,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2241:6:5",
+                    "src": "2267:6:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -4697,38 +4690,11 @@
                   "constant": false,
                   "id": 1004,
                   "mutability": "mutable",
-                  "name": "_talentId",
-                  "nameLocation": "2291:9:5",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 1146,
-                  "src": "2277:23:5",
-                  "stateVariable": false,
-                  "storageLocation": "memory",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string"
-                  },
-                  "typeName": {
-                    "id": 1003,
-                    "name": "string",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "2277:6:5",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string"
-                    }
-                  },
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 1006,
-                  "mutability": "mutable",
                   "name": "_customerWallet",
-                  "nameLocation": "2319:15:5",
+                  "nameLocation": "2309:15:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1146,
-                  "src": "2311:23:5",
+                  "scope": 1142,
+                  "src": "2301:23:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4736,10 +4702,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1005,
+                    "id": 1003,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2311:7:5",
+                    "src": "2301:7:5",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -4750,13 +4716,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1008,
+                  "id": 1006,
                   "mutability": "mutable",
                   "name": "_chatId",
-                  "nameLocation": "2359:7:5",
+                  "nameLocation": "2349:7:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1146,
-                  "src": "2345:21:5",
+                  "scope": 1142,
+                  "src": "2335:21:5",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -4764,10 +4730,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1007,
+                    "id": 1005,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2345:6:5",
+                    "src": "2335:6:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -4776,23 +4742,23 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2199:196:5"
+              "src": "2189:196:5"
             },
             "returnParameters": {
-              "id": 1012,
+              "id": 1008,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2413:0:5"
+              "src": "2393:0:5"
             },
-            "scope": 1147,
-            "src": "2183:1210:5",
+            "scope": 1143,
+            "src": "2173:1200:5",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1158,
-        "src": "60:3336:5",
+        "scope": 1154,
+        "src": "60:3316:5",
         "usedErrors": [],
         "usedEvents": []
       },
@@ -4803,36 +4769,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 1157,
+        "id": 1153,
         "linearizedBaseContracts": [
-          1157
+          1153
         ],
         "name": "ILOBToken",
-        "nameLocation": "3410:9:5",
+        "nameLocation": "3390:9:5",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "a9059cbb",
-            "id": 1156,
+            "id": 1152,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "transfer",
-            "nameLocation": "3436:8:5",
+            "nameLocation": "3416:8:5",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1152,
+              "id": 1148,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1149,
+                  "id": 1145,
                   "mutability": "mutable",
                   "name": "recipient",
-                  "nameLocation": "3453:9:5",
+                  "nameLocation": "3433:9:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1156,
-                  "src": "3445:17:5",
+                  "scope": 1152,
+                  "src": "3425:17:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4840,10 +4806,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1148,
+                    "id": 1144,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3445:7:5",
+                    "src": "3425:7:5",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -4854,13 +4820,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1151,
+                  "id": 1147,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "3472:6:5",
+                  "nameLocation": "3452:6:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1156,
-                  "src": "3464:14:5",
+                  "scope": 1152,
+                  "src": "3444:14:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4868,10 +4834,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1150,
+                    "id": 1146,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3464:7:5",
+                    "src": "3444:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -4880,21 +4846,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3444:35:5"
+              "src": "3424:35:5"
             },
             "returnParameters": {
-              "id": 1155,
+              "id": 1151,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1154,
+                  "id": 1150,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1156,
-                  "src": "3498:4:5",
+                  "scope": 1152,
+                  "src": "3478:4:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4902,10 +4868,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 1153,
+                    "id": 1149,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3498:4:5",
+                    "src": "3478:4:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -4914,22 +4880,22 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3497:6:5"
+              "src": "3477:6:5"
             },
-            "scope": 1157,
-            "src": "3427:77:5",
+            "scope": 1153,
+            "src": "3407:77:5",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1158,
-        "src": "3400:107:5",
+        "scope": 1154,
+        "src": "3380:107:5",
         "usedErrors": [],
         "usedEvents": []
       }
     ],
-    "src": "33:3476:5"
+    "src": "33:3456:5"
   },
   "compiler": {
     "name": "solc",
@@ -4937,7 +4903,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-25T15:42:50.701Z",
+  "updatedAt": "2025-02-26T12:56:50.791Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
