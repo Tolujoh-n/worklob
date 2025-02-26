@@ -29,4 +29,6 @@
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser. 
 
-### WORKLOB
+### WORKLOB 
+
+- Most Update needed: Need to resolve confimation on chat, chatting and Claiming staking and restaking, convertion of price to USD in UI display.
