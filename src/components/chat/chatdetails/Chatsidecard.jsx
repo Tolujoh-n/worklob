@@ -68,8 +68,7 @@ const Chatsidecard = () => {
               <i className="fas fa-clock"></i> {jobType}
             </h5>
             <h5 className="card-title">
-              <i className="fas fa-dollar-sign"> </i>
-              {job.budget} {job.fixedCompensation}
+              {job.budget} {job.fixedCompensation} TIA
             </h5>
           </div>
         </div>
@@ -86,8 +85,7 @@ const Chatsidecard = () => {
               {job.deliveryDays || "N/A"}
             </h5>
             <h5 className="card-title">
-              <i className="fas fa-dollar-sign"> </i>
-              {job.budget} {job.fixedCompensation}
+              {job.budget} {job.fixedCompensation} TIA
             </h5>
           </div>
         </div>

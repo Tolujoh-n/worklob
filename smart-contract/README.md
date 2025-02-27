@@ -12,15 +12,15 @@ npm install --save @openzeppelin/contracts
 
 ## Deploy
 
-- `truffle migrate --network baseTestnet`
+- `truffle migrate --network flameTestnet`
 
-- Deploy a specific contract by selecting it's migration number `truffle migrate --network baseTestnet --f 3 --to 3`
+- Deploy a specific contract by selecting it's migration number `truffle migrate --network flameTestnet --f 3 --to 3`
 
 ##
 
-- LOB_TOKEN_ADDRESS: 0xC677a1b3461B2417D7789331357606d8Bb17FD24
-- STAKING_ADDRESS: 0x5B4fB44257c4CC1c178B4a2f63B99d03528b5eFD
-- JOB_CONTRACT_ADDRESS: 0xAa00e2c3970B9690A67043986d8bF0B0F780474b
+- LOB_TOKEN_ADDRESS: 0x77950BA34F2EB2C3ce6cb0A0b73E894ba57B82b8
+- STAKING_ADDRESS: 0xA0754eAFacf78b81839D7FD8D6Bf9FB777EC3576
+- JOB_CONTRACT_ADDRESS: 0xcD370B6B14fEf75C88b68Ceb98b3dFfE2D6Feb8b
 
 ##
 

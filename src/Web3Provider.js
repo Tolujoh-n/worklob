@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import Web3 from "web3";
 import {
-  BASE_TESTNET_PARAMS,
+  FLAME_TESTNET_PARAMS,
   LOB_TOKEN_ABI,
   LOB_TOKEN_ADDRESS,
 } from "./components/Constants";
@@ -37,20 +37,20 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const switchToBaseTestnet = async () => {
+  const switchToFlameTestnet = async () => {
     try {
       const currentChainId = await window.ethereum.request({
         method: "eth_chainId",
       });
 
-      const baseTestnetChainId = `0x${BASE_TESTNET_PARAMS.chainId.toString(
+      const flameTestnetChainId = `0x${FLAME_TESTNET_PARAMS.chainId.toString(
         16
       )}`;
 
-      if (currentChainId !== baseTestnetChainId) {
+      if (currentChainId !== flameTestnetChainId) {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: baseTestnetChainId }],
+          params: [{ chainId: flameTestnetChainId }],
         });
       }
     } catch (error) {
@@ -60,16 +60,16 @@ export const Web3Provider = ({ children }) => {
             method: "wallet_addEthereumChain",
             params: [
               {
-                chainId: `0x${BASE_TESTNET_PARAMS.chainId.toString(16)}`,
-                chainName: BASE_TESTNET_PARAMS.chainName,
-                nativeCurrency: BASE_TESTNET_PARAMS.nativeCurrency,
-                rpcUrls: BASE_TESTNET_PARAMS.rpcUrls,
-                blockExplorerUrls: BASE_TESTNET_PARAMS.blockExplorerUrls,
+                chainId: `0x${FLAME_TESTNET_PARAMS.chainId.toString(16)}`,
+                chainName: FLAME_TESTNET_PARAMS.chainName,
+                nativeCurrency: FLAME_TESTNET_PARAMS.nativeCurrency,
+                rpcUrls: FLAME_TESTNET_PARAMS.rpcUrls,
+                blockExplorerUrls: FLAME_TESTNET_PARAMS.blockExplorerUrls,
               },
             ],
           });
         } catch (addError) {
-          console.error("Failed to add Base Testnet", addError);
+          console.error("Failed to add Flame Testnet", addError);
         }
       } else {
         console.error("Failed to switch network", error);
@@ -98,7 +98,7 @@ export const Web3Provider = ({ children }) => {
 
       console.log("Connected address:", accounts[0]);
 
-      await switchToBaseTestnet();
+      await switchToFlameTestnet();
       window.location.reload();
     } catch (error) {
       console.error("Wallet connection failed", error);

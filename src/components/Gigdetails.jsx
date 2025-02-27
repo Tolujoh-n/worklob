@@ -97,7 +97,7 @@ const Gigdetails = () => {
                 {" "}
                 $ {jobs.budget} {jobs.fixedCompensation}
               </h5>
-              <p className="gig-balance">ETH, USDT</p>
+              <p className="gig-balance">TIA, USDT</p>
 
               <div className="gig-actions">
                 <button

@@ -108,7 +108,7 @@ const Gigdetailsmodal = ({
             required
           >
             <option value="USDT">USDT</option>
-            <option value="ETH">ETH</option>
+            <option value="TIA">TIA</option>
           </select>
           <label>Attach CV</label>
           <input type="file" onChange={handleFileChange} required />

@@ -102,7 +102,7 @@ const Dash = () => {
               {connected ? (
                 <>
                   <h5 className="balance-amount">
-                    {parseFloat(baseETHBalance).toFixed(2)} ETH
+                    {parseFloat(baseETHBalance).toFixed(2)} TIA
                   </h5>
                   <h5 className="balance-amount">$00.00</h5>
                 </>

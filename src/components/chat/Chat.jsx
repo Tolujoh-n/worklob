@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/address.jpg";
-import eth from "../../assets/img/eth.png";
+import TIA from "../../assets/img/tia.png";
 import worklob from "../../assets/img/worklob-coin.png";
 import "./chat.css";
 import axios from "axios";
@@ -162,10 +162,10 @@ const Chat = () => {
             <h5 className="card-title">Escrow Funds:</h5>
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={eth} alt="" />
+                <img id="balance" src={TIA} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{ethBalance} ETH</h6>
+                <h6>{ethBalance} TIA</h6>
               </div>
             </div>
             <hr />

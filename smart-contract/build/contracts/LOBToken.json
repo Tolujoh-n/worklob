@@ -7278,9 +7278,16 @@
     "name": "solc",
     "version": "0.8.20+commit.a1b79de6.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "16604737732183": {
+      "events": {},
+      "links": {},
+      "address": "0x77950BA34F2EB2C3ce6cb0A0b73E894ba57B82b8",
+      "transactionHash": "0x6d8858d30ee6ebf24077c87e868aa22eb46147354495d2e1aa142b264b9cb479"
+    }
+  },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-26T12:56:50.809Z",
+  "updatedAt": "2025-02-26T16:11:24.882Z",
   "devdoc": {
     "errors": {
       "ERC20InsufficientAllowance(address,uint256,uint256)": [

@@ -5,26 +5,26 @@ import WorkLobStaking from "./abi/WorkLobStaking.json"; // Add the ABI file for 
 
 export const JOB_ABI = WorkLOB.abi;
 export const JOB_CONTRACT_ADDRESS =
-  "0xAa00e2c3970B9690A67043986d8bF0B0F780474b"; // Replace with your quiz platform contract address
+  "0xcD370B6B14fEf75C88b68Ceb98b3dFfE2D6Feb8b"; // Replace with your quiz platform contract address
 
 // LOB Token contract details
 export const LOB_TOKEN_ABI = LOBToken.abi;
-export const LOB_TOKEN_ADDRESS = "0xC677a1b3461B2417D7789331357606d8Bb17FD24"; // Replace with your LOB token contract address
+export const LOB_TOKEN_ADDRESS = "0x77950BA34F2EB2C3ce6cb0A0b73E894ba57B82b8"; // Replace with your LOB token contract address
 
 // Worklob Staking contract
 export const WorkLobStaking_abi = WorkLobStaking.abi;
 export const WorkLobStaking_address =
-  "0x5B4fB44257c4CC1c178B4a2f63B99d03528b5eFD";
+  "0xA0754eAFacf78b81839D7FD8D6Bf9FB777EC3576";
 
 // Base Sepolia Testnet configuration
-export const BASE_TESTNET_PARAMS = {
-  chainId: 84532,
-  chainName: "Base Sepolia Testnet",
+export const FLAME_TESTNET_PARAMS = {
+  chainId: 16604737732183,
+  chainName: "Flame Testnet",
   nativeCurrency: {
-    name: "ETH",
-    symbol: "ETH",
+    name: "TIA",
+    symbol: "TIA",
     decimals: 18,
   },
-  rpcUrls: ["https://sepolia.base.org"], // Base Sepolia RPC URL
-  blockExplorerUrls: ["https://sepolia-explorer.base.org"], // Block Explorer URL for Base Sepolia Testnet
+  rpcUrls: ["https://rpc.flame.dawn-1.astria.org"], // Celestia Sepolia RPC URL
+  blockExplorerUrls: ["https://explorer.flame.dawn-1.astria.org"], // Block Explorer URL for Base Sepolia Testnet
 };

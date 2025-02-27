@@ -308,7 +308,7 @@ const Fulltimeform = () => {
           {compensationMode === "Fixed" ? (
             <input
               type="number"
-              placeholder="$0.00"
+              placeholder="0.00 TIA"
               value={fixedCompensation}
               onChange={(e) => setFixedCompensation(e.target.value)}
             />
@@ -316,7 +316,7 @@ const Fulltimeform = () => {
             <>
               <input
                 type="number"
-                placeholder="Min - $0.00"
+                placeholder="Min - 0.00 TIA"
                 value={rangeCompensation.min}
                 onChange={(e) =>
                   setRangeCompensation({
@@ -328,7 +328,7 @@ const Fulltimeform = () => {
               <span>|</span>
               <input
                 type="number"
-                placeholder="Max - $0.00"
+                placeholder="Max - 0.00 TIA"
                 value={rangeCompensation.max}
                 onChange={(e) =>
                   setRangeCompensation({

@@ -3,12 +3,12 @@ import { useWeb3 } from "../../Web3Provider";
 import { Toaster, toast } from "sonner";
 import Web3 from "web3";
 import { LOB_TOKEN_ADDRESS, LOB_TOKEN_ABI } from "../Constants";
-import ETHLogo from "../../assets/img/eth.png";
+import TIALogo from "../../assets/img/tia.png";
 import LOBLogo from "../../assets/img/worklob-coin.png";
 
 const Swapmodal = ({ isOpen, onClose }) => {
   const { connectWallet, walletAddress, connected } = useWeb3();
-  const [fromToken, setFromToken] = useState("ETH");
+  const [fromToken, setFromToken] = useState("TIA");
   const [toToken, setToToken] = useState("LOB");
   const [amount, setAmount] = useState("");
 
@@ -27,7 +27,7 @@ const Swapmodal = ({ isOpen, onClose }) => {
     const sender = accounts[0];
 
     try {
-      if (fromToken === "ETH" && toToken === "LOB") {
+      if (fromToken === "TIA" && toToken === "LOB") {
         const contract = new web3.eth.Contract(
           LOB_TOKEN_ABI,
           LOB_TOKEN_ADDRESS
@@ -40,7 +40,7 @@ const Swapmodal = ({ isOpen, onClose }) => {
         await contract.methods
           .transfer(sender, web3.utils.toWei(amount, "ether"))
           .send({ from: sender });
-      } else if (fromToken === "LOB" && toToken === "ETH") {
+      } else if (fromToken === "LOB" && toToken === "TIA") {
         const contract = new web3.eth.Contract(
           LOB_TOKEN_ABI,
           LOB_TOKEN_ADDRESS
@@ -80,11 +80,11 @@ const Swapmodal = ({ isOpen, onClose }) => {
                   onChange={handleFromTokenChange}
                   style={formControlStyle}
                 >
-                  <option value="ETH">ETH (Base)</option>
+                  <option value="TIA">TIA</option>
                   <option value="LOB">LOB</option>
                 </select>
                 <img
-                  src={fromToken === "ETH" ? ETHLogo : LOBLogo}
+                  src={fromToken === "TIA" ? TIALogo : LOBLogo}
                   alt={fromToken}
                   style={tokenLogoStyle}
                 />
@@ -99,10 +99,10 @@ const Swapmodal = ({ isOpen, onClose }) => {
                   style={formControlStyle}
                 >
                   <option value="LOB">LOB</option>
-                  <option value="ETH">ETH (Base)</option>
+                  <option value="TIA">TIA</option>
                 </select>
                 <img
-                  src={toToken === "ETH" ? ETHLogo : LOBLogo}
+                  src={toToken === "TIA" ? TIALogo : LOBLogo}
                   alt={toToken}
                   style={tokenLogoStyle}
                 />

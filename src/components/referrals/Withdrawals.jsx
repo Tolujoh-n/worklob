@@ -6,9 +6,9 @@ const Withdrawals = () => {
     {
       type: "Deposit",
       date: "2024-08-30",
-      cryptocurrency: "ETH",
+      cryptocurrency: "TIA",
       transactionId: "0x3e123456789abcdef",
-      amount: "100 ETH",
+      amount: "100 TIA",
     },
     {
       type: "Withdrawal",
@@ -20,9 +20,9 @@ const Withdrawals = () => {
     {
       type: "Swap",
       date: "2024-08-27",
-      cryptocurrency: "ETH to LOB",
+      cryptocurrency: "TIA to LOB",
       transactionId: "0x3eabcdef123456789",
-      amount: "25 ETH",
+      amount: "25 TIA",
     },
     {
       type: "Deposit",

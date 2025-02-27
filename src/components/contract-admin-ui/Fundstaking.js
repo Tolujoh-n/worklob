@@ -24,7 +24,7 @@ const Fundstaking = () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
 
-        // Fetch ETH balance
+        // Fetch TIA balance
         const balance = await provider.getBalance(walletAddress);
         setUserBalance(ethers.utils.formatEther(balance));
 
@@ -141,7 +141,7 @@ const Fundstaking = () => {
             Fund Contract
           </button>
           <p className="mt-3">
-            Wallet Balance: <strong>{userBalance} ETH</strong>
+            Wallet Balance: <strong>{userBalance} TIA</strong>
           </p>
           <p className="mt-3">
             LOB Balance: <strong>{lobBalance} LOB</strong>

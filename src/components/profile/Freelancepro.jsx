@@ -187,7 +187,7 @@ const Freelancepro = ({ username }) => {
                     <input
                       type="number"
                       name="hourlyRate"
-                      placeholder="$0.00"
+                      placeholder="0.00 TIA"
                       value={personalInfo.hourlyRate}
                       onChange={handlePersonalInfoChange}
                       className="form-control"
@@ -196,7 +196,7 @@ const Freelancepro = ({ username }) => {
                   <div className="form-group">
                     <label>Preferred Payment Options</label>
                     <div className="payment-options">
-                      {["USDT", "USDC", "ETH"].map((option) => (
+                      {["USDT", "USDC", "TIA"].map((option) => (
                         <button
                           key={option}
                           type="button"

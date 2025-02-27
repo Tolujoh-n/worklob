@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import eth from "../assets/img/eth.png";
+import TIA from "../assets/img/tia.png";
 import worklob from "../assets/img/worklob-coin.png";
 import useimage from "../assets/address.jpg";
 import Modal from "./Modal";
@@ -34,10 +34,10 @@ const Sidebar = () => {
             <h5 className="card-title">Balance:</h5>
             <div className="d-flex align-items-center">
               <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <img id="balance" src={eth} alt="" />
+                <img id="balance" src={TIA} alt="" />
               </div>
               <div className="ps-3">
-                <h6>{parseFloat(baseETHBalance).toFixed(2)} ETH</h6>
+                <h6>{parseFloat(baseETHBalance).toFixed(2)} TIA</h6>
               </div>
             </div>
             <hr />

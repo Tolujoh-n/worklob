@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ETH from "../../assets/img/eth.png";
+import TIA from "../../assets/img/tia.png";
 import btc from "../../assets/img/btc.png";
 import lobcoin from "../../assets/img/worklob-coin.png";
 import { useWeb3 } from "../../Web3Provider";
@@ -27,9 +27,9 @@ const Wallet = () => {
     {
       type: "Deposit",
       date: "2024-08-30",
-      cryptocurrency: "ETH",
+      cryptocurrency: "TIA",
       transactionId: "oxs123456789abcdef",
-      amount: "100 ETH",
+      amount: "100 TIA",
     },
     {
       type: "Withdrawal",
@@ -41,9 +41,9 @@ const Wallet = () => {
     {
       type: "Swap",
       date: "2024-08-27",
-      cryptocurrency: "ETH to LOB",
+      cryptocurrency: "TIA to LOB",
       transactionId: "oxsabcdef123456789",
-      amount: "25 ETH",
+      amount: "25 TIA",
     },
     {
       type: "Deposit",
@@ -75,7 +75,7 @@ const Wallet = () => {
             <div className="wallet-header">
               <h2>Wallet Address</h2>
               <span>
-                Available Balance: {parseFloat(baseETHBalance).toFixed(2)} ETH
+                Available Balance: {parseFloat(baseETHBalance).toFixed(2)} TIA
               </span>
             </div>
             <table className="wallet-table">
@@ -89,9 +89,9 @@ const Wallet = () => {
               <tbody>
                 <tr>
                   <td>
-                    <img src={ETH} alt="ETH" className="token-logo" /> ETH
+                    <img src={TIA} alt="TIA" className="token-logo" /> TIA
                   </td>
-                  <td>{parseFloat(baseETHBalance).toFixed(2)} ETH</td>
+                  <td>{parseFloat(baseETHBalance).toFixed(2)} TIA</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>
@@ -142,9 +142,9 @@ const Wallet = () => {
               <tbody>
                 <tr>
                   <td>
-                    <img src={ETH} alt="ETH" className="token-logo" /> ETH
+                    <img src={TIA} alt="TIA" className="token-logo" /> TIA
                   </td>
-                  <td>0 ETH</td>
+                  <td>0 TIA</td>
                   <td>0.00 USDT</td>
                 </tr>
                 <tr>

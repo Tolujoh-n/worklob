@@ -225,7 +225,7 @@ const Freelanceform = () => {
               id="budget"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
-              placeholder="$0.00"
+              placeholder="0.00 TIA"
               required
             />
             <small className="freelform__note">

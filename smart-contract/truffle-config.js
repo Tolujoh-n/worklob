@@ -3,14 +3,14 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 module.exports = {
   networks: {
-    // Base Testnet Configuration
-    baseTestnet: {
+    // Flame Testnet Configuration
+    flameTestnet: {
       provider: () =>
         new HDWalletProvider(
           process.env.MNEMONIC, // Your wallet's mnemonic
-          "https://sepolia.base.org" // RPC URL for Base Testnet
+          "https://rpc.flame.dawn-1.astria.org" // RPC URL for Base Testnet
         ),
-      network_id: "*", // Network ID for Base Testnet: 84532
+      network_id: "*", // Network ID for Celestia Testnet: 16604737732183
       gas: 8000000, // Gas limit
       gasPrice: 1000000000, // Gas price (1 Gwei)
       timeoutBlocks: 200, // Increase timeout for deployment

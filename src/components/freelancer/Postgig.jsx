@@ -37,7 +37,7 @@ const Freelanceform = () => {
   const handleSkillSelect = (skill) => {
     if (!selectedSkills.includes(skill)) {
       setSelectedSkills([...selectedSkills, skill]);
-      setSkillInput(""); 
+      setSkillInput("");
     }
   };
 
@@ -47,9 +47,9 @@ const Freelanceform = () => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const fileNames = files.map((file) => file.name); 
+    const fileNames = files.map((file) => file.name);
     if (fileNames.length + fileList.length <= 10) {
-      setFileList([...fileList, ...fileNames]); 
+      setFileList([...fileList, ...fileNames]);
     } else {
       alert("You can only upload a maximum of 10 files.");
     }
@@ -68,9 +68,9 @@ const Freelanceform = () => {
     e.preventDefault();
     setDragging(false);
     const files = Array.from(e.dataTransfer.files);
-    const fileNames = files.map((file) => file.name); 
+    const fileNames = files.map((file) => file.name);
     if (fileNames.length + fileList.length <= 10) {
-      setFileList([...fileList, ...fileNames]); 
+      setFileList([...fileList, ...fileNames]);
     } else {
       alert("You can only upload a maximum of 10 files.");
     }
@@ -97,7 +97,7 @@ const Freelanceform = () => {
       description: sanitizedDescription,
       selectedSkills,
       budget,
-      fileList, 
+      fileList,
       userId,
     };
 
@@ -115,7 +115,10 @@ const Freelanceform = () => {
         }, 2000);
       }
     } catch (e) {
-      console.error("Error posting job:", e.response ? e.response.data : e.message);
+      console.error(
+        "Error posting job:",
+        e.response ? e.response.data : e.message
+      );
     }
   };
 
@@ -223,7 +226,7 @@ const Freelanceform = () => {
               id="budget"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
-              placeholder="$0.00"
+              placeholder="0.00 TIA"
               required
             />
             <small className="freelform__note">
@@ -231,8 +234,6 @@ const Freelanceform = () => {
               cryptocurrency that you arrange with the talent.
             </small>
           </div>
-
-         
 
           <div className="freelform__buttons">
             <button type="button" className="usbutton">

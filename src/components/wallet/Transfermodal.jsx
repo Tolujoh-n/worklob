@@ -6,7 +6,7 @@ import { LOB_TOKEN_ADDRESS, LOB_TOKEN_ABI } from "../Constants";
 
 const Transfermodal = ({ isOpen, onClose }) => {
   const { connectWallet, connected } = useWeb3();
-  const [token, setToken] = useState("ETH");
+  const [token, setToken] = useState("TIA");
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [sender, setSender] = useState("");
@@ -44,7 +44,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
 
     const web3 = new Web3(window.ethereum);
     let contractAddress =
-      token === "ETH"
+      token === "TIA"
         ? "0x0000000000000000000000000000000000000000"
         : LOB_TOKEN_ADDRESS;
 
@@ -52,7 +52,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
     console.log("Sender address:", sender);
 
     try {
-      if (token === "ETH") {
+      if (token === "TIA") {
         await web3.eth.sendTransaction({
           from: sender,
           to: recipient,
@@ -89,7 +89,7 @@ const Transfermodal = ({ isOpen, onClose }) => {
                 onChange={(e) => setToken(e.target.value)}
                 style={formControlStyle}
               >
-                <option value="ETH">ETH (Base)</option>
+                <option value="TIA">TIA</option>
                 <option value="LOB">LOB</option>
               </select>
             </div>
