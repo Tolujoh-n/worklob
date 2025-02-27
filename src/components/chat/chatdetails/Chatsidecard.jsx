@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../../../config";
 
 const Chatsidecard = () => {
   const [job, setJob] = useState(null);
@@ -18,11 +19,6 @@ const Chatsidecard = () => {
     applicantId = decodedToken.userId;
     isTalent = user.role === "Talent"; // Assuming 'role' defines if user is 'talent'
   }
-
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   useEffect(() => {
     const fetchJobDetails = async () => {

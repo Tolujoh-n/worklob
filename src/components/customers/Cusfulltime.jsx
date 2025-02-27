@@ -4,15 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import person from "../../assets/address.jpg";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import API_URL from "../../config";
 
 const Cusfulltime = () => {
   const [selectedTab, setSelectedTab] = useState("Published");
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
+
   const token = localStorage.getItem("token");
 
   let userId;

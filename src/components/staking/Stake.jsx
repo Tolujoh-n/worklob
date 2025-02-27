@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Staking from "./Staking";
 import Mystake from "./Mystake";
+import API_URL from "../../config";
 
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
@@ -23,11 +24,6 @@ function Stake() {
 
   // Add a fallback for user
   const username = user ? user.username : "Guest";
-
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   const handleClick = (tab) => {
     setActiveTab(tab);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaFileAlt } from "react-icons/fa";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Fulltimeprofile = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
@@ -17,10 +18,6 @@ const Fulltimeprofile = ({ username }) => {
     github: "",
   });
 
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   // Fetch full-time profile data from backend
   const fetchFullTimeProfile = async () => {

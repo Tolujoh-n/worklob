@@ -7,6 +7,7 @@ import Fulltimeprofile from "../components/profile/Fulltimeprofile";
 import Changepassword from "../components/Changepassword";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import API_URL from "../config";
 
 function Settings() {
   const token = localStorage.getItem("token");
@@ -25,11 +26,6 @@ function Settings() {
 
   // Add a fallback for user
   const username = user ? user.username : "Guest";
-
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   return (
     <>

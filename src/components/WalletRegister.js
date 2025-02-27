@@ -5,6 +5,7 @@ import metamask from "../assets/img/metamask.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { useWeb3 } from "../Web3Provider";
+import API_URL from "../config";
 
 const WalletRegister = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ const WalletRegister = () => {
 
     try {
       const response = await axios.post(
-        "https://worklob-backend.onrender.com/api/v1/user/wallet-signup",
+        `${API_URL}/api/v1/user/wallet-signup`,
         {
           username: formData.username,
           email: formData.email,

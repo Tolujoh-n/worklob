@@ -2,17 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ethers } from "ethers";
 import { JOB_CONTRACT_ADDRESS, JOB_ABI } from "../../Constants";
-
+import API_URL from "../../../config";
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 const workLOB = new ethers.Contract(JOB_CONTRACT_ADDRESS, JOB_ABI, signer);
 
 async function getAmount(jobId) {
   console.log("Fetching amount for jobId:", jobId);
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   try {
     let response = await axios.get(

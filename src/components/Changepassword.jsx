@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
+import API_URL from "../config";
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
@@ -11,11 +12,6 @@ const ChangePassword = () => {
   });
   const navigate = useNavigate();
   const userId = "670b9bd5f791f0011f067886";
-
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

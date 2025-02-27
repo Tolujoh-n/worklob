@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import person from "../../assets/address.jpg";
+import API_URL from "../../config";
 
 const Browsegigs = () => {
   const [jobs, setJobs] = useState([]);
@@ -9,11 +10,6 @@ const Browsegigs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [roleFilter, setRoleFilter] = useState("");
-
-  const API_URL =
-        process.env.REACT_APP_API_URL ||
-        "https://worklob-backend.onrender.com" ||
-        "http://localhost:8080";
 
   useEffect(() => {
     const fetchFrJobs = async () => {

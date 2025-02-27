@@ -4,6 +4,7 @@ import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import metamask from "../assets/img/metamask.png";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
+import API_URL from "../config";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -20,10 +21,6 @@ const Register = () => {
     setFormData({ ...formData, role });
     setRoleSelected(true);
   };
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,16 +55,13 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post(
-        "https://worklob-backend.onrender.com/api/v1/user/signup",
-        {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          role: formData.role,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/v1/user/signup`, {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        role: formData.role,
+      });
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);

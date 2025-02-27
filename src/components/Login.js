@@ -5,6 +5,7 @@ import { Toaster, toast } from "sonner";
 import metamask from "../assets/img/metamask.png";
 import axios from "axios";
 import { useWeb3 } from "../Web3Provider";
+import API_URL from "../config";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -35,11 +36,6 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const API_URL =
-        process.env.REACT_APP_API_URL ||
-        "https://worklob-backend.onrender.com" ||
-        "http://localhost:8080";
-
       const response = await axios.post(`${API_URL}/api/v1/user/signin`, {
         username: formData.username,
         password: formData.password,
@@ -70,10 +66,7 @@ const Login = () => {
     const loginWithWallet = async () => {
       if (connected && walletAddress) {
         try {
-          const API_URL =
-            process.env.REACT_APP_API_URL ||
-            "https://worklob-backend.onrender.com" ||
-            "http://localhost:8080";
+
           const response = await axios.post(
             `${API_URL}/api/v1/user/wallet-login`,
             {

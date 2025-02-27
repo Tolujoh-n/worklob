@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import API_URL from "../config";
 
 const Gigdetailsmodal = ({
   recruiterImage,
@@ -45,10 +46,6 @@ const Gigdetailsmodal = ({
     console.log("Form Data:", formData);
 
     try {
-      const API_URL =
-        process.env.REACT_APP_API_URL ||
-        "https://worklob-backend.onrender.com" ||
-        "http://localhost:8080";
       const response = await axios.post(
         `${API_URL}/api/v1/application/applyjob`,
         formData,

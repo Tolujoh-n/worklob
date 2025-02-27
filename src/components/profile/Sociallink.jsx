@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit } from "react-icons/fa";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Sociallink = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
@@ -10,11 +11,6 @@ const Sociallink = ({ username }) => {
     facebook: "",
     twitter: "",
   });
-
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   // Fetch social links data from backend
   const fetchSocialLinks = async () => {

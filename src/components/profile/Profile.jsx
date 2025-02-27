@@ -4,14 +4,11 @@ import profile from "../../assets/address.jpg";
 import { Link } from "react-router-dom";
 import { FaFileAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
+import API_URL from "../../config";
 
 function Profile({ username }) {
   const token = localStorage.getItem("token");
   const us = JSON.parse(localStorage.getItem("user"));
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   let userName;
 

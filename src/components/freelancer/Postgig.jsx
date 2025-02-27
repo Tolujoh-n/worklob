@@ -5,6 +5,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const availableSkills = [
   "JavaScript",
@@ -101,10 +102,6 @@ const Freelanceform = () => {
       userId,
     };
 
-    const API_URL =
-      process.env.REACT_APP_API_URL ||
-      "https://worklob-backend.onrender.com" ||
-      "http://localhost:8080";
     try {
       const response = await axios.post(
         `${API_URL}/api/v1/gigJob/postgig`,

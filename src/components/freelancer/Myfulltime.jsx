@@ -4,6 +4,7 @@ import axios from "axios";
 import person from "../../assets/address.jpg"; // Fallback image
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Myfulltime = () => {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -18,10 +19,6 @@ const Myfulltime = () => {
     const decodedToken = jwtDecode(token);
     userId = decodedToken.userId;
   }
-  const API_URL =
-    process.env.REACT_APP_API_URL ||
-    "https://worklob-backend.onrender.com" ||
-    "http://localhost:8080";
 
   const statusMap = {
     all: "all",
