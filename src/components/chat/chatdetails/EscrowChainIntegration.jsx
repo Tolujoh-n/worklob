@@ -9,7 +9,10 @@ const workLOB = new ethers.Contract(JOB_CONTRACT_ADDRESS, JOB_ABI, signer);
 
 async function getAmount(jobId) {
   console.log("Fetching amount for jobId:", jobId);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
 
   try {
     let response = await axios.get(

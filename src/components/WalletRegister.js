@@ -55,7 +55,7 @@ const WalletRegister = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/user/wallet-signup",
+        "https://worklob-backend.onrender.com/api/v1/user/wallet-signup",
         {
           username: formData.username,
           email: formData.email,

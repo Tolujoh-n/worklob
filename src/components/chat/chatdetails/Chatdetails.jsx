@@ -37,7 +37,10 @@ const Chatdetails = () => {
     isTalent = user.role === "Talent"; // Assuming 'role' defines if user is 'talent'
   }
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
 
   useEffect(() => {
     const fetchJobDetails = async () => {

@@ -7,7 +7,10 @@ const Education = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
   const [education, setEducation] = useState([]);
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
 
   // Fetch education data from backend
   const fetchEducation = async () => {

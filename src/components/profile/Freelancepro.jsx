@@ -16,7 +16,10 @@ const Freelancepro = ({ username }) => {
     { projectName: "", description: "", files: [] },
   ]);
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
 
   // Fetch freelance info from backend
   const fetchFreelanceInfo = async () => {

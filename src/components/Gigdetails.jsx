@@ -37,7 +37,10 @@ const Gigdetails = () => {
     // console.log(userId);
   }
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
 
   useEffect(() => {
     const fetchJobs = async () => {

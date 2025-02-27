@@ -13,7 +13,10 @@ const Chat = () => {
   const [worklobBalance, setWorklobBalance] = useState("0");
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
   const token = localStorage.getItem("token");
 
   let userId;

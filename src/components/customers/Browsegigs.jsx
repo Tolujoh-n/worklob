@@ -10,7 +10,10 @@ const Browsegigs = () => {
   const [sortBy, setSortBy] = useState("latest");
   const [roleFilter, setRoleFilter] = useState("");
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+        process.env.REACT_APP_API_URL ||
+        "https://worklob-backend.onrender.com" ||
+        "http://localhost:8080";
 
   useEffect(() => {
     const fetchFrJobs = async () => {

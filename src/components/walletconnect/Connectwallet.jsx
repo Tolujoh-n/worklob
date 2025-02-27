@@ -65,7 +65,7 @@ const Connectwallet = () => {
       );
 
       const response = await axios.post(
-        "http://localhost:8080/api/v1/user/change-role",
+        "https://worklob-backend.onrender.com/api/v1/user/change-role",
         {
           userId,
           role: newRole,
@@ -104,7 +104,10 @@ const Connectwallet = () => {
     }
   };
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
   const handleLogout = async () => {
     setIsLoading(true);
     try {

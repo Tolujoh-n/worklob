@@ -20,6 +20,10 @@ const Register = () => {
     setFormData({ ...formData, role });
     setRoleSelected(true);
   };
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://worklob-backend.onrender.com" ||
+    "http://localhost:8080";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +59,7 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/user/signup",
+        "https://worklob-backend.onrender.com/api/v1/user/signup",
         {
           username: formData.username,
           email: formData.email,
