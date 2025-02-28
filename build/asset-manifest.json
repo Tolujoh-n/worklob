@@ -1,0 +1,31 @@
+{
+  "files": {
+    "main.css": "/static/css/main.f06f9481.css",
+    "main.js": "/static/js/main.024c3b93.js",
+    "static/js/511.01271755.chunk.js": "/static/js/511.01271755.chunk.js",
+    "static/media/remixicon.svg?t=1687271883607": "/static/media/remixicon.84630bafd47d16c17a08.svg",
+    "static/media/boxicons.svg": "/static/media/boxicons.61829f134e586c0c9e89.svg",
+    "static/media/remixicon.eot?t=1687271883607": "/static/media/remixicon.83e9a22ce7f199999169.eot",
+    "static/media/remixicon.ttf?t=1687271883607": "/static/media/remixicon.0bcb16fc20c3d365da14.ttf",
+    "static/media/boxicons.eot": "/static/media/boxicons.65a8ce52fc5427e8f94d.eot",
+    "static/media/boxicons.woff": "/static/media/boxicons.d12afc36557395143e4b.woff",
+    "static/media/boxicons.ttf": "/static/media/boxicons.db9ddb1898dbd76badca.ttf",
+    "static/media/remixicon.woff?t=1687271883607": "/static/media/remixicon.3f0f84f17d39491e07ff.woff",
+    "static/media/bootstrap-icons.woff?": "/static/media/bootstrap-icons.4753c5ba57962b4d7bf8.woff",
+    "static/media/remixicon.woff2?t=1687271883607": "/static/media/remixicon.85992a032c7668836563.woff2",
+    "static/media/bootstrap-icons.woff2?": "/static/media/bootstrap-icons.6d63d0501e5ed7b79dab.woff2",
+    "static/media/boxicons.woff2": "/static/media/boxicons.df635aaf04cd75132f62.woff2",
+    "static/media/worklob-logo-cp-no-bg.png": "/static/media/worklob-logo-cp-no-bg.1f90b9d0982745151ac1.png",
+    "static/media/worklob-logo.png": "/static/media/worklob-logo.6baf282e7d18231f2b18.png",
+    "static/media/worklob-coin.png": "/static/media/worklob-coin.e18c34312abaf171aa93.png",
+    "static/media/worklob-logo-cp.png": "/static/media/worklob-logo-cp.652e37d3323c69e1ae4d.png",
+    "index.html": "/index.html",
+    "main.f06f9481.css.map": "/static/css/main.f06f9481.css.map",
+    "main.024c3b93.js.map": "/static/js/main.024c3b93.js.map",
+    "511.01271755.chunk.js.map": "/static/js/511.01271755.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f06f9481.css",
+    "static/js/main.024c3b93.js"
+  ]
+}
