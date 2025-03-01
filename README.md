@@ -1,4 +1,8 @@
-# Getting Started WorkLob
+# WORKLOB: Central Hub for Jobs and Talent
+
+-WorkLob is the ultimate platform connecting job seekers, employers, and freelancers. Whether you're looking for full-time, part-time, or freelance work—or you're a job creator searching for top talent—WorkLob brings everything about jobs and opportunities into one place.
+
+## Getting Started WorkLob
 
 ## WorkLob WhitePaper: https://docs.google.com/document/d/1eSffapuMNv2RsnZKFVqBN0wbX-oP0-eaVAjt1sLYCdo/edit?usp=sharing
 
