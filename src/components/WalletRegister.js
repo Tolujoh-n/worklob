@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/img/worklob-logo-cp-no-bg.png";
 import metamask from "../assets/img/metamask.png";
@@ -28,14 +28,20 @@ const WalletRegister = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const getWalletAddress = async () => {
+    if (!walletAddress) {
+      await connectWallet();
+    }
+    setFormData((prevData) => ({
+      ...prevData,
+      walletAddress: walletAddress,
+    }));
+    toast.success("Wallet connected successfully!");
+  };
+
   const handleWalletConnect = async () => {
     try {
-      await connectWallet();
-      setFormData((prevData) => ({
-        ...prevData,
-        walletAddress: walletAddress,
-      }));
-      toast.success("Wallet connected successfully!");
+      await getWalletAddress();
     } catch (error) {
       toast.error("Failed to connect wallet.");
     }
@@ -85,6 +91,15 @@ const WalletRegister = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (connected && !formData.walletAddress) {
+      setFormData((prevData) => ({
+        ...prevData,
+        walletAddress: walletAddress,
+      }));
+    }
+  }, [connected, walletAddress]);
 
   return (
     <div>
@@ -164,24 +179,27 @@ const WalletRegister = () => {
                   disabled
                 />
               </div>
-              <button
-                id="connbtn"
-                type="button"
-                style={{ marginBottom: "20px" }}
-                onClick={handleWalletConnect}
-              >
-                <img
-                  src={metamask}
-                  alt="Wallet"
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    marginRight: "8px",
-                  }}
-                />
-                {connected ? "Wallet Connected" : "Connect Wallet"}
-              </button>
+              
+              {!walletAddress && (
+                <button
+                  id="connbtn"
+                  type="button"
+                  style={{ marginBottom: "20px" }}
+                  onClick={handleWalletConnect}
+                >
+                  <img
+                    src={metamask}
+                    alt="Wallet"
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      marginRight: "8px",
+                    }}
+                  />
+                  Connect Wallet
+                </button>
+              )}
               <button id="optionbut" type="submit">
                 Sign Up
               </button>
