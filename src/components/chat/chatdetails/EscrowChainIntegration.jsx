@@ -2,14 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ethers } from "ethers";
 import { JOB_CONTRACT_ADDRESS, JOB_ABI } from "../../Constants";
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const workLOB = new ethers.Contract(JOB_CONTRACT_ADDRESS, JOB_ABI, signer);
+import API_URL from "../../../config";
 
 async function getAmount(jobId) {
   console.log("Fetching amount for jobId:", jobId);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   try {
     let response = await axios.get(
@@ -61,6 +57,10 @@ export async function deposit(
   customerWallet,
   chatId
 ) {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const workLOB = new ethers.Contract(JOB_CONTRACT_ADDRESS, JOB_ABI, signer);
+
   const amount = await getAmount(jobId);
   if (!amount) {
     console.error("Amount not found for jobId:", jobId);
@@ -103,6 +103,10 @@ export async function complete(
   talentWallet,
   chatId
 ) {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const workLOB = new ethers.Contract(JOB_CONTRACT_ADDRESS, JOB_ABI, signer);
+
   console.log("Complete function triggered with data:");
   console.log({
     jobId,
@@ -136,6 +140,10 @@ export async function confirm(
   customerWallet,
   chatId
 ) {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const workLOB = new ethers.Contract(JOB_CONTRACT_ADDRESS, JOB_ABI, signer);
+
   console.log("Confirm function triggered with data:");
   console.log({
     jobId,

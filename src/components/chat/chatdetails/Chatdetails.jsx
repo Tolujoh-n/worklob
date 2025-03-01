@@ -8,6 +8,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 import Chatsidecard from "./Chatsidecard";
+import API_URL from "../../../config";
 
 const Chatdetails = () => {
   const [activeCategory, setActiveCategory] = useState("Thread");
@@ -37,7 +38,7 @@ const Chatdetails = () => {
     isTalent = user.role === "Talent"; // Assuming 'role' defines if user is 'talent'
   }
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+
 
   useEffect(() => {
     const fetchJobDetails = async () => {

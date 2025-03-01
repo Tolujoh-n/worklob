@@ -4,6 +4,7 @@ import axios from "axios";
 import person from "../../assets/address.jpg"; // Fallback image
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Myfreelance = () => {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -12,8 +13,6 @@ const Myfreelance = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   let userId;
   if (token) {

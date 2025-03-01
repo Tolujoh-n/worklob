@@ -4,12 +4,12 @@ import profile from "../assets/address.jpg";
 import { Link, useParams } from "react-router-dom";
 import { FaFileAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
+import API_URL from "../config";
 
 const Userprofile = () => {
   const { username } = useParams();
   const token = localStorage.getItem("token");
   const us = JSON.parse(localStorage.getItem("user"));
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   let userName;
 

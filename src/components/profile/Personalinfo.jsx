@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { FaEdit } from "react-icons/fa";
 import person from "../../assets/address.jpg";
 import axios from "axios";
+import API_URL from "../../config";
 
 const Personalinfo = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
@@ -16,8 +17,6 @@ const Personalinfo = ({ username }) => {
   });
   const [isNewProfile, setIsNewProfile] = useState(true);
   const [profileImageFile, setProfileImageFile] = useState(null);
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   const fetchProfile = async () => {
     try {

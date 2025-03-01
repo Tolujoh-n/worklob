@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import API_URL from "../config";
 
 const Buygigmodal = ({
   recruiterImage,
@@ -37,7 +38,6 @@ const Buygigmodal = ({
     formData.append("userRole", userRole); // Add this line
 
     try {
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
       const response = await axios.post(
         `${API_URL}/api/v1/application/buyGig`,
         formData,

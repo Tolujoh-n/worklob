@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaPlus } from "react-icons/fa";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Education = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
   const [education, setEducation] = useState([]);
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   // Fetch education data from backend
   const fetchEducation = async () => {

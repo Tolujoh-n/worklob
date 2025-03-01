@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useimage from "../assets/address.jpg";
 import { Toaster, toast } from "sonner";
+import API_URL from "../config";
 
 const Followhr = () => {
   const [topCustomers, setTopCustomers] = useState([]);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     const fetchJobs = async () => {

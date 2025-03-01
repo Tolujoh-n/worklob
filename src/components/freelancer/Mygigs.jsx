@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Mygigs = () => {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -26,8 +27,6 @@ const Mygigs = () => {
       console.error("Error decoding token:", error);
     }
   }
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   // Fetch job statuses to filter jobs by status
   const fetchJobStatuses = async () => {

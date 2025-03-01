@@ -3,6 +3,7 @@ import axios from "axios";
 import person from "../../assets/address.jpg";
 import { FaEdit, FaPlus, FaFileAlt } from "react-icons/fa";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const Freelancepro = ({ username }) => {
   const [editingSection, setEditingSection] = useState(null);
@@ -15,8 +16,6 @@ const Freelancepro = ({ username }) => {
   const [portfolio, setPortfolio] = useState([
     { projectName: "", description: "", files: [] },
   ]);
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   // Fetch freelance info from backend
   const fetchFreelanceInfo = async () => {

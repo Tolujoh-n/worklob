@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import person from "../assets/address.jpg";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../config";
 
 const Fulltimejob = () => {
   const [jobs, setJobs] = useState([]);
@@ -9,8 +10,6 @@ const Fulltimejob = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     const fetchJobs = async () => {

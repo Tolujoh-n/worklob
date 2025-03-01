@@ -5,6 +5,7 @@ import Education from "./Education";
 import Sociallink from "./Sociallink";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const EditProfile = () => {
   const token = localStorage.getItem("token");
@@ -23,8 +24,6 @@ const EditProfile = () => {
 
   // Add a fallback for user
   const username = user ? user.username : "Guest";
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   return (
     <div className="gigprofile container">

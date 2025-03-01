@@ -5,6 +5,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import API_URL from "../../config";
 
 const availableSkills = [
   "JavaScript",
@@ -37,7 +38,7 @@ const Freelanceform = () => {
   const handleSkillSelect = (skill) => {
     if (!selectedSkills.includes(skill)) {
       setSelectedSkills([...selectedSkills, skill]);
-      setSkillInput(""); 
+      setSkillInput("");
     }
   };
 
@@ -47,9 +48,9 @@ const Freelanceform = () => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const fileNames = files.map((file) => file.name); 
+    const fileNames = files.map((file) => file.name);
     if (fileNames.length + fileList.length <= 10) {
-      setFileList([...fileList, ...fileNames]); 
+      setFileList([...fileList, ...fileNames]);
     } else {
       alert("You can only upload a maximum of 10 files.");
     }
@@ -68,9 +69,9 @@ const Freelanceform = () => {
     e.preventDefault();
     setDragging(false);
     const files = Array.from(e.dataTransfer.files);
-    const fileNames = files.map((file) => file.name); 
+    const fileNames = files.map((file) => file.name);
     if (fileNames.length + fileList.length <= 10) {
-      setFileList([...fileList, ...fileNames]); 
+      setFileList([...fileList, ...fileNames]);
     } else {
       alert("You can only upload a maximum of 10 files.");
     }
@@ -97,11 +98,10 @@ const Freelanceform = () => {
       description: sanitizedDescription,
       selectedSkills,
       budget,
-      fileList, 
+      fileList,
       userId,
     };
 
-    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
     try {
       const response = await axios.post(
         `${API_URL}/api/v1/gigJob/postgig`,
@@ -115,7 +115,10 @@ const Freelanceform = () => {
         }, 2000);
       }
     } catch (e) {
-      console.error("Error posting job:", e.response ? e.response.data : e.message);
+      console.error(
+        "Error posting job:",
+        e.response ? e.response.data : e.message
+      );
     }
   };
 
@@ -231,8 +234,6 @@ const Freelanceform = () => {
               cryptocurrency that you arrange with the talent.
             </small>
           </div>
-
-         
 
           <div className="freelform__buttons">
             <button type="button" className="usbutton">

@@ -9,6 +9,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Morejobs from "./Morejobs";
 import Followhr from "./Followhr";
+import API_URL from "../config";
 
 const Gigdetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,8 +37,6 @@ const Gigdetails = () => {
     applicantId = decodedToken.userId;
     // console.log(userId);
   }
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     const fetchJobs = async () => {

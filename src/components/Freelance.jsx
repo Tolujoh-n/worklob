@@ -3,14 +3,13 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import person from "../assets/address.jpg";
 import Modal from "./Modal";
+import API_URL from "../config";
 
 const Freelance = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     const fetchFrJobs = async () => {

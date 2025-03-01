@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { useWeb3 } from "../../Web3Provider";
+import API_URL from "../../config";
 
 const Connectwallet = () => {
   const { connectWallet, walletAddress, connected, disconnectWallet } =
@@ -64,13 +65,10 @@ const Connectwallet = () => {
         }
       );
 
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/user/change-role",
-        {
-          userId,
-          role: newRole,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/v1/user/change-role`, {
+        userId,
+        role: newRole,
+      });
 
       if (response.status === 200) {
         const updatedUser = { ...user, role: newRole };
@@ -104,7 +102,6 @@ const Connectwallet = () => {
     }
   };
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
   const handleLogout = async () => {
     setIsLoading(true);
     try {
